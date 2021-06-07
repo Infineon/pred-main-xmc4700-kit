@@ -1,0 +1,4 @@
+clean2:	
+	-@echo All content from $(CURDIR) will be deleted!
+	-$(RM) $(CURDIR)/*
+	-@echo clean2 is finished

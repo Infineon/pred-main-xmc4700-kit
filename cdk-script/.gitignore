@@ -1,0 +1,10 @@
+target
+.idea
+.aws
+.env
+!tools
+aws
+
+tools/pyscripts/__pycache__/
+
+cf/RealTimeStack-packaged.yaml

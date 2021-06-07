@@ -1,0 +1,419 @@
+package Model.APPS.ADC_MEASUREMENT_ADV.v4_0_20;
+
+// Import statements
+import ifx.davex.app.manifest.*
+
+abstract class ADC_MEASUREMENT_ADV_GUI extends AppManifest {
+	/* Begin : UI variable section */
+	 public GTab gtab_overview;
+	 public GTab gtab_general_configuration;
+	 public GTab gtab_queue_source_sequencer;
+	 public GTab gtab_interrupt;
+	 public GTab gtab_dummy_labels;
+	 public GImage gimage_overview;
+	 public GImage gimage_channel_config;
+	 public GImage gimage_post_proc;
+	 public GImage gimage_sync_group;
+	 public GImage gimage_boundary;
+	 public GInteger gfloat_no_of_channels;
+	 public GInteger ginteger_num_cev;
+	 public GInteger ginteger_num_sync_slaves;
+	 public GInteger ginteger_num_rev;
+	 public GInteger ginteger_num_src_event;
+	 public GCombo gcombo_req_src_selection;
+	 public GCombo gcombo_trigger_edge_select;
+	 public GCombo gcombo_gating_select;
+	 public GCombo gcombo_priority;
+	 public GCombo gcombo_adc_startmode;
+	 public GCombo gcombo_convert_mode;
+	 public GCombo gcombo_gain_ch_a;
+	 public GCombo gcombo_gain_ch_b;
+	 public GCombo gcombo_gain_ch_c;
+	 public GCombo gcombo_gain_ch_d;
+	 public GCombo gcombo_gain_ch_e;
+	 public GCombo gcombo_gain_ch_f;
+	 public GCombo gcombo_gain_ch_g;
+	 public GCombo gcombo_gain_ch_h;
+	 public GCombo gcombo_input_ref_a;
+	 public GCombo gcombo_input_ref_b;
+	 public GCombo gcombo_input_ref_c;
+	 public GCombo gcombo_input_ref_d;
+	 public GCombo gcombo_input_ref_e;
+	 public GCombo gcombo_input_ref_f;
+	 public GCombo gcombo_input_ref_g;
+	 public GCombo gcombo_input_ref_h;
+	 public GCombo gcombo_q_entry_0;
+	 public GCombo gcombo_q_entry_1;
+	 public GCombo gcombo_q_entry_2;
+	 public GCombo gcombo_q_entry_3;
+	 public GCombo gcombo_q_entry_4;
+	 public GCombo gcombo_q_entry_5;
+	 public GCombo gcombo_q_entry_6;
+	 public GCombo gcombo_q_entry_7;
+	 public GCombo gcombo_fifo_enable_ch_a;
+	 public GCombo gcombo_filter_ch_a;
+	 public GCombo gcombo_fifo_enable_ch_b;
+	 public GCombo gcombo_filter_ch_b;
+	 public GCombo gcombo_fifo_enable_ch_c;
+	 public GCombo gcombo_filter_ch_c;
+	 public GCombo gcombo_fifo_enable_ch_d;
+	 public GCombo gcombo_filter_ch_d;
+	 public GCombo gcombo_fifo_enable_ch_e;
+	 public GCombo gcombo_filter_ch_e;
+	 public GCombo gcombo_fifo_enable_ch_f;
+	 public GCombo gcombo_filter_ch_f;
+	 public GCombo gcombo_fifo_enable_ch_g;
+	 public GCombo gcombo_filter_ch_g;
+	 public GCombo gcombo_fifo_enable_ch_h;
+	 public GCombo gcombo_filter_ch_h;
+	 public GCombo gcombo_sync_groups_required;
+	 public GCombo gcombo_ncm_ch_0;
+	 public GCombo gcombo_boundsell_ch_0;
+	 public GCombo gcombo_boundselu_ch_0;
+	 public GCombo gcombo_chev_ch_0;
+	 public GCombo gcombo_bfl_ctrl_ch_0;
+	 public GCombo gcombo_ncm_ch_1;
+	 public GCombo gcombo_boundsell_ch_1;
+	 public GCombo gcombo_boundselu_ch_1;
+	 public GCombo gcombo_chev_ch_1;
+	 public GCombo gcombo_bfl_ctrl_ch_1;
+	 public GCombo gcombo_ncm_ch_2;
+	 public GCombo gcombo_boundsell_ch_2;
+	 public GCombo gcombo_boundselu_ch_2;
+	 public GCombo gcombo_chev_ch_2;
+	 public GCombo gcombo_bfl_ctrl_ch_2;
+	 public GCombo gcombo_ncm_ch_3;
+	 public GCombo gcombo_boundsell_ch_3;
+	 public GCombo gcombo_boundselu_ch_3;
+	 public GCombo gcombo_chev_ch_3;
+	 public GCombo gcombo_bfl_ctrl_ch_3;
+	 public GFloat gstring_actual_sampleT;
+	 public GFloat gstring_coversion_time;
+	 public GFloat gfloat_desired_sampleT;
+	 public GFloat gfloat_actual_sample_time;
+	 public GFloat gfloat_total_coversion_time;
+	 public GString gstring_trigger_edge_sel;
+	 public GString gstring_gating_sel;
+	 public GString gstring_conv_mode;
+	 public GString gstring_channel_name_a;
+	 public GString gstring_channel_name_b;
+	 public GString gstring_channel_name_c;
+	 public GString gstring_channel_name_d;
+	 public GString gstring_channel_name_e;
+	 public GString gstring_channel_name_f;
+	 public GString gstring_channel_name_g;
+	 public GString gstring_channel_name_h;
+	 public GString gstring_postproc_channel_name_a;
+	 public GString gstring_postproc_channel_name_b;
+	 public GString gstring_postproc_channel_name_c;
+	 public GString gstring_postproc_channel_name_d;
+	 public GString gstring_postproc_channel_name_e;
+	 public GString gstring_postproc_channel_name_f;
+	 public GString gstring_postproc_channel_name_g;
+	 public GString gstring_postproc_channel_name_h;
+	 public GString gstring_sync_master_name_a;
+	 public GString gstring_sync_master_name_b;
+	 public GString gstring_sync_master_name_c;
+	 public GString gstring_sync_master_name_d;
+	 public GString gstring_sync_slave_A_name_a;
+	 public GString gstring_sync_slave_A_name_b;
+	 public GString gstring_sync_slave_A_name_c;
+	 public GString gstring_sync_slave_A_name_d;
+	 public GString gstring_sync_slave_B_name_a;
+	 public GString gstring_sync_slave_B_name_b;
+	 public GString gstring_sync_slave_B_name_c;
+	 public GString gstring_sync_slave_B_name_d;
+	 public GString gstring_sync_slave_C_name_a;
+	 public GString gstring_sync_slave_C_name_b;
+	 public GString gstring_sync_slave_C_name_c;
+	 public GString gstring_sync_slave_C_name_d;
+	 public GString gstring_callback_function;
+	 public GCheck gcheck_insert_at_init;
+	 public GCheck gcheck_expose_queue_scan;
+	 public GCheck gcheck_autoscan_enable;
+	 public GCheck gcheck_share_all_pins;
+	 public GCheck gcheck_shared_pin_a;
+	 public GCheck gcheck_shared_pin_b;
+	 public GCheck gcheck_shared_pin_c;
+	 public GCheck gcheck_shared_pin_d;
+	 public GCheck gcheck_shared_pin_e;
+	 public GCheck gcheck_shared_pin_f;
+	 public GCheck gcheck_shared_pin_g;
+	 public GCheck gcheck_shared_pin_h;
+	 public GCheck gcheck_wfr_ch_a;
+	 public GCheck gcheck_wfr_ch_b;
+	 public GCheck gcheck_wfr_ch_c;
+	 public GCheck gcheck_wfr_ch_d;
+	 public GCheck gcheck_wfr_ch_e;
+	 public GCheck gcheck_wfr_ch_f;
+	 public GCheck gcheck_wfr_ch_g;
+	 public GCheck gcheck_wfr_ch_h;
+	 public GCheck gcheck_enable_res_evt_ch_a;
+	 public GCheck gcheck_enable_res_evt_ch_b;
+	 public GCheck gcheck_enable_res_evt_ch_c;
+	 public GCheck gcheck_enable_res_evt_ch_d;
+	 public GCheck gcheck_enable_res_evt_ch_e;
+	 public GCheck gcheck_enable_res_evt_ch_f;
+	 public GCheck gcheck_enable_res_evt_ch_g;
+	 public GCheck gcheck_enable_res_evt_ch_h;
+	 public GCheck gcheck_ext_trig_q_entry_0;
+	 public GCheck gcheck_ext_trig_q_entry_1;
+	 public GCheck gcheck_ext_trig_q_entry_2;
+	 public GCheck gcheck_ext_trig_q_entry_3;
+	 public GCheck gcheck_ext_trig_q_entry_4;
+	 public GCheck gcheck_ext_trig_q_entry_5;
+	 public GCheck gcheck_ext_trig_q_entry_6;
+	 public GCheck gcheck_ext_trig_q_entry_7;
+	 public GCheck gcheck_refill_q_entry_0;
+	 public GCheck gcheck_refill_q_entry_1;
+	 public GCheck gcheck_refill_q_entry_2;
+	 public GCheck gcheck_refill_q_entry_3;
+	 public GCheck gcheck_refill_q_entry_4;
+	 public GCheck gcheck_refill_q_entry_5;
+	 public GCheck gcheck_refill_q_entry_6;
+	 public GCheck gcheck_refill_q_entry_7;
+	 public GCheck gcheck_src_evt_q_entry_0;
+	 public GCheck gcheck_src_evt_q_entry_1;
+	 public GCheck gcheck_src_evt_q_entry_2;
+	 public GCheck gcheck_src_evt_q_entry_3;
+	 public GCheck gcheck_src_evt_q_entry_4;
+	 public GCheck gcheck_src_evt_q_entry_5;
+	 public GCheck gcheck_src_evt_q_entry_6;
+	 public GCheck gcheck_src_evt_q_entry_7;
+	 public GCheck gcheck_subtraction_mode_result_reg;
+	 public GCheck gcheck_sync_master_a;
+	 public GCheck gcheck_sync_master_b;
+	 public GCheck gcheck_sync_master_c;
+	 public GCheck gcheck_sync_master_d;
+	 public GCheck gcheck_config_globiclass1;
+	 public GCheck gcheck_enable_callback;
+	 public GLabel glabel_trigger_note;
+	 public GLabel glabel_trigger_edge_select;
+	 public GLabel glabel_gating_select;
+	 public GLabel glabel_priority;
+	 public GLabel glabel_adc_startmode;
+	 public GLabel glabel_convert_mode;
+	 public GLabel glabel_desired_sampleT;
+	 public GLabel glabel_actual_sample_time;
+	 public GLabel glabel_total_coversion_time;
+	 public GLabel glabel_conversion_limitation;
+	 public GLabel glabel_wait_for_trigger_note;
+	 public GLabel glabel_sync_note;
+	 public GLabel glabel_global_iclass1;
+	 public GLabel glabel_callback_function;
+	 public GGroup gGroup_queue_config;
+	 public GGroup gGroup_class_config;
+	 public GInterruptPrio ginterruptprio_request_src_intr;
+	 public GMessage gmessage_trigger_autoscan_warning;
+	 public GMessage gmessage_intr_callback_info;
+	 public GMessage gmessage_req_src_callback;
+
+	 public ADC_MEASUREMENT_ADV_GUI(DaveEnv daveEnv){
+
+	 gtab_overview = GTab(widgetName:"gtab_overview", text:"Overview", enabled:true, visible:true)
+	 gtab_general_configuration = GTab(widgetName:"gtab_general_configuration", text:"General Settings", enabled:true, visible:true)
+	 gtab_queue_source_sequencer = GTab(widgetName:"gtab_queue_source_sequencer", text:"Sequence Plan", enabled:true, visible:true)
+	 gtab_interrupt = GTab(widgetName:"gtab_interrupt", text:"Interrupts", enabled:true, visible:true)
+	 gtab_dummy_labels = GTab(widgetName:"gtab_dummy_labels", text:"Dummy labels", enabled:false, visible:true)
+	 gimage_overview = GImage(widgetName:"gimage_overview", path: "Uimodel/General_settings_adc_queue_scan.png", enabled:true, visible:true)
+	 gimage_channel_config = GImage(widgetName:"gimage_channel_config", path: "Uimodel/channel_configuration_xmc1.png", enabled:true, visible:true)
+	 gimage_post_proc = GImage(widgetName:"gimage_post_proc", path: "Uimodel/post_proc_subtraction_mode.png", enabled:true, visible:true)
+	 gimage_sync_group = GImage(widgetName:"gimage_sync_group", path: "Uimodel/Sync_3_groups.png", enabled:true, visible:true)
+	 gimage_boundary = GImage(widgetName:"gimage_boundary", path: "Uimodel/ADC_measurement_advanced_limitcheck.PNG", enabled:true, visible:true)
+	 gfloat_no_of_channels = GInteger(widgetName:"gfloat_no_of_channels", value:1, minValue:1, maxValue:8, enabled:true, visible:true, isMandatoryValue:false)
+	 ginteger_num_cev = GInteger(widgetName:"ginteger_num_cev", value:0, minValue:0, maxValue:4, enabled:false, visible:true, isMandatoryValue:false)
+	 ginteger_num_sync_slaves = GInteger(widgetName:"ginteger_num_sync_slaves", value:0, minValue:0, maxValue:32, enabled:false, visible:true, isMandatoryValue:false)
+	 ginteger_num_rev = GInteger(widgetName:"ginteger_num_rev", value:0, minValue:0, maxValue:8, enabled:false, visible:true, isMandatoryValue:false)
+	 ginteger_num_src_event = GInteger(widgetName:"ginteger_num_src_event", value:0, minValue:0, maxValue:8, enabled:false, visible:true, isMandatoryValue:false)
+	 gcombo_req_src_selection = GCombo(widgetName:"gcombo_req_src_selection", options:["ADC_SCAN_APP","ADC_QUEUE_APP"], value:"ADC_SCAN_APP", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_trigger_edge_select = GCombo(widgetName:"gcombo_trigger_edge_select", options:["No External Trigger","External Trigger Upon Rising Edge","External Trigger Upon Falling Edge","External Trigger Upon Both The Edge"], value:"No External Trigger", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_gating_select = GCombo(widgetName:"gcombo_gating_select", options:["No Conversion Request is Issued","All Conversion Requests are Issued","Conversion Request Issued When Gate is High","Conversion Request Issued When Gate is Low"], value:"All Conversion Requests are Issued", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_priority = GCombo(widgetName:"gcombo_priority", options:["Priority-0  (Lowest Priority)","Priority-1","Priority-2","Priority-3 (Highest Priority)"], value:"Priority-0  (Lowest Priority)", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_adc_startmode = GCombo(widgetName:"gcombo_adc_startmode", options:["Wait For Start Mode","Cancel Inject Repeat Mode","Cancel Inject With Cancel Mode"], value:"Wait For Start Mode", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_convert_mode = GCombo(widgetName:"gcombo_convert_mode", options:["12 Bit Conversion","10 Bit Conversion","8 Bit Conversion","10 Bit Fast Conversion"], value:"12 Bit Conversion", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_gain_ch_a = GCombo(widgetName:"gcombo_gain_ch_a", options:["1:1","1:3","1:6","1:12"], value:"1:1", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_gain_ch_b = GCombo(widgetName:"gcombo_gain_ch_b", options:["1:1","1:3","1:6","1:12"], value:"1:1", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_gain_ch_c = GCombo(widgetName:"gcombo_gain_ch_c", options:["1:1","1:3","1:6","1:12"], value:"1:1", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_gain_ch_d = GCombo(widgetName:"gcombo_gain_ch_d", options:["1:1","1:3","1:6","1:12"], value:"1:1", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_gain_ch_e = GCombo(widgetName:"gcombo_gain_ch_e", options:["1:1","1:3","1:6","1:12"], value:"1:1", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_gain_ch_f = GCombo(widgetName:"gcombo_gain_ch_f", options:["1:1","1:3","1:6","1:12"], value:"1:1", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_gain_ch_g = GCombo(widgetName:"gcombo_gain_ch_g", options:["1:1","1:3","1:6","1:12"], value:"1:1", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_gain_ch_h = GCombo(widgetName:"gcombo_gain_ch_h", options:["1:1","1:3","1:6","1:12"], value:"1:1", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_input_ref_a = GCombo(widgetName:"gcombo_input_ref_a", options:["VAref","CH0"], value:"VAref", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_input_ref_b = GCombo(widgetName:"gcombo_input_ref_b", options:["VAref","CH0"], value:"VAref", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_input_ref_c = GCombo(widgetName:"gcombo_input_ref_c", options:["VAref","CH0"], value:"VAref", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_input_ref_d = GCombo(widgetName:"gcombo_input_ref_d", options:["VAref","CH0"], value:"VAref", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_input_ref_e = GCombo(widgetName:"gcombo_input_ref_e", options:["VAref","CH0"], value:"VAref", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_input_ref_f = GCombo(widgetName:"gcombo_input_ref_f", options:["VAref","CH0"], value:"VAref", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_input_ref_g = GCombo(widgetName:"gcombo_input_ref_g", options:["VAref","CH0"], value:"VAref", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_input_ref_h = GCombo(widgetName:"gcombo_input_ref_h", options:["VAref","CH0"], value:"VAref", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_q_entry_0 = GCombo(widgetName:"gcombo_q_entry_0", options:["None"], value:"None", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_q_entry_1 = GCombo(widgetName:"gcombo_q_entry_1", options:["None"], value:"None", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_q_entry_2 = GCombo(widgetName:"gcombo_q_entry_2", options:["None"], value:"None", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_q_entry_3 = GCombo(widgetName:"gcombo_q_entry_3", options:["None"], value:"None", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_q_entry_4 = GCombo(widgetName:"gcombo_q_entry_4", options:["None"], value:"None", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_q_entry_5 = GCombo(widgetName:"gcombo_q_entry_5", options:["None"], value:"None", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_q_entry_6 = GCombo(widgetName:"gcombo_q_entry_6", options:["None"], value:"None", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_q_entry_7 = GCombo(widgetName:"gcombo_q_entry_7", options:["None"], value:"None", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_fifo_enable_ch_a = GCombo(widgetName:"gcombo_fifo_enable_ch_a", options:["No","2 Stages","3 Stages","4 Stages","6 Stages","8 Stages","12 Stages","16 Stages"], value:"No", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_filter_ch_a = GCombo(widgetName:"gcombo_filter_ch_a", options:["No","Subtraction Mode","Accumulate 2x","Accumulate 3x","Accumulate 4x","FIR (a=2, b=1, c=0)","FIR (a=1, b=2, c=0)","FIR (a=2, b=0, c=1)","FIR (a=1, b=1, c=1)","FIR (a=1, b=0, c=2)","FIR (a=3, b=1, c=0)","FIR (a=2, b=2, c=0)","FIR (a=1, b=3, c=0)","FIR (a=3, b=0, c=1)","FIR (a=2, b=1, c=1)","FIR (a=1, b=2, c=1)","FIR (a=2, b=0, c=2)","FIR (a=1, b=1, c=2)","FIR (a=1, b=0, c=3)","IIR (a=2, b=2)","IIR (a=3, B=4)"], value:"No", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_fifo_enable_ch_b = GCombo(widgetName:"gcombo_fifo_enable_ch_b", options:["No","2 Stages","3 Stages","4 Stages","6 Stages","8 Stages","12 Stages","16 Stages"], value:"No", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_filter_ch_b = GCombo(widgetName:"gcombo_filter_ch_b", options:["No","Subtraction Mode","Accumulate 2x","Accumulate 3x","Accumulate 4x","FIR (a=2, b=1, c=0)","FIR (a=1, b=2, c=0)","FIR (a=2, b=0, c=1)","FIR (a=1, b=1, c=1)","FIR (a=1, b=0, c=2)","FIR (a=3, b=1, c=0)","FIR (a=2, b=2, c=0)","FIR (a=1, b=3, c=0)","FIR (a=3, b=0, c=1)","FIR (a=2, b=1, c=1)","FIR (a=1, b=2, c=1)","FIR (a=2, b=0, c=2)","FIR (a=1, b=1, c=2)","FIR (a=1, b=0, c=3)","IIR (a=2, b=2)","IIR (a=3, B=4)"], value:"No", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_fifo_enable_ch_c = GCombo(widgetName:"gcombo_fifo_enable_ch_c", options:["No","2 Stages","3 Stages","4 Stages","6 Stages","8 Stages","12 Stages","16 Stages"], value:"No", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_filter_ch_c = GCombo(widgetName:"gcombo_filter_ch_c", options:["No","Subtraction Mode","Accumulate 2x","Accumulate 3x","Accumulate 4x","FIR (a=2, b=1, c=0)","FIR (a=1, b=2, c=0)","FIR (a=2, b=0, c=1)","FIR (a=1, b=1, c=1)","FIR (a=1, b=0, c=2)","FIR (a=3, b=1, c=0)","FIR (a=2, b=2, c=0)","FIR (a=1, b=3, c=0)","FIR (a=3, b=0, c=1)","FIR (a=2, b=1, c=1)","FIR (a=1, b=2, c=1)","FIR (a=2, b=0, c=2)","FIR (a=1, b=1, c=2)","FIR (a=1, b=0, c=3)","IIR (a=2, b=2)","IIR (a=3, B=4)"], value:"No", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_fifo_enable_ch_d = GCombo(widgetName:"gcombo_fifo_enable_ch_d", options:["No","2 Stages","3 Stages","4 Stages","6 Stages","8 Stages","12 Stages","16 Stages"], value:"No", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_filter_ch_d = GCombo(widgetName:"gcombo_filter_ch_d", options:["No","Subtraction Mode","Accumulate 2x","Accumulate 3x","Accumulate 4x","FIR (a=2, b=1, c=0)","FIR (a=1, b=2, c=0)","FIR (a=2, b=0, c=1)","FIR (a=1, b=1, c=1)","FIR (a=1, b=0, c=2)","FIR (a=3, b=1, c=0)","FIR (a=2, b=2, c=0)","FIR (a=1, b=3, c=0)","FIR (a=3, b=0, c=1)","FIR (a=2, b=1, c=1)","FIR (a=1, b=2, c=1)","FIR (a=2, b=0, c=2)","FIR (a=1, b=1, c=2)","FIR (a=1, b=0, c=3)","IIR (a=2, b=2)","IIR (a=3, B=4)"], value:"No", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_fifo_enable_ch_e = GCombo(widgetName:"gcombo_fifo_enable_ch_e", options:["No","2 Stages","3 Stages","4 Stages","6 Stages","8 Stages","12 Stages","16 Stages"], value:"No", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_filter_ch_e = GCombo(widgetName:"gcombo_filter_ch_e", options:["No","Subtraction Mode","Accumulate 2x","Accumulate 3x","Accumulate 4x","FIR (a=2, b=1, c=0)","FIR (a=1, b=2, c=0)","FIR (a=2, b=0, c=1)","FIR (a=1, b=1, c=1)","FIR (a=1, b=0, c=2)","FIR (a=3, b=1, c=0)","FIR (a=2, b=2, c=0)","FIR (a=1, b=3, c=0)","FIR (a=3, b=0, c=1)","FIR (a=2, b=1, c=1)","FIR (a=1, b=2, c=1)","FIR (a=2, b=0, c=2)","FIR (a=1, b=1, c=2)","FIR (a=1, b=0, c=3)","IIR (a=2, b=2)","IIR (a=3, B=4)"], value:"No", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_fifo_enable_ch_f = GCombo(widgetName:"gcombo_fifo_enable_ch_f", options:["No","2 Stages","3 Stages","4 Stages","6 Stages","8 Stages","12 Stages","16 Stages"], value:"No", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_filter_ch_f = GCombo(widgetName:"gcombo_filter_ch_f", options:["No","Subtraction Mode","Accumulate 2x","Accumulate 3x","Accumulate 4x","FIR (a=2, b=1, c=0)","FIR (a=1, b=2, c=0)","FIR (a=2, b=0, c=1)","FIR (a=1, b=1, c=1)","FIR (a=1, b=0, c=2)","FIR (a=3, b=1, c=0)","FIR (a=2, b=2, c=0)","FIR (a=1, b=3, c=0)","FIR (a=3, b=0, c=1)","FIR (a=2, b=1, c=1)","FIR (a=1, b=2, c=1)","FIR (a=2, b=0, c=2)","FIR (a=1, b=1, c=2)","FIR (a=1, b=0, c=3)","IIR (a=2, b=2)","IIR (a=3, B=4)"], value:"No", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_fifo_enable_ch_g = GCombo(widgetName:"gcombo_fifo_enable_ch_g", options:["No","2 Stages","3 Stages","4 Stages","6 Stages","8 Stages","12 Stages","16 Stages"], value:"No", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_filter_ch_g = GCombo(widgetName:"gcombo_filter_ch_g", options:["No","Subtraction Mode","Accumulate 2x","Accumulate 3x","Accumulate 4x","FIR (a=2, b=1, c=0)","FIR (a=1, b=2, c=0)","FIR (a=2, b=0, c=1)","FIR (a=1, b=1, c=1)","FIR (a=1, b=0, c=2)","FIR (a=3, b=1, c=0)","FIR (a=2, b=2, c=0)","FIR (a=1, b=3, c=0)","FIR (a=3, b=0, c=1)","FIR (a=2, b=1, c=1)","FIR (a=1, b=2, c=1)","FIR (a=2, b=0, c=2)","FIR (a=1, b=1, c=2)","FIR (a=1, b=0, c=3)","IIR (a=2, b=2)","IIR (a=3, B=4)"], value:"No", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_fifo_enable_ch_h = GCombo(widgetName:"gcombo_fifo_enable_ch_h", options:["No","2 Stages","3 Stages","4 Stages","6 Stages","8 Stages","12 Stages","16 Stages"], value:"No", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_filter_ch_h = GCombo(widgetName:"gcombo_filter_ch_h", options:["No","Subtraction Mode","Accumulate 2x","Accumulate 3x","Accumulate 4x","FIR (a=2, b=1, c=0)","FIR (a=1, b=2, c=0)","FIR (a=2, b=0, c=1)","FIR (a=1, b=1, c=1)","FIR (a=1, b=0, c=2)","FIR (a=3, b=1, c=0)","FIR (a=2, b=2, c=0)","FIR (a=1, b=3, c=0)","FIR (a=3, b=0, c=1)","FIR (a=2, b=1, c=1)","FIR (a=1, b=2, c=1)","FIR (a=2, b=0, c=2)","FIR (a=1, b=1, c=2)","FIR (a=1, b=0, c=3)","IIR (a=2, b=2)","IIR (a=3, B=4)"], value:"No", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_sync_groups_required = GCombo(widgetName:"gcombo_sync_groups_required", options:["None","1 Slave","2 Slaves","3 Slaves"], value:"None", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_ncm_ch_0 = GCombo(widgetName:"gcombo_ncm_ch_0", options:["None"], value:"None", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_boundsell_ch_0 = GCombo(widgetName:"gcombo_boundsell_ch_0", options:["Group Boundary 0","Group Boundary 1","Global Boundary 0","Global Boundary 1"], value:"Group Boundary 0", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_boundselu_ch_0 = GCombo(widgetName:"gcombo_boundselu_ch_0", options:["Group Boundary 0","Group Boundary 1","Global Boundary 0","Global Boundary 1"], value:"Group Boundary 1", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_chev_ch_0 = GCombo(widgetName:"gcombo_chev_ch_0", options:["Disabled","If Result Inside Band","If Result Outside Band","On Each New Result"], value:"Disabled", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_bfl_ctrl_ch_0 = GCombo(widgetName:"gcombo_bfl_ctrl_ch_0", options:["Disabled","Enabled","Inverted"], value:"Disabled", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_ncm_ch_1 = GCombo(widgetName:"gcombo_ncm_ch_1", options:["None"], value:"None", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_boundsell_ch_1 = GCombo(widgetName:"gcombo_boundsell_ch_1", options:["Group Boundary 0","Group Boundary 1","Global Boundary 0","Global Boundary 1"], value:"Group Boundary 0", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_boundselu_ch_1 = GCombo(widgetName:"gcombo_boundselu_ch_1", options:["Group Boundary 0","Group Boundary 1","Global Boundary 0","Global Boundary 1"], value:"Group Boundary 1", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_chev_ch_1 = GCombo(widgetName:"gcombo_chev_ch_1", options:["Disabled","If Result Inside Band","If Result Outside Band","On Each New Result"], value:"Disabled", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_bfl_ctrl_ch_1 = GCombo(widgetName:"gcombo_bfl_ctrl_ch_1", options:["Disabled","Enabled","Inverted"], value:"Disabled", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_ncm_ch_2 = GCombo(widgetName:"gcombo_ncm_ch_2", options:["None"], value:"None", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_boundsell_ch_2 = GCombo(widgetName:"gcombo_boundsell_ch_2", options:["Group Boundary 0","Group Boundary 1","Global Boundary 0","Global Boundary 1"], value:"Group Boundary 0", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_boundselu_ch_2 = GCombo(widgetName:"gcombo_boundselu_ch_2", options:["Group Boundary 0","Group Boundary 1","Global Boundary 0","Global Boundary 1"], value:"Group Boundary 1", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_chev_ch_2 = GCombo(widgetName:"gcombo_chev_ch_2", options:["Disabled","If Result Inside Band","If Result Outside Band","On Each New Result"], value:"Disabled", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_bfl_ctrl_ch_2 = GCombo(widgetName:"gcombo_bfl_ctrl_ch_2", options:["Disabled","Enabled","Inverted"], value:"Disabled", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_ncm_ch_3 = GCombo(widgetName:"gcombo_ncm_ch_3", options:["None"], value:"None", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_boundsell_ch_3 = GCombo(widgetName:"gcombo_boundsell_ch_3", options:["Group Boundary 0","Group Boundary 1","Global Boundary 0","Global Boundary 1"], value:"Group Boundary 0", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_boundselu_ch_3 = GCombo(widgetName:"gcombo_boundselu_ch_3", options:["Group Boundary 0","Group Boundary 1","Global Boundary 0","Global Boundary 1"], value:"Group Boundary 1", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_chev_ch_3 = GCombo(widgetName:"gcombo_chev_ch_3", options:["Disabled","If Result Inside Band","If Result Outside Band","On Each New Result"], value:"Disabled", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_bfl_ctrl_ch_3 = GCombo(widgetName:"gcombo_bfl_ctrl_ch_3", options:["Disabled","Enabled","Inverted"], value:"Disabled", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_actual_sampleT = GFloat(widgetName:"gstring_actual_sampleT", value:0.0, minValue:0, maxValue:10000, enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_coversion_time = GFloat(widgetName:"gstring_coversion_time", value:0.0, minValue:0, maxValue:Double.POSITIVE_INFINITY, enabled:false, visible:true, isMandatoryValue:false)
+	 gfloat_desired_sampleT = GFloat(widgetName:"gfloat_desired_sampleT", value:100, minValue:0, maxValue:8000, enabled:true, visible:true, isMandatoryValue:false)
+	 gfloat_actual_sample_time = GFloat(widgetName:"gfloat_actual_sample_time", value:0, minValue:0, maxValue:10000, enabled:false, visible:true, isMandatoryValue:false)
+	 gfloat_total_coversion_time = GFloat(widgetName:"gfloat_total_coversion_time", value:0, minValue:0, maxValue:Double.POSITIVE_INFINITY, enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_trigger_edge_sel = GString(widgetName:"gstring_trigger_edge_sel", value:"Falling Edge", enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_gating_sel = GString(widgetName:"gstring_gating_sel", value:"Always convert", enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_conv_mode = GString(widgetName:"gstring_conv_mode", value:"10 Bit Fast Conversion", enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_channel_name_a = GString(widgetName:"gstring_channel_name_a", value:"Channel_A", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_channel_name_b = GString(widgetName:"gstring_channel_name_b", value:"Channel_B", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_channel_name_c = GString(widgetName:"gstring_channel_name_c", value:"Channel_C", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_channel_name_d = GString(widgetName:"gstring_channel_name_d", value:"Channel_D", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_channel_name_e = GString(widgetName:"gstring_channel_name_e", value:"Channel_E", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_channel_name_f = GString(widgetName:"gstring_channel_name_f", value:"Channel_F", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_channel_name_g = GString(widgetName:"gstring_channel_name_g", value:"Channel_G", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_channel_name_h = GString(widgetName:"gstring_channel_name_h", value:"Channel_H", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_postproc_channel_name_a = GString(widgetName:"gstring_postproc_channel_name_a", value:"Channel_A", enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_postproc_channel_name_b = GString(widgetName:"gstring_postproc_channel_name_b", value:"Channel_B", enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_postproc_channel_name_c = GString(widgetName:"gstring_postproc_channel_name_c", value:"Channel_C", enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_postproc_channel_name_d = GString(widgetName:"gstring_postproc_channel_name_d", value:"Channel_D", enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_postproc_channel_name_e = GString(widgetName:"gstring_postproc_channel_name_e", value:"Channel_E", enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_postproc_channel_name_f = GString(widgetName:"gstring_postproc_channel_name_f", value:"Channel_F", enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_postproc_channel_name_g = GString(widgetName:"gstring_postproc_channel_name_g", value:"Channel_G", enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_postproc_channel_name_h = GString(widgetName:"gstring_postproc_channel_name_h", value:"Channel_H", enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_sync_master_name_a = GString(widgetName:"gstring_sync_master_name_a", value:"Channel_A", enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_sync_master_name_b = GString(widgetName:"gstring_sync_master_name_b", value:"Channel_B", enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_sync_master_name_c = GString(widgetName:"gstring_sync_master_name_c", value:"Channel_C", enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_sync_master_name_d = GString(widgetName:"gstring_sync_master_name_d", value:"Channel_D", enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_sync_slave_A_name_a = GString(widgetName:"gstring_sync_slave_A_name_a", value:"Channel_A_sync_slaveA", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_sync_slave_A_name_b = GString(widgetName:"gstring_sync_slave_A_name_b", value:"Channel_B_sync_slaveA", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_sync_slave_A_name_c = GString(widgetName:"gstring_sync_slave_A_name_c", value:"Channel_C_sync_slaveA", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_sync_slave_A_name_d = GString(widgetName:"gstring_sync_slave_A_name_d", value:"Channel_D_sync_slaveA", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_sync_slave_B_name_a = GString(widgetName:"gstring_sync_slave_B_name_a", value:"Channel_A_sync_slaveB", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_sync_slave_B_name_b = GString(widgetName:"gstring_sync_slave_B_name_b", value:"Channel_B_sync_slaveB", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_sync_slave_B_name_c = GString(widgetName:"gstring_sync_slave_B_name_c", value:"Channel_C_sync_slaveB", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_sync_slave_B_name_d = GString(widgetName:"gstring_sync_slave_B_name_d", value:"Channel_D_sync_slaveB", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_sync_slave_C_name_a = GString(widgetName:"gstring_sync_slave_C_name_a", value:"Channel_A_sync_slaveC", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_sync_slave_C_name_b = GString(widgetName:"gstring_sync_slave_C_name_b", value:"Channel_B_sync_slaveC", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_sync_slave_C_name_c = GString(widgetName:"gstring_sync_slave_C_name_c", value:"Channel_C_sync_slaveC", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_sync_slave_C_name_d = GString(widgetName:"gstring_sync_slave_C_name_d", value:"Channel_D_sync_slaveC", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_callback_function = GString(widgetName:"gstring_callback_function", value:"adc_measurement_adv_callback", enabled:true, visible:true, isMandatoryValue:false)
+	 gcheck_insert_at_init = GCheck(widgetName:"gcheck_insert_at_init", value:true, enabled:true, visible:true)
+	 gcheck_expose_queue_scan = GCheck(widgetName:"gcheck_expose_queue_scan", value:false, enabled:true, visible:true)
+	 gcheck_autoscan_enable = GCheck(widgetName:"gcheck_autoscan_enable", value:false, enabled:true, visible:true)
+	 gcheck_share_all_pins = GCheck(widgetName:"gcheck_share_all_pins", value:false, enabled:true, visible:true)
+	 gcheck_shared_pin_a = GCheck(widgetName:"gcheck_shared_pin_a", value:false, enabled:true, visible:true)
+	 gcheck_shared_pin_b = GCheck(widgetName:"gcheck_shared_pin_b", value:false, enabled:true, visible:true)
+	 gcheck_shared_pin_c = GCheck(widgetName:"gcheck_shared_pin_c", value:false, enabled:true, visible:true)
+	 gcheck_shared_pin_d = GCheck(widgetName:"gcheck_shared_pin_d", value:false, enabled:true, visible:true)
+	 gcheck_shared_pin_e = GCheck(widgetName:"gcheck_shared_pin_e", value:false, enabled:true, visible:true)
+	 gcheck_shared_pin_f = GCheck(widgetName:"gcheck_shared_pin_f", value:false, enabled:true, visible:true)
+	 gcheck_shared_pin_g = GCheck(widgetName:"gcheck_shared_pin_g", value:false, enabled:true, visible:true)
+	 gcheck_shared_pin_h = GCheck(widgetName:"gcheck_shared_pin_h", value:false, enabled:true, visible:true)
+	 gcheck_wfr_ch_a = GCheck(widgetName:"gcheck_wfr_ch_a", value:false, enabled:true, visible:true)
+	 gcheck_wfr_ch_b = GCheck(widgetName:"gcheck_wfr_ch_b", value:false, enabled:true, visible:true)
+	 gcheck_wfr_ch_c = GCheck(widgetName:"gcheck_wfr_ch_c", value:false, enabled:true, visible:true)
+	 gcheck_wfr_ch_d = GCheck(widgetName:"gcheck_wfr_ch_d", value:false, enabled:true, visible:true)
+	 gcheck_wfr_ch_e = GCheck(widgetName:"gcheck_wfr_ch_e", value:false, enabled:true, visible:true)
+	 gcheck_wfr_ch_f = GCheck(widgetName:"gcheck_wfr_ch_f", value:false, enabled:true, visible:true)
+	 gcheck_wfr_ch_g = GCheck(widgetName:"gcheck_wfr_ch_g", value:false, enabled:true, visible:true)
+	 gcheck_wfr_ch_h = GCheck(widgetName:"gcheck_wfr_ch_h", value:false, enabled:true, visible:true)
+	 gcheck_enable_res_evt_ch_a = GCheck(widgetName:"gcheck_enable_res_evt_ch_a", value:false, enabled:true, visible:true)
+	 gcheck_enable_res_evt_ch_b = GCheck(widgetName:"gcheck_enable_res_evt_ch_b", value:false, enabled:true, visible:true)
+	 gcheck_enable_res_evt_ch_c = GCheck(widgetName:"gcheck_enable_res_evt_ch_c", value:false, enabled:true, visible:true)
+	 gcheck_enable_res_evt_ch_d = GCheck(widgetName:"gcheck_enable_res_evt_ch_d", value:false, enabled:true, visible:true)
+	 gcheck_enable_res_evt_ch_e = GCheck(widgetName:"gcheck_enable_res_evt_ch_e", value:false, enabled:true, visible:true)
+	 gcheck_enable_res_evt_ch_f = GCheck(widgetName:"gcheck_enable_res_evt_ch_f", value:false, enabled:true, visible:true)
+	 gcheck_enable_res_evt_ch_g = GCheck(widgetName:"gcheck_enable_res_evt_ch_g", value:false, enabled:true, visible:true)
+	 gcheck_enable_res_evt_ch_h = GCheck(widgetName:"gcheck_enable_res_evt_ch_h", value:false, enabled:true, visible:true)
+	 gcheck_ext_trig_q_entry_0 = GCheck(widgetName:"gcheck_ext_trig_q_entry_0", value:false, enabled:true, visible:true)
+	 gcheck_ext_trig_q_entry_1 = GCheck(widgetName:"gcheck_ext_trig_q_entry_1", value:false, enabled:true, visible:true)
+	 gcheck_ext_trig_q_entry_2 = GCheck(widgetName:"gcheck_ext_trig_q_entry_2", value:false, enabled:true, visible:true)
+	 gcheck_ext_trig_q_entry_3 = GCheck(widgetName:"gcheck_ext_trig_q_entry_3", value:false, enabled:true, visible:true)
+	 gcheck_ext_trig_q_entry_4 = GCheck(widgetName:"gcheck_ext_trig_q_entry_4", value:false, enabled:true, visible:true)
+	 gcheck_ext_trig_q_entry_5 = GCheck(widgetName:"gcheck_ext_trig_q_entry_5", value:false, enabled:true, visible:true)
+	 gcheck_ext_trig_q_entry_6 = GCheck(widgetName:"gcheck_ext_trig_q_entry_6", value:false, enabled:true, visible:true)
+	 gcheck_ext_trig_q_entry_7 = GCheck(widgetName:"gcheck_ext_trig_q_entry_7", value:false, enabled:true, visible:true)
+	 gcheck_refill_q_entry_0 = GCheck(widgetName:"gcheck_refill_q_entry_0", value:true, enabled:true, visible:true)
+	 gcheck_refill_q_entry_1 = GCheck(widgetName:"gcheck_refill_q_entry_1", value:true, enabled:true, visible:true)
+	 gcheck_refill_q_entry_2 = GCheck(widgetName:"gcheck_refill_q_entry_2", value:true, enabled:true, visible:true)
+	 gcheck_refill_q_entry_3 = GCheck(widgetName:"gcheck_refill_q_entry_3", value:true, enabled:true, visible:true)
+	 gcheck_refill_q_entry_4 = GCheck(widgetName:"gcheck_refill_q_entry_4", value:true, enabled:true, visible:true)
+	 gcheck_refill_q_entry_5 = GCheck(widgetName:"gcheck_refill_q_entry_5", value:true, enabled:true, visible:true)
+	 gcheck_refill_q_entry_6 = GCheck(widgetName:"gcheck_refill_q_entry_6", value:true, enabled:true, visible:true)
+	 gcheck_refill_q_entry_7 = GCheck(widgetName:"gcheck_refill_q_entry_7", value:true, enabled:true, visible:true)
+	 gcheck_src_evt_q_entry_0 = GCheck(widgetName:"gcheck_src_evt_q_entry_0", value:false, enabled:true, visible:true)
+	 gcheck_src_evt_q_entry_1 = GCheck(widgetName:"gcheck_src_evt_q_entry_1", value:false, enabled:true, visible:true)
+	 gcheck_src_evt_q_entry_2 = GCheck(widgetName:"gcheck_src_evt_q_entry_2", value:false, enabled:true, visible:true)
+	 gcheck_src_evt_q_entry_3 = GCheck(widgetName:"gcheck_src_evt_q_entry_3", value:false, enabled:true, visible:true)
+	 gcheck_src_evt_q_entry_4 = GCheck(widgetName:"gcheck_src_evt_q_entry_4", value:false, enabled:true, visible:true)
+	 gcheck_src_evt_q_entry_5 = GCheck(widgetName:"gcheck_src_evt_q_entry_5", value:false, enabled:true, visible:true)
+	 gcheck_src_evt_q_entry_6 = GCheck(widgetName:"gcheck_src_evt_q_entry_6", value:false, enabled:true, visible:true)
+	 gcheck_src_evt_q_entry_7 = GCheck(widgetName:"gcheck_src_evt_q_entry_7", value:false, enabled:true, visible:true)
+	 gcheck_subtraction_mode_result_reg = GCheck(widgetName:"gcheck_subtraction_mode_result_reg", value:false, enabled:true, visible:true)
+	 gcheck_sync_master_a = GCheck(widgetName:"gcheck_sync_master_a", value:false, enabled:true, visible:true)
+	 gcheck_sync_master_b = GCheck(widgetName:"gcheck_sync_master_b", value:false, enabled:true, visible:true)
+	 gcheck_sync_master_c = GCheck(widgetName:"gcheck_sync_master_c", value:false, enabled:true, visible:true)
+	 gcheck_sync_master_d = GCheck(widgetName:"gcheck_sync_master_d", value:false, enabled:true, visible:true)
+	 gcheck_config_globiclass1 = GCheck(widgetName:"gcheck_config_globiclass1", value:false, enabled:true, visible:true)
+	 gcheck_enable_callback = GCheck(widgetName:"gcheck_enable_callback", value:false, enabled:true, visible:true)
+	 glabel_trigger_note = GLabel(widgetName:"glabel_trigger_note", text:"Note: \r\nConfigure 'Trigger edge selection' and 'Gating selection' in ADC_SCAN / ADC_QUEUE APP.", enabled:true, visible:true)
+	 glabel_trigger_edge_select = GLabel(widgetName:"glabel_trigger_edge_select", text:"Trigger edge selection:", enabled:true, visible:true)
+	 glabel_gating_select = GLabel(widgetName:"glabel_gating_select", text:"Gating selection:", enabled:true, visible:true)
+	 glabel_priority = GLabel(widgetName:"glabel_priority", text:"Priority of queue source:", enabled:true, visible:true)
+	 glabel_adc_startmode = GLabel(widgetName:"glabel_adc_startmode", text:"Conversion start mode:", enabled:true, visible:true)
+	 glabel_convert_mode = GLabel(widgetName:"glabel_convert_mode", text:"Conversion mode:", enabled:true, visible:true)
+	 glabel_desired_sampleT = GLabel(widgetName:"glabel_desired_sampleT", text:"Desired sample time [nsec]:", enabled:true, visible:true)
+	 glabel_actual_sample_time = GLabel(widgetName:"glabel_actual_sample_time", text:"Actual sample time [nsec]:", enabled:true, visible:true)
+	 glabel_total_coversion_time = GLabel(widgetName:"glabel_total_coversion_time", text:"Total conversion time [nsec]:", enabled:true, visible:true)
+	 glabel_conversion_limitation = GLabel(widgetName:"glabel_conversion_limitation", text:"Note: Total conversion time is always calculated with post calibration enabled.", enabled:true, visible:true)
+	 glabel_wait_for_trigger_note = GLabel(widgetName:"glabel_wait_for_trigger_note", text:"\"Note: An external trigger is selected but no channel is configured as \"Wait for trigger\" in this APP.\"", enabled:true, visible:true)
+	 glabel_sync_note = GLabel(widgetName:"glabel_sync_note", text:"Note: Ensure that the \"Arbitration mode\" for all the sync groups are set to \"Runs Permanently\" in GLOBAL_ADC APP.", enabled:true, visible:true)
+	 glabel_global_iclass1 = GLabel(widgetName:"glabel_global_iclass1", text:"Note: It is mandatory to configure global ICLASS1. This can be done either by enabling \"Configure global ICLASS1\" or through an API call.", enabled:true, visible:true)
+	 glabel_callback_function = GLabel(widgetName:"glabel_callback_function", text:"Callback function", enabled:true, visible:true)
+	 gGroup_queue_config = GGroup(widgetName:"gGroup_queue_config", text:"Request Source Settings", enabled:true, visible:true)
+	 gGroup_class_config = GGroup(widgetName:"gGroup_class_config", text:"Class Settings", enabled:true, visible:true)
+	 ginterruptprio_request_src_intr = GInterruptPrio(widgetName:"ginterruptprio_request_src_intr", priorityValue:3, minPriority:0, maxPriority:63, subPriorityValue:0, minSubPriority:0, maxSubPriority:63, subPriorityVisible:true, enabled:true, visible:true)
+	 gmessage_trigger_autoscan_warning = GMessage(widgetName:"gmessage_trigger_autoscan_warning", text:"External trigger and continuous conversion mode is enabled. This mode is not supported by the APP.", isError:false, visible:true)
+	 gmessage_intr_callback_info = GMessage(widgetName:"gmessage_intr_callback_info", text:"Enable the request source interrupt in the request source APP.", isError:false, visible:true)
+	 gmessage_req_src_callback = GMessage(widgetName:"gmessage_req_src_callback", text:"Invalid function name.", isError:true, visible:true)
+
+
+	 }
+	/* End : UI variable section */
+}

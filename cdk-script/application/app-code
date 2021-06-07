@@ -1,0 +1,52 @@
+-- ** Anomaly detection **
+-- Compute an anomaly score for each record in the source stream using Random Cut Forest
+-- Creates a temporary stream and defines a metrics schema
+CREATE OR REPLACE STREAM "METRICS_STREAM" (
+  "PARTITION_KEY"                       VARCHAR(512),
+  "SEQUENCE_NUMBER"                     VARCHAR(128),
+  "SHARD_ID"                            VARCHAR(64),
+  "APPROXIMATE_ARRIVAL_TIME"            VARCHAR(30),
+  "dps368_temp_1_mean"                  DOUBLE,
+  "dps368_temp_2_mean"                  DOUBLE,
+  "dps368_temp_5_mean"                  DOUBLE,
+  "dps368_pressure_1_mean"              DOUBLE,
+  "dps368_pressure_2_mean"              DOUBLE,
+  "dps368_pressure_5_mean"              DOUBLE,
+  "tli4971_current_1_rms"               DOUBLE,
+  "tli4971_current_2_rms"               DOUBLE,
+  "tli4971_current_3_rms"               DOUBLE,
+  "tle4997e_hall_mean"                  DOUBLE
+);
+
+-- Creates an output stream and defines a schema
+CREATE OR REPLACE STREAM "SCORE_STREAM" (
+   "PARTITION_KEY"       varchar(512),
+   "SEQUENCE_NUMBER"       varchar(128),
+   "SHARD_ID"       varchar(64),
+   "APPROXIMATE_ARRIVAL_TIME"  varchar(30),
+   "ANOMALY_SCORE"  DOUBLE);
+
+-- Select metrics for algorithm
+CREATE OR REPLACE PUMP "METRICS_SEPARATION_PUMP" AS INSERT INTO "METRICS_STREAM"
+SELECT STREAM "PARTITION_KEY", "SEQUENCE_NUMBER", "SHARD_ID", TIMESTAMP_TO_CHAR('yyyy-MM-dd''T''HH:mm:ss.SSSZ', "APPROXIMATE_ARRIVAL_TIME"),
+                "dps368_temp_1_mean",
+                "dps368_temp_2_mean",
+                "dps368_temp_5_mean",
+                "dps368_pressure_1_mean",
+                "dps368_pressure_2_mean",
+                "dps368_pressure_5_mean",
+                1000 * "tli4971_current_1_rms",
+                1000 * "tli4971_current_2_rms",
+                1000 * "tli4971_current_3_rms",
+                "tle4997e_hall_mean"
+FROM "input_stream_001";
+
+CREATE OR REPLACE PUMP "STREAM_PUMP_Others" AS INSERT INTO "SCORE_STREAM"
+SELECT STREAM "PARTITION_KEY", "SEQUENCE_NUMBER", "SHARD_ID", "APPROXIMATE_ARRIVAL_TIME", "ANOMALY_SCORE"
+FROM TABLE(
+    RANDOM_CUT_FOREST(
+        CURSOR(
+            SELECT STREAM * FROM "METRICS_STREAM"
+        )
+    )
+);

@@ -1,0 +1,863 @@
+package Model.APPS.I2S_CONFIG.v4_0_6;
+
+/*
+ Copyright (c) 2016-2020, Infineon Technologies AG
+ All rights reserved.
+											
+ Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ following conditions are met:
+																			 
+ Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ disclaimer.
+  
+ Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ disclaimer in the documentation and/or other materials provided with the distribution.
+  
+ Neither the name of the copyright holders nor the names of its contributors may be used to endorse or promote
+ products derived from this software without specific prior written permission.
+																			 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE  FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ WHETHER IN CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+																			 
+ To improve the quality of the software, users are encouraged to share modifications, enhancements or bug fixes with
+ Infineon Technologies AG: dave@infineon.com. */
+
+/*************** Revision History **********************************************
+ Version     Date          Description
+ 4.0.2       30-Jun-2016   Initial version for DAVEv4.<br>					
+ 4.0.4       17-Aug-2016   Added default protocol interrupt node configuration.<br>   
+ 4.0.6       09-Jan-2021   Modified check for minimum XMCLib version. <BR>
+ *******************************************************************************/
+// Import statements
+import ifx.davex.app.manifest.*
+
+class  I2S_CONFIG extends I2S_CONFIG_GUI {
+
+	 /* Note  : Following APP properties are mandatory and important */
+	 
+	 /* Begin : APP property section */
+	
+	/**
+	 * APP version
+	 * Format: a string with three digit separated by a dot.
+	 */
+	def version            = '4.0.6'
+	
+	/**
+	 * APP categories declaration. 
+	 * It is list of strings. Subcategories are separated by slash.
+	 * No limits on number of categories and subcategories depth.
+	 */
+	def categoriesDescription = ["Peripheral Configuration"] 
+
+	/** 
+	 * Minimum DAVE version required for this APP.
+	 * 
+	 * It is string with three digit separated by a dot.
+	 */
+	def minDaveVersion           = '4.2.4'
+	
+	/** 
+	 * Keywords used by search feature in APPs selection view
+	 * 
+	 * It is a list of string.
+	 */
+	def keywords      = 
+	[		
+                          'Config',
+                          'I2S',
+                          'Communication',
+                          'Peripheral Configuration',
+                          'I2S_CONFIG',
+                          'Serial',
+                          'ALL'
+	]
+	
+	/** 
+	 * softwareIDs is used to declare which devices are compatible with this APP.
+	 * It is a map with key a string containing a pattern that shall match the SW id of
+	 * the device and as value the minimal version of the APP.
+	 */
+	
+    /**
+     * Any step of XMC4500F144 and XMC4400F144
+	 * Any step of XMC4400F100 and XMC4400F64
+	 * Any step, any variant and any packages of XMC1300
+	 */
+	def softwareIDs       = [
+		"XMC1.1.*.*.*": "4.0.0",
+		"XMC1.2.*.*.*": "4.0.0",
+		"XMC1.3.*.*.*": "4.0.0",
+		"XMC1.4.*.*.*": "4.0.0",
+		"XMC4.1.*.*.*": "4.0.0",
+		"XMC4.2.*.*.*": "4.0.0",
+		"XMC4.3.*.*.*": "4.0.0",
+		"XMC4.4.*.*.*": "4.0.0",
+		"XMC4.5.*.*.*": "4.0.0",
+		"XMC4.7.*.*.*": "4.0.0",
+		"XMC4.8.*.*.*": "4.0.0"
+		]
+	
+	/**
+	 * Singleton property:
+	 * When it is true the APP can be instantiated only once. 
+	 */
+	def singleton     = false
+
+
+	/**
+	 * initProvider property
+	 * It shall be true to add a call to <AppName>_Init() 
+	 */
+	def initProvider  = true
+	
+	/**
+	 * Deprecated APP
+	 * Set it to true to indicate that the APP shall be not used for new projects.
+	 */
+	def deprecated    = false
+	
+	/**
+	 * Sharable property.
+	 * It shall be true to allows multiple APPs to require the same instance of this APP.
+	 */
+	def sharable      = false
+
+	/**
+	 *  APP function description.
+	 */
+	def description = "Configures the USIC peripheral to function as an I2S master or slave device"
+	
+	/* End   : APP property section */
+	
+	/* Begin : User APP property section */
+	
+	/*Required Apps*/
+	MRequiredApp ra_clock             	      	     		// Consumed clock APP
+
+	/*Required resource groups*/
+	MVirtualResourceGroup hwres_usic_channel              	// USIC channel hardware resource
+	
+	/*Required virtual signals*/
+	MVirtualSignal vs_i2s_dx0ins							// Input stage DX0 input selection DX0INS signal (used in all modes)
+	MVirtualSignal vs_i2s_dx1ins							// Input stage DX1 input selection DX1INS signal (used for external freq. input/delay compensation)
+	MVirtualSignal vs_i2s_dx1ins_sys_out					// Input stage DX1INS signal system output
+	MVirtualSignal vs_i2s_dx2ins							// Input stage DX2 input selection DX2INS signal (used for transmit data validation/delay compensation)
+	MVirtualSignal vs_i2s_dout0								// Shift Data DOUT0 signal. 
+	MVirtualSignal vs_i2s_dx2ins_sys_out 				    // DX2OUT signal system output; 
+	
+	
+	MVirtualSignal vs_i2s_selo_0                            //Word Address (Word Select )[SELOx] signal.   
+	MVirtualSignal vs_i2s_sclkout							// Shift clock output signal
+	MVirtualSignal vs_i2s_mclkout
+	MVirtualSignal vs_i2s_standard_tx_event         		// Standard buffer transmit event signal
+	MVirtualSignal vs_i2s_standard_rx_event         		// Standard buffer receive event signal
+	MVirtualSignal vs_i2s_tx_shift_event            		// Transmit shift event signal
+	MVirtualSignal vs_i2s_rx_start_event           			// Receive start event signal
+	MVirtualSignal vs_i2s_alt_rx_event              		// Standard buffer alternative receive event signal
+	MVirtualSignal vs_i2s_proto_specfic_event       		// I2S protocol specific event signal
+	MVirtualSignal vs_i2s_fifo_tx_event             		// FIFO transmit buffer event signal
+	MVirtualSignal vs_i2s_fifo_tx_err_event         		// Transmit FIFO buffer error event signal
+	MVirtualSignal vs_i2s_fifo_rx_event             		// FIFO standard receive buffer event signal
+	MVirtualSignal vs_i2s_fifo_rx_err_event         		// Receive FIFO buffer error event signal
+	MVirtualSignal vs_i2s_fifo_alt_rx_event         		// FIFO alternative receive buffer event signal
+	
+	
+	/*Variable definition*/
+	GFloat gfloat_internal_clock = GFloat() 				// The peripheral clock from Clock APP. Used in baud rate calculations
+	GCombo baudrate_registers_values = GCombo()  			// To save the baud rate values
+
+	/* End   : User APP property section */
+
+	/* APP Constructor */
+	public I2S_CONFIG(DaveEnv daveEnv) {
+		boolean isfamily_4x = false /*Identify if target family is XMC4000*/
+		boolean isfamily_1x = false /*Identify if target family is XMC1000*/
+		
+		MF is_device_Master = MF({gcombo_device_type.value == "Master"}, Boolean)						
+		MF is_device_Slave = MF({gcombo_device_type.value == "Slave"}, Boolean)		
+//		MF is_mode_HalfDuplex = MF({gcombo_operation_mode.value  == "Half Duplex" }, Boolean)		
+//		MF is_mode_Fullduplex_r_Halfduplex = MF({gcombo_operation_mode.value == "Full Duplex" ||
+//			                                     gcombo_operation_mode.value == "Half Duplex" }, Boolean)
+		
+		MF is_mode_Fullduplex_r_Halfduplex = MF({(gcheck_loopback_mode_enable.value == false)}, Boolean)
+		
+//		MF is_mode_LoopBack = MF({gcombo_operation_mode.value == "Loop Back"}, Boolean)					
+//		MF isnt_mode_LoopBack = MF({gcombo_operation_mode.value != "Loop Back"}, Boolean)
+		
+		MF is_mode_LoopBack = MF({(gcheck_loopback_mode_enable.value == true)}, Boolean)
+		MF isnt_mode_LoopBack = MF({(gcheck_loopback_mode_enable.value == false)}, Boolean)
+		
+		/* MF variable to check if the input stage DX1 is being used */
+		MF uses_DX1 = MF({ (gcombo_device_type.value == "Slave" ||
+			               (gcombo_device_type.value == "Master" &&
+				           (gcombo_dx1_input_stage_master.value == "External Frequency Input" ||
+					        gcombo_dx1_input_stage_master.value == "Delay Compensation")))}, Boolean)	 		
+		
+		/* MF variable to check if the input stage DX2 is being used */
+		MF uses_DX2 = MF({ (gcombo_device_type.value == "Slave" ||
+			               (gcombo_device_type.value == "Master" && 
+						   (gcombo_dx2_input_stage_master.value == "Transmit Data Validation" ||
+		                    gcombo_dx2_input_stage_master.value == "Delay Compensation")))}, Boolean)	 
+		
+		/* MF variable to check if the input stage DX2 is being used for TDV */
+		MF is_transmitDataValidation_Selected  = MF({gcombo_device_type.value == "Master" &&
+				                                     gcombo_dx2_input_stage_master.value == "Transmit Data Validation"}, Boolean)
+			 		
+		/* MF variable to check if the output SCLKOUT is being used */
+		MF uses_SCLKOUT = MF({(gcombo_device_type.value == "Master" ||
+		 	                  (gcombo_device_type.value == "Slave" && gcombo_sclkout_output_slave.value == "Independent Clock Output"))}, Boolean)
+			 		
+		/* MF variable to check if the output MCLKOUT is being used */
+		MF uses_MCLKOUT = MF({((gcombo_device_type.value == "Master" && gcombo_mclkout_output_master.value == "Master Time Base") ||
+			                   (gcombo_device_type.value == "Slave" && gcombo_mclkout_output_slave.value == "Independent Clock Output"))}, Boolean)	 		
+
+		
+		/* ----Baud Rate Generator settings tab  --------------------------- */
+		/* MF variable to check if the clock selected is internal */
+		MF uses_Internal_Clock = MF({gcombo_clock_selection.value == "Internal Source (FD)"}, Boolean)
+		
+		/* MF variable to check if the clock selected is external */
+		MF uses_External_Clock = MF({gcombo_clock_selection.value == "External Source (DX1T)"}, Boolean) 
+
+		gmessage_baud_rate_external_clock_source.visible = MF({
+			((gcombo_device_type.value == "Master") &&
+				(gcombo_dx1_input_stage_master.value != "External Frequency Input") &&
+				(gcombo_clock_selection.value  == "External Source (DX1T)"))
+		}, Boolean)
+
+		gmessage_baud_rate_external_clock_source.isError = MF({
+			((gcombo_device_type.value == "Master") &&
+				(gcombo_dx1_input_stage_master.value != "External Frequency Input") &&
+				(gcombo_clock_selection.value  == "External Source (DX1T)"))
+		}, Boolean)
+
+		
+		/* ---- TAB : FIFO   -------------------------------------------- */
+		/* ---- GROUP : Tx FIFO Buffer  --------------------------------- */
+		/* MF variable to check if the transmit FIFO is enabled */
+		MF is_txFIFO_enabled = MF({gcombo_number_tx_fifo_entries.value != "0"}, Boolean)				 
+		/* MF variable to check if the transmit FIFO is disabled */
+		MF is_txFIFO_disabled = MF({gcombo_number_tx_fifo_entries.value == "0"}, Boolean)				 
+
+		/* ---- GROUP : Rx FIFO Buffer  -------------------------------- */
+		/* MF variable to check if the receive FIFO is enabled */
+		MF is_rxFIFO_enabled = MF({gcombo_number_rx_fifo_entries.value != "0"}, Boolean)
+		/* MF variable to check if the receive FIFO is disabled */
+		MF is_rxFIFO_disabled = MF({gcombo_number_rx_fifo_entries.value == "0"}, Boolean)				 
+		
+		/* -------------------------------------------------------------- */
+		/* --------- Target Specific User Variable Initialization ------- */
+		/* -------------------------------------------------------------- */
+		if (daveEnv.project.selectedDevice.deviceId.family == "XMC4") 
+		{
+			isfamily_4x = true
+		} 
+		else if (daveEnv.project.selectedDevice.deviceId.family == "XMC1") 
+		{
+			isfamily_1x = true
+		}
+		
+		/* -------------------------------------------------------------- */
+		/* ----------- APP consumption Block ---------------------------- */
+		/* -------------------------------------------------------------- */
+		if (isfamily_4x) 
+		{
+			ra_clock = MRequiredApp("CLOCK_XMC4", "Clock APP", RSHARABLE, "4.0.4")
+		} 
+		else 
+		{
+			ra_clock = MRequiredApp("CLOCK_XMC1", "Clock APP", RSHARABLE, "4.0.4")
+		}
+		
+		hwres_usic_channel = MVirtualResourceGroup("Channel", ["peripheral", "usic", "*", "channel", "*"])
+		
+		/*For Loop Back mode, DX0 input stage should be connected to DOUT0 by connecting DX0INS to DX0G */
+		addRegisterBitFieldConstraint(hwres_usic_channel, "dx0cr_dsel", [6], is_mode_LoopBack)
+		
+		if(isfamily_1x) 
+		{
+			addRegisterBitFieldConstraint(hwres_usic_channel, "dx3cr_dsel", [6], is_mode_LoopBack)
+		}
+
+		
+		vs_i2s_dx0ins = MVirtualSignal(hwres_usic_channel, MF({
+			                                                    if(gcombo_device_type.value == "Slave") 
+																{
+																  if (gcheck_loopback_mode_enable.value == false) 
+																  {
+																    "Serial Data Out"
+																  }
+																}
+			                                                    else 
+																{ 
+																  if (gcheck_loopback_mode_enable.value == false) 
+																  {
+																    "Serial Data In"
+																  }
+				                                                }
+			                                          		  }, String),  "dx0ins", true, is_mode_Fullduplex_r_Halfduplex)
+		
+		vs_i2s_dx1ins = MVirtualSignal(hwres_usic_channel, MF({
+			                                                     if(gcombo_device_type.value == "Slave") 
+																 {
+				                                                    "sclkin"
+			                                                     } 
+																 else if(gcombo_dx1_input_stage_master.value == "External Frequency Input") 
+																 {
+				                                                    "external_clk_in"
+			                                                     } 
+																 else if(gcombo_dx1_input_stage_master.value == "Delay Compensation") 
+																 {
+				                                                    "sclk_delay_compensation"
+			                                                     }
+																 else
+																 {
+				                                                    "dx1ins"
+			                                                     }
+		                                                      }, String), "dx1ins", uses_DX1, uses_DX1)
+		
+		vs_i2s_dx1ins_sys_out = MVirtualSignal(hwres_usic_channel, "dx1ins_out", "dx1ins", uses_DX1, is_device_Slave)
+		
+		vs_i2s_dx2ins = MVirtualSignal(hwres_usic_channel, MF({
+			                                                     if(gcombo_device_type.value == "Slave") 
+																 {
+				                                                    "wain"
+                                                                 } 
+																 else 
+																 { // gcombo_device_type.value == "Master"
+				                                                   if(gcombo_dx2_input_stage_master.value == "Transmit Data Validation") 
+																   {
+					                                                  "transmit_data_validation"
+				                                                   } 
+																   else if(gcombo_dx2_input_stage_master.value == "Delay Compensation") 
+																   {
+					                                                  "sel_delay_compensation"
+				                                                   }
+																   else
+																   {
+				                                                      "dx2ins"
+			                                                       }
+			                                                     }
+		                                                      }, String), "dx2ins", uses_DX2, uses_DX2)
+		
+		vs_i2s_dx2ins_sys_out = MVirtualSignal(hwres_usic_channel, "dx2ins_out", "dx2ins", uses_DX2, is_device_Slave)
+		
+		vs_i2s_selo_0 = MVirtualSignal(hwres_usic_channel, "selox", "selo0", is_device_Master, is_device_Master) 
+		/* Always visible when this running as a master. */
+		vs_i2s_dout0  = MVirtualSignal(hwres_usic_channel, MF({
+			                                                    if(gcombo_device_type.value == "Slave") 
+																{
+																  if (gcheck_loopback_mode_enable.value == false)
+																  {
+					                                                "Serial Data In"
+																  }
+			                                                    } 
+																else 
+																{ 
+																  if (gcheck_loopback_mode_enable.value == false)
+																  {
+					                                                "Serial Data Out"
+																  }
+				                                                } 
+				                                              }, String), "dout0", true, isnt_mode_LoopBack)
+		
+
+		
+		vs_i2s_sclkout = MVirtualSignal(hwres_usic_channel, MF({
+			                                                     if(gcombo_device_type.value == "Master") 
+																 {
+				                                                    "sclkout"
+			                                                     } 
+																 else if(gcombo_sclkout_output_slave.value == "Independent Clock Output") 
+																 {
+				                                                    "independent_sclk_output"
+			                                                     }
+																 else
+			                                                     {
+				                                                    "sclkout"
+			                                                     }
+		                                                       }, String), "sclkout", uses_SCLKOUT, uses_SCLKOUT)
+		
+		vs_i2s_mclkout = MVirtualSignal(hwres_usic_channel, MF({ 
+			                                                     if(gcombo_device_type.value == "Master" &&
+				                                                    gcombo_mclkout_output_master.value == "Master Time Base") 
+																 {
+				                                                   "master_time_base"
+			                                                     } 
+																 else if(gcombo_device_type.value == "Slave" &&
+				                                                         gcombo_mclkout_output_slave.value == "Independent Clock Output") 
+																 {
+				                                                   "independent_mclk_output"
+			                                                     }
+																 else
+		                                                         {
+				                                                   "mclkout"
+			                                                     } 
+		                                                       }, String), "mclkout", uses_MCLKOUT, uses_MCLKOUT)
+		
+		vs_i2s_standard_tx_event   =  MVirtualSignal(hwres_usic_channel, "transmit_buffer_event", "transmit_buffer_int", true, true)
+		vs_i2s_standard_rx_event   =  MVirtualSignal(hwres_usic_channel, "standard_receive_event", "standard_receive_int", true, true)
+		vs_i2s_tx_shift_event      =  MVirtualSignal(hwres_usic_channel, "transmit_shift_event", "transmit_shift_int", true, true)
+		vs_i2s_rx_start_event      =  MVirtualSignal(hwres_usic_channel, "receive_start_event", "receive_start_int", true, true)
+		vs_i2s_alt_rx_event        =  MVirtualSignal(hwres_usic_channel, "alternate_receive_event", "alternate_receive_int", true, true)
+		vs_i2s_proto_specfic_event =  MVirtualSignal(hwres_usic_channel, "protocol_specific_event", "protocol_specific_int", true, true)
+		vs_i2s_fifo_tx_event       =  MVirtualSignal(hwres_usic_channel, "fifo_standard_transmit_buffer_event", "standard_transmit_buffer_int", is_txFIFO_enabled, is_txFIFO_enabled)
+		vs_i2s_fifo_tx_err_event   =  MVirtualSignal(hwres_usic_channel, "fifo_transmit_buffer_error_event", "transmit_buffer_error_int", is_txFIFO_enabled, is_txFIFO_enabled)
+		vs_i2s_fifo_rx_event       =  MVirtualSignal(hwres_usic_channel, "fifo_standard_receive_buffer_event", "standard_receive_buffer_int", is_rxFIFO_enabled, is_rxFIFO_enabled)
+		vs_i2s_fifo_rx_err_event   =  MVirtualSignal(hwres_usic_channel, "fifo_receive_buffer_error_event", "receive_buffer_error_int", is_rxFIFO_enabled, is_rxFIFO_enabled)
+		vs_i2s_fifo_alt_rx_event   =  MVirtualSignal(hwres_usic_channel, "fifo_alternate_receive_buffer_event", "alternate_receive_buffer_int", is_rxFIFO_enabled, is_rxFIFO_enabled)	
+		
+		/*Set the size based on UI selection. Refer USIC->TBCTR/RBCTR->SIZE bitfield in reference manual*/
+		addRegisterBitFieldConstraint(hwres_usic_channel, "tbctr_size", 
+			                          MF({
+			                              [ gcombo_number_tx_fifo_entries.options.indexOf(gcombo_number_tx_fifo_entries.value) ]
+		                                 }, List), is_txFIFO_enabled)
+		addRegisterBitFieldConstraint(hwres_usic_channel, "rbctr_size", 
+			                          MF({
+			                              [ gcombo_number_rx_fifo_entries.options.indexOf(gcombo_number_rx_fifo_entries.value) ]
+		                                 }, List), is_rxFIFO_enabled)
+		
+//		addConnectionConstraint(vs_i2s_dout0, vs_i2s_dx0ins, MF({((gcombo_operation_mode.value == "Loop Back"))},Boolean))
+		addConnectionConstraint(vs_i2s_dout0, vs_i2s_dx0ins, MF({((gcheck_loopback_mode_enable.value == true))},Boolean))
+		
+		/* ---- GROUP : Frame format  ----------------------------------- */
+		ginteger_word_length.maxValue = MF({
+			                                 if(ginteger_frame_length.value >= 16 )
+			                                 {
+				                               (16)
+			                                 }
+											 else
+			                                 {
+			                                   ginteger_frame_length.value
+			                                 }
+			                               }, Integer)
+		
+		/* ---- GROUP : Delay Compensation  ----------------------------- */
+//		gcheck_enable_delay_compensation_master.visible = is_device_Master
+//		gcheck_enable_delay_compensation_slave.visible = is_device_Slave
+		
+		
+		gmessage_delay_compensation_method_master.visible = MF({
+			                                                     gcombo_device_type.value == "Master" &&
+			                                                     gcheck_enable_delay_compensation.value == true &&
+			                                                     gcombo_dx1_input_stage_master.value != "Delay Compensation"
+		                                                       }, Boolean)
+		
+		gmessage_delay_compensation_method_master.isError = MF({
+			                                                     gcombo_device_type.value == "Master" &&
+			                                                     gcheck_enable_delay_compensation.value == true &&
+			                                                     gcombo_dx1_input_stage_master.value != "Delay Compensation"
+		                                                       }, Boolean)
+
+		
+		/* ---- GROUP : Input stages  ----------------------------------- */
+		gcombo_dx1_input_stage_master.visible = is_device_Master
+		gcombo_dx1_input_stage_slave.visible  = is_device_Slave
+		
+		gmessage_invert_dx1_input_stage.visible = MF({
+			                                           if((gcombo_device_type.value == "Slave") &&
+				                                          (gcombo_shift_clock_setting.value == "No Delay, Polarity Inversion") &&
+				                                          (gcheck_enable_invert_dx1_input_stage.value == false)) 
+													   {
+				                                          return true
+			                                           } 
+													   else 
+													   {
+				                                          return false
+			                                           }
+		                                             }, Boolean)
+		
+		gmessage_invert_dx1_input_stage.isError = MF({
+		 	                                           if((gcombo_device_type.value == "Slave") &&
+				                                          (gcombo_shift_clock_setting.value == "No Delay, Polarity Inversion") &&
+				                                          (gcheck_enable_invert_dx1_input_stage.value == false)) 
+														{
+				                                          return true
+			                                            } 
+														else 
+														{
+				                                          return false
+			                                            }
+		                                              }, Boolean)
+		
+		gcombo_dx2_input_stage_master.visible = is_device_Master
+		gcombo_dx2_input_stage_slave.visible = is_device_Slave
+		
+
+
+//		
+//		glabel_transmit_data_validation_trigger_edge_slave.visible = MF({(gcombo_device_type.value == "Slave")}, Boolean)
+//		
+//		gcombo_transmit_data_validation_trigger_edge_slave.visible = MF({(gcombo_device_type.value == "Slave")}, Boolean)
+//		
+//		glabel_transmit_data_validation_trigger_edge_slave.enabled = MF({
+//			                                                             (gcombo_device_type.value == "Slave" && gcheck_dx2_event.value == true)
+//		                                                                }, Boolean)
+//		
+		/* ---- GROUP : Output signals  --------------------------------- */
+		gcombo_sclkout_output_master.visible = is_device_Master
+		gcombo_sclkout_output_slave.visible = is_device_Slave
+		
+		gcombo_mclkout_output_master.visible = is_device_Master
+		gcombo_mclkout_output_slave.visible = is_device_Slave
+		
+		/* ---- GROUP : Baud rate generation  --------------------------- */
+		if(isfamily_4x) 
+		{
+			/*Read the peripheral bus clock to derive maximum baudrate value*/
+			gfloat_internal_clock.value = MF({ra_clock.getVal(["gfloat_peribusfreq", "value"])}, Float)
+		} 
+		else 
+		{
+			/*Read the MCLK value to derive maximum baudrate value*/
+			gfloat_internal_clock.value = MF({ra_clock.getVal(["gfloat_mclkactfrq", "value"])}, Float)
+		}
+		
+		
+		ggroup_baud_rate.visible  = MF({
+			                             if (gcombo_device_type.value == "Master") 
+										 {
+				                           return true
+			                             } 
+										 else 
+										 {
+				                           return false
+			                             }
+		                               }, Boolean)
+		
+		glabel_desired_baud_rate.visible = uses_Internal_Clock
+		gfloat_desired_baud_rate.visible = uses_Internal_Clock
+		glabel_actual_baud_rate.visible = uses_Internal_Clock
+		gfloat_actual_baud_rate.visible = uses_Internal_Clock
+		
+		glabel_external_clock_edge.visible = uses_External_Clock
+		gcombo_external_clock_edge.visible = uses_External_Clock
+		
+		gfloat_desired_baud_rate.maxValue = MF({
+													Float max_baud
+													if(gfloat_internal_clock.value != 0) 
+													{
+													  max_baud = (gfloat_internal_clock.value * 1000) / 2 /*Baud in mega hertz*/
+													} 
+													else 
+													{
+													  max_baud = 0
+													}
+													return max_baud
+											   }, Float)
+		
+		/* ---------------Begin: Step, Divider factor & Real Baud Rate Calculation---------------------------------------------- */
+		
+		/* The logic used below is based on fractional divider configuration that uses fFD.
+		 * fFD = fPERIPH * (n/1024), 'n' represents the 'step' value
+		 * fFD is used by the clock dividers PDIV and DCTQ to obtain the required baudrate.
+		 * DCTQ is the 'Oversampling', which is fixed as 2 in case of SPI communication.
+		 * Baudrate = fFD / ( (PDIV+1) * (DCTQ+1) ) = fFD / ( (PDIV+1) * 2 )
+		 * The logic iterates through the entire range of 'step'[0 to 1023] to check for the PDIV value
+		 * with least fractional difference between the 'Desired baudrate' and the calculated baudrate
+		 * using dividers. Finally, the value of 'step' and PDIV, that generated the least fractional
+		 * difference with desired baudrate will be chosen for calculating the actual baudrate. */
+		baudrate_registers_values.options = MF({
+			Float peripheral_clock
+			Float max_baud
+			Float desired_baud
+			Integer clock_divider = 1023
+			Integer clock_divider_min
+
+			Integer pdiv
+			Integer pdiv_int
+			Integer pdiv_int_min
+			Integer pdiv_frac
+			Integer pdiv_frac_min
+
+			Integer rate
+			Integer oversampling
+			Integer calBaud
+			Integer min_calBaud_diff = 0x7fffffff
+			Integer diff_baud
+			Float real_baud_rate
+			
+			if(gcombo_clock_selection.value == "Internal Source (FD)") 
+			{
+				peripheral_clock =  (gfloat_internal_clock.value * 10000)/* Integer.parseInt(gfloat_peripheralclock.value * 10000) */
+
+				max_baud = (((gfloat_internal_clock.value * 1023)/(2)) * (1000000f/1024f))
+				max_baud = (max_baud / 1000).round(2)   /*max_baud in KHz */
+
+				desired_baud = gfloat_desired_baud_rate.value
+
+				if(desired_baud > max_baud) 
+				{
+					rate = max_baud * 10
+				} 
+				else 
+				{
+					rate = gfloat_desired_baud_rate.value * 10
+				}
+
+				oversampling = 2
+
+				clock_divider_min = 1
+				pdiv_int_min = 1
+				pdiv_frac_min = 1023
+
+				while((clock_divider < 1024) && (clock_divider > 0)) 
+				{
+					pdiv = ((peripheral_clock * clock_divider) / (rate * oversampling))
+					pdiv_int = pdiv >> 10
+					pdiv_frac = pdiv & 1023
+
+					if ((pdiv_int < 1024) && (pdiv_frac < pdiv_frac_min))
+					{
+						pdiv_frac_min = pdiv_frac
+						pdiv_int_min = pdiv_int
+						clock_divider_min = clock_divider
+					}
+					clock_divider--
+				}
+				calBaud = ((gfloat_internal_clock.value * (clock_divider_min))/((oversampling)*1024*(pdiv_int_min)) * 1000000)
+
+				real_baud_rate = (Float)(calBaud/1000)
+
+				return [
+					clock_divider_min,	// Step (FDR.STEP)
+					pdiv_int_min,		// Divider factor (BRG.PDIV)
+					real_baud_rate		// Real baud rate in kHz
+				]
+			} 
+			else 
+			{
+				return [
+					"0",		// Step (FDR.STEP)
+					"1",		// Divider factor (BRG.PDIV + 1)
+					"0.0f"		// Real baud rate in kHz
+				]
+			}
+		}, List)
+		/* ---------------End: Step, Divider factor & Real Baud Rate Calculation------------------------------------------------ */
+		ginteger_step.value = MF({baudrate_registers_values.options.get(0).toInteger()}, Integer)
+		ginteger_divider_factor_internal_clk.value = MF({baudrate_registers_values.options.get(1).toInteger()}, Integer)
+		gfloat_actual_baud_rate.value = MF({baudrate_registers_values.options.get(2).toFloat()}, Float)
+		
+		//	Divider factor (read-only for internal clock)
+		//	Step value (internal clock & read-only)
+		
+		ginteger_divider_factor_internal_clk.visible = uses_Internal_Clock
+		ginteger_divider_factor_internal_clk.enabled = uses_Internal_Clock
+		
+		ginteger_divider_factor_external_clk.visible = uses_External_Clock
+		ginteger_divider_factor_external_clk.enabled = uses_External_Clock
+
+		glabel_step.visible = uses_Internal_Clock
+		ginteger_step.visible = uses_Internal_Clock
+		
+		/* ---- GROUP : Protocol Events  ------------------------------- */
+		gcheck_raisingedge_event.visible = is_device_Master
+		gcheck_fallingedge_event.visible = is_device_Master
+		gcheck_end_event.visible = is_device_Master
+		gcheck_baud_rate_event.visible = is_device_Master
+		
+		gcheck_dx2_event.visible = MF({ /* Visible in master mode if any of the clock out is set to a value other than "NONE" or if in slave mode*/
+												(gcombo_device_type.value == "Slave")  ||
+												((gcombo_device_type.value == "Master") && (gcombo_dx2_input_stage_master.value != "None"))
+												 },Boolean)
+		
+		
+		
+		/* ---------------End: GROUP :Protocol Events ------------------------------------------------ */
+		
+		gcheck_enable_invert_outputs.visible =  MF({ /* invert clock outputs is enable if any of the clock out is set to a value other than "NONE" */
+												(gcombo_device_type.value == "Master")  ||
+												((gcombo_device_type.value == "Slave") && (gcombo_mclkout_output_slave.value != "None"))   ||
+												((gcombo_device_type.value == "Slave")  && (gcombo_sclkout_output_slave.value != "None"))
+												 },Boolean)
+		
+		gimage_baud_rate.path = MF({
+			if(gcombo_clock_selection.value == "Internal Source (FD)") {
+				"Uimodel/I2S_CONFIG_BRG_internal_clk.png"
+			} else { // gcombo_clock_selection.value == "External Source (DX1T)"
+				"Uimodel/I2S_CONFIG_BRG_external_clk.png"
+			}
+		}, String)
+		
+		glabel_clock_selection.enabled  = MF({
+			                                   if (gcombo_device_type.value == "Master") 
+											   {
+				                                 return true
+			                                   } 
+											   else 
+											   {
+				                                 return false
+			                                   }
+		                                     }, Boolean)
+		
+		gcombo_clock_selection.enabled  = MF({
+			                                   if (gcombo_device_type.value == "Master") 
+											   {
+				                                 return true
+			                                   } 
+											   else 
+											   {
+				                                 return false
+			                                   }
+		                                     }, Boolean)
+		
+		glabel_shift_clock_setting.text = MF({
+			                                   if (gcombo_device_type.value == "Master") 
+											   {
+				                                 "Shift clock signal (SCLKOUT) setting with respect to the shift clock (SCLK) signal from the\nBaud Rate Generator:"
+			                                   } 
+											   else 
+											   {
+				                                 "Shift clock signal (SCLKIN) setting to adapt to the function of the data shift unit:"
+			                                   }
+		                                     }, String)
+		
+		gcombo_shift_clock_setting.options = MF({
+			                                      if (gcombo_device_type.value == "Master") 
+												  {
+				                                    return [
+															"No Delay, No Polarity Inversion",
+															"No Delay, Polarity Inversion",
+															"Delayed By 1/2 Shift Clock Period, No Polarity Inversion",
+															"Delayed By 1/2 Shift Clock Period, Polarity Inversion"
+														   ]
+												  } 
+												  else 
+												  {
+													return [
+															"No Delay, No Polarity Inversion",
+															"No Delay, Polarity Inversion"
+													       ]
+												  }
+												}, List)
+		
+		/* ---- GROUP : Tx FIFO events  ------------------------------- */
+		ginteger_tx_fifo_data_pointer.enabled = false
+		glabel_tx_fifo_data_pointer.enabled = is_txFIFO_enabled
+		ginteger_tx_fifo_data_pointer.value = MF({ hwres_usic_channel.getRegValue("TBCTR", "tbctr_dptr") }, Integer)
+		
+		ggroup_tx_fifo_interrupts_conf.enabled = is_txFIFO_enabled
+		glabel_limit_for_transmit_events.enabled = is_txFIFO_enabled
+		ginteger_limit_for_transmit_events.enabled = is_txFIFO_enabled
+		
+		ginteger_limit_for_transmit_events.maxValue = MF({
+			                                               if(gcombo_number_tx_fifo_entries.value != "0") 
+														   {
+				                                             return Integer.parseInt(gcombo_number_tx_fifo_entries.value) - 1
+			                                               } 
+														   else 
+														   {
+				                                             return 0
+			                                               }
+		                                                 }, Integer)
+		
+		gtab_dummy.visible  = false
+		
+		/* ---- GROUP : Rx FIFO buffer  --------------------------------- */
+		glabel_rx_fifo_data_pointer.enabled = is_rxFIFO_enabled
+		ginteger_rx_fifo_data_pointer.enabled = false
+		ginteger_rx_fifo_data_pointer.value = MF({ hwres_usic_channel.getRegValue("RBCTR", "rbctr_dptr") }, Integer)
+		
+		/* ---- GROUP : Rx FIFO events  --------------------------------- */
+		ggroup_rx_fifo_events_conf.enabled = is_rxFIFO_enabled
+		
+		ginteger_limit_for_receive_events.maxValue = MF({
+			                                              if(gcombo_number_rx_fifo_entries.value != "0") 
+														  {
+				                                            return Integer.parseInt(gcombo_number_rx_fifo_entries.value) - 1
+			                                              } 
+														  else 
+														  {
+				                                            return 0
+			                                              }
+		                                                }, Integer)
+		
+		/* ---- GROUP : DX1 Input Stage  --------------------------- */
+		gcheck_dx1.visible = MF({(  /* Visible in master config with input stage not set to "NONE". Visible in case of Slave. */
+							((gcombo_device_type.value == "Master") && (gcombo_dx1_input_stage_master.value != "None")) ||
+							(gcombo_device_type.value == "Slave")
+						)}, Boolean)
+
+		gcheck_enable_invert_dx1_input_stage.visible = MF({(
+			((gcombo_device_type.value == "Master") && (gcombo_dx1_input_stage_master.value != "None"))
+													||
+			((gcombo_device_type.value == "Slave") && (gcombo_dx1_input_stage_slave.value != "None"))
+		)},Boolean)
+
+		/* ---- GROUP : DX2 Input Stage  --------------------------- */
+		gcheck_dx2.visible = MF({( /* Visible in master config with input stage not set to "NONE". Visible in case of Slave. */
+						((gcombo_device_type.value == "Master") && (gcombo_dx2_input_stage_master.value != "None")) ||
+						(gcombo_device_type.value == "Slave")
+					)}, Boolean)
+
+		gcheck_enable_invert_dx2_input_stage.visible = MF({
+			(gcombo_device_type.value == "Master" && gcombo_dx2_input_stage_master.value != "None") ||
+			(gcombo_device_type.value == "Slave")
+		   },Boolean)
+
+		
+		glabel_type_transmit_data_validation.visible = MF({  /* Available for Master allowing Transmit data validation. */
+					((gcombo_dx2_input_stage_master.value == "Transmit Data Validation") &&  
+						(gcombo_device_type.value == "Master")
+						)
+				},Boolean)
+		
+		gcombo_type_transmit_data_validation.visible = MF({  /* Trigger Edge is available for Master allowing Transmit data validation and validation type is triggered by an EVENT. */
+					((gcombo_dx2_input_stage_master.value == "Transmit Data Validation") &&  
+						(gcombo_device_type.value == "Master")
+						)
+				},Boolean)
+		
+
+		gcombo_transmit_data_validation_trigger_edge.visible = MF({(	/* Trigger edge config has to be visible when Validation feature is active */
+			((gcombo_device_type.value == "Master") && (gcombo_dx2_input_stage_master.value != "None"))
+                    || 
+			(gcombo_device_type.value == "Slave")
+			)}, Boolean)
+	
+		glabel_transmit_data_validation_trigger_edge.visible = MF({(gcombo_transmit_data_validation_trigger_edge.visible)}, Boolean)
+		
+		/* ---- GMessage Visibility --------------------------- */
+		gmessage_sclkout_settings_slave.visible = MF({ /* In slave mode, delay compensation is selected with SCLKOUT set to "NONE" */
+			((gcheck_enable_delay_compensation.value == true) && (gcombo_device_type.value == "Slave") && 
+					(gcombo_sclkout_output_slave.value == "None"))
+		},Boolean)
+		
+		gmessage_sclkout_settings_slave.isError = MF({ /* In slave mode, delay compensation is selected with SCLKOUT set to "NONE" */
+			((gcheck_enable_delay_compensation.value == true) && (gcombo_device_type.value == "Slave") && 
+					(gcombo_sclkout_output_slave.value == "None"))
+		},Boolean)
+		
+
+		gmessage_dx2_event_events_page.visible = MF({( /* DX2 Event will not be generated even if its checked if trigger edge is set to "None"*/
+			((gcombo_transmit_data_validation_trigger_edge.visible == true) && (gcombo_transmit_data_validation_trigger_edge.value == "None") && (gcheck_dx2_event.value == true))
+			)}, Boolean)
+		
+		gmessage_dx2_event_general_settings_page.visible = MF({( /* DX2 Event will not be occur if trigger edge is set to "None"*/ 
+			(((gcombo_device_type.value == "Master") && (gcombo_dx2_input_stage_master.value == "Transmit Data Validation")) && 
+				((gcombo_transmit_data_validation_trigger_edge.value == "None") && (gcombo_type_transmit_data_validation.value == "Transfer On Event (DX2T)")) )
+			)}, Boolean)
+		
+
+	}
+	// File Generation
+	def generateFiles(){
+		copy("i2s_config.c", "i2s_config.c")
+		copy("i2s_config.h", "i2s_config.h")
+		generate("i2s_config_confc.tmpl", "i2s_config_conf.c")
+		generate("i2s_config_confh.tmpl", "i2s_config_conf.h")
+		generate("i2s_config_extern.tmpl", "i2s_config_extern.h")
+	}
+	
+	/**
+	 * Add main code here
+	 */
+}
+

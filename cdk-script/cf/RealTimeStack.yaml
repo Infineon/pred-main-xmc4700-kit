@@ -1,0 +1,2780 @@
+#
+# Copyright (C) 2021 Infineon Technologies AG.
+#
+# Licensed under the EVAL_XMC47_PREDMAIN_AA Evaluation Software License
+# Agreement V1.0 (the "License"); you may not use this file except in compliance
+# with the License.
+
+# For receiving a copy of the License, please refer to:
+#
+# https://github.com/Infineon/pred-main-xmc4700-kit/LICENSE.txt
+#
+# Licensee acknowledges that the Licensed Items are provided by Licensor free of
+# charge. Accordingly, without prejudice to Section 9 of the License, the
+# Licensed Items provided by Licensor under this Agreement are provided "AS IS"
+# without any warranty or liability of any kind and Licensor hereby expressly
+# disclaims any warranties or representations, whether express, implied,
+# statutory or otherwise, including but not limited to warranties of
+# workmanship, merchantability, fitness for a particular purpose, defects in the
+# Licensed Items, or non-infringement of third parties' intellectual property
+# rights.
+#
+
+Resources:
+  infnlogs5F4229D2:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  infineonkitrealtimelogss3rolepolicyE7101A46:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: s3:*
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - infnlogs5F4229D2
+                - Arn
+        Version: "2012-10-17"
+      Description: ""
+      Path: /
+  infineonkitrealtimelogss3role4D30F7C6:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: firehose.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Ref: infineonkitrealtimelogss3rolepolicyE7101A46
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaKinesisExecutionRole
+      RoleName: infineonkitrealtimelogs-s3-role
+  infineonkitrealtimelogss3roleDefaultPolicyAEF67961:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:GetObject*
+              - s3:GetBucket*
+              - s3:List*
+              - s3:DeleteObject*
+              - s3:PutObject*
+              - s3:Abort*
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - infnlogs5F4229D2
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - infnlogs5F4229D2
+                        - Arn
+                    - /*
+        Version: "2012-10-17"
+      PolicyName: infineonkitrealtimelogss3roleDefaultPolicyAEF67961
+      Roles:
+        - Ref: infineonkitrealtimelogss3role4D30F7C6
+  infineonkitrealtimeDataStream8122D501:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      ShardCount: 1
+      Name: metrics-data
+      RetentionPeriodHours: 24
+  infineonkitrealtimelogss3deliverystream:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    Properties:
+      DeliveryStreamName: infineonkitrealtime_logss3-delivery-stream
+      ExtendedS3DestinationConfiguration:
+        BucketARN:
+          Fn::GetAtt:
+            - infnlogs5F4229D2
+            - Arn
+        BufferingHints:
+          IntervalInSeconds: 300
+          SizeInMBs: 5
+        CloudWatchLoggingOptions:
+          Enabled: true
+          LogGroupName: /kinesisfirehose/infineonkitrealtime_logss3-delivery-stream
+          LogStreamName: infineonkitrealtime_logss3-delivery-stream
+        CompressionFormat: ZIP
+        RoleARN:
+          Fn::GetAtt:
+            - infineonkitrealtimelogss3role4D30F7C6
+            - Arn
+  userpool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+      AutoVerifiedAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireSymbols: false
+          RequireUppercase: false
+          TemporaryPasswordValidityDays: 7
+      UsernameAttributes:
+        - email
+      UserPoolName: infineonkitrealtimeuser-pool
+  userpoolclient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId:
+        Ref: userpool
+      ExplicitAuthFlows:
+        - ALLOW_REFRESH_TOKEN_AUTH
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_USER_SRP_AUTH
+  userpooldomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain:
+        Fn::Join:
+          - ""
+          - - infineonkitrealtime-
+            - Ref: AWS::AccountId
+      UserPoolId:
+        Ref: userpool
+  infineonkitrealtimeidentitypool:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      AllowUnauthenticatedIdentities: false
+      CognitoIdentityProviders:
+        - ClientId:
+            Ref: userpoolclient
+          ProviderName:
+            Fn::GetAtt:
+              - userpool
+              - ProviderName
+      IdentityPoolName: infineonkitrealtime_identity_pool
+  infineonkitrealtimeescognito1DFBB4AE:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - ec2:DescribeVpcs
+              - cognito-identity:ListIdentityPools
+              - cognito-idp:ListUserPools
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      Description: ""
+      Path: /
+  ElasticSearchRole172E322D:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: es.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/AmazonESCognitoAccess
+        - Ref: infineonkitrealtimeescognito1DFBB4AE
+  infineonkitrealtime:
+    Type: AWS::Elasticsearch::Domain
+    Properties:
+      AccessPolicies:
+        Statement:
+          - Action: es:*
+            Effect: Allow
+            Principal:
+              AWS:
+                - Fn::GetAtt:
+                    - authrole98FCF49E
+                    - Arn
+                - Fn::GetAtt:
+                    - ElasticSearchRole172E322D
+                    - Arn
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:aws:es:"
+                  - Ref: AWS::Region
+                  - ":"
+                  - Ref: AWS::AccountId
+                  - :domain/infineon-
+                  - Ref: AWS::AccountId
+                  - /*
+        Version: "2012-10-17"
+      CognitoOptions:
+        Enabled: true
+        IdentityPoolId:
+          Ref: infineonkitrealtimeidentitypool
+        RoleArn:
+          Fn::GetAtt:
+            - ElasticSearchRole172E322D
+            - Arn
+        UserPoolId:
+          Ref: userpool
+      DomainEndpointOptions:
+        EnforceHTTPS: true
+      DomainName:
+        Fn::Join:
+          - ""
+          - - infineon-
+            - Ref: AWS::AccountId
+      EBSOptions:
+        EBSEnabled: true
+        VolumeSize: 10
+        VolumeType: gp2
+      ElasticsearchClusterConfig:
+        InstanceCount: 1
+        InstanceType: t2.medium.elasticsearch
+      ElasticsearchVersion: "7.7"
+      NodeToNodeEncryptionOptions:
+        Enabled: true
+  iotruleDF629FEB:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: iot.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSIoTRuleActions
+  metricstoesrolepolicy2E06BA13:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - es:ESHttpGet
+              - es:ESHttpPost
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      Description: ""
+      Path: /
+  analyticseslambdaroleF1E9EDBA:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Ref: metricstoesrolepolicy2E06BA13
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      RoleName: metrics-to-es-role
+  MetricsToEsFunction18A9F7E0:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ../lambda/infn-metrics-to-es.jar
+      Role:
+        Fn::GetAtt:
+          - analyticseslambdaroleF1E9EDBA
+          - Arn
+      Environment:
+        Variables:
+          AWS_DOMAIN:
+            Fn::Join:
+              - ""
+              - - https://
+                - Fn::GetAtt:
+                    - infineonkitrealtime
+                    - DomainEndpoint
+      Handler: com.JsonLambdaConverter
+      MemorySize: 256
+      Runtime: java8
+      Timeout: 120
+    DependsOn:
+      - analyticseslambdaroleF1E9EDBA
+  MetricsToEsFunctionEventInvokeConfig525F0B76:
+    Type: AWS::Lambda::EventInvokeConfig
+    Properties:
+      FunctionName:
+        Ref: MetricsToEsFunction18A9F7E0
+      Qualifier: $LATEST
+      MaximumEventAgeInSeconds: 60
+  MetricsToEsLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        Fn::Join:
+          - ""
+          - - /aws/lambda/
+            - Ref: MetricsToEsFunction18A9F7E0
+      RetentionInDays: 90
+    DependsOn:
+      - MetricsToEsFunctionEventInvokeConfig525F0B76
+      - MetricsToEsFunction18A9F7E0
+  iotlambdatopicrule:
+    Type: AWS::IoT::TopicRule
+    Properties:
+      TopicRulePayload:
+        Actions:
+          - Lambda:
+              FunctionArn:
+                Fn::GetAtt:
+                  - MetricsToEsFunction18A9F7E0
+                  - Arn
+          - Kinesis:
+              PartitionKey: ${topic(3)}
+              RoleArn:
+                Fn::GetAtt:
+                  - iotruleDF629FEB
+                  - Arn
+              StreamName:
+                Ref: infineonkitrealtimeDataStream8122D501
+          - Firehose:
+              DeliveryStreamName: infineonkitrealtime_logss3-delivery-stream
+              RoleArn:
+                Fn::GetAtt:
+                  - iotruleDF629FEB
+                  - Arn
+              Separator: "\n"
+        AwsIotSqlVersion: "2016-03-23"
+        RuleDisabled: false
+        Sql: SELECT * as pl, topic(3) as n FROM 'infn/dev/#'
+      RuleName: redirect_metrics
+  idpermissionlambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - MetricsToEsFunction18A9F7E0
+          - Arn
+      Principal: iot.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+          - iotlambdatopicrule
+          - Arn
+  CognitoDefaultAuthenticatedRoleC5D5C31E:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - cognito-sync:*
+              - cognito-identity:*
+              - es:ESHttpGet
+              - es:ESHttpPost
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      Description: ""
+      Path: /
+  authrole98FCF49E:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud:
+                  Ref: infineonkitrealtimeidentitypool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: authenticated
+            Effect: Allow
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Ref: CognitoDefaultAuthenticatedRoleC5D5C31E
+  CognitoDefaultUnauthenticatedRoleABBF7267:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - cognito-sync:*
+              - cognito-identity:*
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      Description: ""
+      Path: /
+  unauthrole20CAF2AB:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud:
+                  Ref: infineonkitrealtimeidentitypool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: unauthenticated
+            Effect: Allow
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Ref: CognitoDefaultUnauthenticatedRoleABBF7267
+  ipoolroleattachment:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Properties:
+      IdentityPoolId:
+        Ref: infineonkitrealtimeidentitypool
+      Roles:
+        authenticated:
+          Fn::GetAtt:
+            - authrole98FCF49E
+            - Arn
+        unauthenticated:
+          Fn::GetAtt:
+            - unauthrole20CAF2AB
+            - Arn
+  kinesisanalyticsrole69085149:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: kinesisanalytics.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaRole
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaKinesisExecutionRole
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/AmazonKinesisFullAccess
+  AnalyticsToCommonJsonLambdaRole934B1626:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  AnalyticsToCommonJsonLambda2646A9B3:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ../lambda/infn-analytics-to-json.jar
+      Role:
+        Fn::GetAtt:
+          - AnalyticsToCommonJsonLambdaRole934B1626
+          - Arn
+      Handler: com.JsonLambdaConverter
+      Runtime: java8
+      Timeout: 60
+    DependsOn:
+      - AnalyticsToCommonJsonLambdaRole934B1626
+  AnalyticsToCommonJsonLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        Fn::Join:
+          - ""
+          - - /aws/lambda/
+            - Ref: AnalyticsToCommonJsonLambda2646A9B3
+      RetentionInDays: 90
+    DependsOn:
+      - AnalyticsToCommonJsonLambda2646A9B3
+  infineonkitrealtimeanalyticsapp:
+    Type: AWS::KinesisAnalytics::Application
+    Properties:
+      Inputs:
+        - InputProcessingConfiguration:
+            InputLambdaProcessor:
+              ResourceARN:
+                Fn::GetAtt:
+                  - AnalyticsToCommonJsonLambda2646A9B3
+                  - Arn
+              RoleARN:
+                Fn::GetAtt:
+                  - kinesisanalyticsrole69085149
+                  - Arn
+          InputSchema:
+            RecordColumns:
+              - Mapping: $.dps368_temp_1_on
+                Name: dps368_temp_1_on
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_1_min
+                Name: dps368_temp_1_min
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_1_max
+                Name: dps368_temp_1_max
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_1_mean
+                Name: dps368_temp_1_mean
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_1_rms
+                Name: dps368_temp_1_rms
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_1_std
+                Name: dps368_temp_1_std
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_1_var
+                Name: dps368_temp_1_var
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_2_on
+                Name: dps368_temp_2_on
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_2_min
+                Name: dps368_temp_2_min
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_2_max
+                Name: dps368_temp_2_max
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_2_mean
+                Name: dps368_temp_2_mean
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_2_rms
+                Name: dps368_temp_2_rms
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_2_std
+                Name: dps368_temp_2_std
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_2_var
+                Name: dps368_temp_2_var
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_3_on
+                Name: dps368_temp_3_on
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_3_min
+                Name: dps368_temp_3_min
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_3_max
+                Name: dps368_temp_3_max
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_3_mean
+                Name: dps368_temp_3_mean
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_3_rms
+                Name: dps368_temp_3_rms
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_3_std
+                Name: dps368_temp_3_std
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_3_var
+                Name: dps368_temp_3_var
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_1_on
+                Name: dps368_pressure_1_on
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_1_min
+                Name: dps368_pressure_1_min
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_1_max
+                Name: dps368_pressure_1_max
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_1_mean
+                Name: dps368_pressure_1_mean
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_1_rms
+                Name: dps368_pressure_1_rms
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_1_std
+                Name: dps368_pressure_1_std
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_1_var
+                Name: dps368_pressure_1_var
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_2_on
+                Name: dps368_pressure_2_on
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_2_min
+                Name: dps368_pressure_2_min
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_2_max
+                Name: dps368_pressure_2_max
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_2_mean
+                Name: dps368_pressure_2_mean
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_2_rms
+                Name: dps368_pressure_2_rms
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_2_std
+                Name: dps368_pressure_2_std
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_2_var
+                Name: dps368_pressure_2_var
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_3_on
+                Name: dps368_pressure_3_on
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_3_min
+                Name: dps368_pressure_3_min
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_3_max
+                Name: dps368_pressure_3_max
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_3_mean
+                Name: dps368_pressure_3_mean
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_3_rms
+                Name: dps368_pressure_3_rms
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_3_std
+                Name: dps368_pressure_3_std
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_3_var
+                Name: dps368_pressure_3_var
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_1_on
+                Name: tli4971_current_1_on
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_1_min
+                Name: tli4971_current_1_min
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_1_max
+                Name: tli4971_current_1_max
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_1_mean
+                Name: tli4971_current_1_mean
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_1_rms
+                Name: tli4971_current_1_rms
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_1_std
+                Name: tli4971_current_1_std
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_1_var
+                Name: tli4971_current_1_var
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_2_on
+                Name: tli4971_current_2_on
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_2_min
+                Name: tli4971_current_2_min
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_2_max
+                Name: tli4971_current_2_max
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_2_mean
+                Name: tli4971_current_2_mean
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_2_rms
+                Name: tli4971_current_2_rms
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_2_std
+                Name: tli4971_current_2_std
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_2_var
+                Name: tli4971_current_2_var
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_3_on
+                Name: tli4971_current_3_on
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_3_min
+                Name: tli4971_current_3_min
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_3_max
+                Name: tli4971_current_3_max
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_3_mean
+                Name: tli4971_current_3_mean
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_3_rms
+                Name: tli4971_current_3_rms
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_3_std
+                Name: tli4971_current_3_std
+                SqlType: DOUBLE
+              - Mapping: $.tli4971_current_3_var
+                Name: tli4971_current_3_var
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_on
+                Name: tle4997e_hall_on
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_min
+                Name: tle4997e_hall_min
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_max
+                Name: tle4997e_hall_max
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_mean
+                Name: tle4997e_hall_mean
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_rms
+                Name: tle4997e_hall_rms
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_std
+                Name: tle4997e_hall_std
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_var
+                Name: tle4997e_hall_var
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_0
+                Name: tle4997e_hall_freq_0
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_1
+                Name: tle4997e_hall_freq_1
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_2
+                Name: tle4997e_hall_freq_2
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_3
+                Name: tle4997e_hall_freq_3
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_4
+                Name: tle4997e_hall_freq_4
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_5
+                Name: tle4997e_hall_freq_5
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_6
+                Name: tle4997e_hall_freq_6
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_7
+                Name: tle4997e_hall_freq_7
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_8
+                Name: tle4997e_hall_freq_8
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_9
+                Name: tle4997e_hall_freq_9
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_10
+                Name: tle4997e_hall_freq_10
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_11
+                Name: tle4997e_hall_freq_11
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_12
+                Name: tle4997e_hall_freq_12
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_13
+                Name: tle4997e_hall_freq_13
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_14
+                Name: tle4997e_hall_freq_14
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_15
+                Name: tle4997e_hall_freq_15
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_16
+                Name: tle4997e_hall_freq_16
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_17
+                Name: tle4997e_hall_freq_17
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_18
+                Name: tle4997e_hall_freq_18
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_19
+                Name: tle4997e_hall_freq_19
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_20
+                Name: tle4997e_hall_freq_20
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_21
+                Name: tle4997e_hall_freq_21
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_22
+                Name: tle4997e_hall_freq_22
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_23
+                Name: tle4997e_hall_freq_23
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_24
+                Name: tle4997e_hall_freq_24
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_25
+                Name: tle4997e_hall_freq_25
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_26
+                Name: tle4997e_hall_freq_26
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_27
+                Name: tle4997e_hall_freq_27
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_28
+                Name: tle4997e_hall_freq_28
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_29
+                Name: tle4997e_hall_freq_29
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_30
+                Name: tle4997e_hall_freq_30
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_31
+                Name: tle4997e_hall_freq_31
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_32
+                Name: tle4997e_hall_freq_32
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_33
+                Name: tle4997e_hall_freq_33
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_34
+                Name: tle4997e_hall_freq_34
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_35
+                Name: tle4997e_hall_freq_35
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_36
+                Name: tle4997e_hall_freq_36
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_37
+                Name: tle4997e_hall_freq_37
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_38
+                Name: tle4997e_hall_freq_38
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_39
+                Name: tle4997e_hall_freq_39
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_40
+                Name: tle4997e_hall_freq_40
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_41
+                Name: tle4997e_hall_freq_41
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_42
+                Name: tle4997e_hall_freq_42
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_43
+                Name: tle4997e_hall_freq_43
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_44
+                Name: tle4997e_hall_freq_44
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_45
+                Name: tle4997e_hall_freq_45
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_46
+                Name: tle4997e_hall_freq_46
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_47
+                Name: tle4997e_hall_freq_47
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_48
+                Name: tle4997e_hall_freq_48
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_49
+                Name: tle4997e_hall_freq_49
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_50
+                Name: tle4997e_hall_freq_50
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_51
+                Name: tle4997e_hall_freq_51
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_52
+                Name: tle4997e_hall_freq_52
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_53
+                Name: tle4997e_hall_freq_53
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_54
+                Name: tle4997e_hall_freq_54
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_55
+                Name: tle4997e_hall_freq_55
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_56
+                Name: tle4997e_hall_freq_56
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_57
+                Name: tle4997e_hall_freq_57
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_58
+                Name: tle4997e_hall_freq_58
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_59
+                Name: tle4997e_hall_freq_59
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_60
+                Name: tle4997e_hall_freq_60
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_61
+                Name: tle4997e_hall_freq_61
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_62
+                Name: tle4997e_hall_freq_62
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_63
+                Name: tle4997e_hall_freq_63
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_64
+                Name: tle4997e_hall_freq_64
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_65
+                Name: tle4997e_hall_freq_65
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_66
+                Name: tle4997e_hall_freq_66
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_67
+                Name: tle4997e_hall_freq_67
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_68
+                Name: tle4997e_hall_freq_68
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_69
+                Name: tle4997e_hall_freq_69
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_70
+                Name: tle4997e_hall_freq_70
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_71
+                Name: tle4997e_hall_freq_71
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_72
+                Name: tle4997e_hall_freq_72
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_73
+                Name: tle4997e_hall_freq_73
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_74
+                Name: tle4997e_hall_freq_74
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_75
+                Name: tle4997e_hall_freq_75
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_76
+                Name: tle4997e_hall_freq_76
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_77
+                Name: tle4997e_hall_freq_77
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_78
+                Name: tle4997e_hall_freq_78
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_79
+                Name: tle4997e_hall_freq_79
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_80
+                Name: tle4997e_hall_freq_80
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_81
+                Name: tle4997e_hall_freq_81
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_82
+                Name: tle4997e_hall_freq_82
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_83
+                Name: tle4997e_hall_freq_83
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_84
+                Name: tle4997e_hall_freq_84
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_85
+                Name: tle4997e_hall_freq_85
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_86
+                Name: tle4997e_hall_freq_86
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_87
+                Name: tle4997e_hall_freq_87
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_88
+                Name: tle4997e_hall_freq_88
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_89
+                Name: tle4997e_hall_freq_89
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_90
+                Name: tle4997e_hall_freq_90
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_91
+                Name: tle4997e_hall_freq_91
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_92
+                Name: tle4997e_hall_freq_92
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_93
+                Name: tle4997e_hall_freq_93
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_94
+                Name: tle4997e_hall_freq_94
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_95
+                Name: tle4997e_hall_freq_95
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_96
+                Name: tle4997e_hall_freq_96
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_97
+                Name: tle4997e_hall_freq_97
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_98
+                Name: tle4997e_hall_freq_98
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_99
+                Name: tle4997e_hall_freq_99
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_100
+                Name: tle4997e_hall_freq_100
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_101
+                Name: tle4997e_hall_freq_101
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_102
+                Name: tle4997e_hall_freq_102
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_103
+                Name: tle4997e_hall_freq_103
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_104
+                Name: tle4997e_hall_freq_104
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_105
+                Name: tle4997e_hall_freq_105
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_106
+                Name: tle4997e_hall_freq_106
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_107
+                Name: tle4997e_hall_freq_107
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_108
+                Name: tle4997e_hall_freq_108
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_109
+                Name: tle4997e_hall_freq_109
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_110
+                Name: tle4997e_hall_freq_110
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_111
+                Name: tle4997e_hall_freq_111
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_112
+                Name: tle4997e_hall_freq_112
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_113
+                Name: tle4997e_hall_freq_113
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_114
+                Name: tle4997e_hall_freq_114
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_115
+                Name: tle4997e_hall_freq_115
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_116
+                Name: tle4997e_hall_freq_116
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_117
+                Name: tle4997e_hall_freq_117
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_118
+                Name: tle4997e_hall_freq_118
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_119
+                Name: tle4997e_hall_freq_119
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_120
+                Name: tle4997e_hall_freq_120
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_121
+                Name: tle4997e_hall_freq_121
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_122
+                Name: tle4997e_hall_freq_122
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_123
+                Name: tle4997e_hall_freq_123
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_124
+                Name: tle4997e_hall_freq_124
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_125
+                Name: tle4997e_hall_freq_125
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_126
+                Name: tle4997e_hall_freq_126
+                SqlType: DOUBLE
+              - Mapping: $.tle4997e_hall_freq_127
+                Name: tle4997e_hall_freq_127
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_on
+                Name: im69d_mic_1_on
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_min
+                Name: im69d_mic_1_min
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_max
+                Name: im69d_mic_1_max
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_mean
+                Name: im69d_mic_1_mean
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_rms
+                Name: im69d_mic_1_rms
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_std
+                Name: im69d_mic_1_std
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_var
+                Name: im69d_mic_1_var
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_0
+                Name: im69d_mic_1_freq_0
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_1
+                Name: im69d_mic_1_freq_1
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_2
+                Name: im69d_mic_1_freq_2
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_3
+                Name: im69d_mic_1_freq_3
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_4
+                Name: im69d_mic_1_freq_4
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_5
+                Name: im69d_mic_1_freq_5
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_6
+                Name: im69d_mic_1_freq_6
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_7
+                Name: im69d_mic_1_freq_7
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_8
+                Name: im69d_mic_1_freq_8
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_9
+                Name: im69d_mic_1_freq_9
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_10
+                Name: im69d_mic_1_freq_10
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_11
+                Name: im69d_mic_1_freq_11
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_12
+                Name: im69d_mic_1_freq_12
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_13
+                Name: im69d_mic_1_freq_13
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_14
+                Name: im69d_mic_1_freq_14
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_15
+                Name: im69d_mic_1_freq_15
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_16
+                Name: im69d_mic_1_freq_16
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_17
+                Name: im69d_mic_1_freq_17
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_18
+                Name: im69d_mic_1_freq_18
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_19
+                Name: im69d_mic_1_freq_19
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_20
+                Name: im69d_mic_1_freq_20
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_21
+                Name: im69d_mic_1_freq_21
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_22
+                Name: im69d_mic_1_freq_22
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_23
+                Name: im69d_mic_1_freq_23
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_24
+                Name: im69d_mic_1_freq_24
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_25
+                Name: im69d_mic_1_freq_25
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_26
+                Name: im69d_mic_1_freq_26
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_27
+                Name: im69d_mic_1_freq_27
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_28
+                Name: im69d_mic_1_freq_28
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_29
+                Name: im69d_mic_1_freq_29
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_30
+                Name: im69d_mic_1_freq_30
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_31
+                Name: im69d_mic_1_freq_31
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_32
+                Name: im69d_mic_1_freq_32
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_33
+                Name: im69d_mic_1_freq_33
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_34
+                Name: im69d_mic_1_freq_34
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_35
+                Name: im69d_mic_1_freq_35
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_36
+                Name: im69d_mic_1_freq_36
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_37
+                Name: im69d_mic_1_freq_37
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_38
+                Name: im69d_mic_1_freq_38
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_39
+                Name: im69d_mic_1_freq_39
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_40
+                Name: im69d_mic_1_freq_40
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_41
+                Name: im69d_mic_1_freq_41
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_42
+                Name: im69d_mic_1_freq_42
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_43
+                Name: im69d_mic_1_freq_43
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_44
+                Name: im69d_mic_1_freq_44
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_45
+                Name: im69d_mic_1_freq_45
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_46
+                Name: im69d_mic_1_freq_46
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_47
+                Name: im69d_mic_1_freq_47
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_48
+                Name: im69d_mic_1_freq_48
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_49
+                Name: im69d_mic_1_freq_49
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_50
+                Name: im69d_mic_1_freq_50
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_51
+                Name: im69d_mic_1_freq_51
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_52
+                Name: im69d_mic_1_freq_52
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_53
+                Name: im69d_mic_1_freq_53
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_54
+                Name: im69d_mic_1_freq_54
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_55
+                Name: im69d_mic_1_freq_55
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_56
+                Name: im69d_mic_1_freq_56
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_57
+                Name: im69d_mic_1_freq_57
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_58
+                Name: im69d_mic_1_freq_58
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_59
+                Name: im69d_mic_1_freq_59
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_60
+                Name: im69d_mic_1_freq_60
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_61
+                Name: im69d_mic_1_freq_61
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_62
+                Name: im69d_mic_1_freq_62
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_63
+                Name: im69d_mic_1_freq_63
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_64
+                Name: im69d_mic_1_freq_64
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_65
+                Name: im69d_mic_1_freq_65
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_66
+                Name: im69d_mic_1_freq_66
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_67
+                Name: im69d_mic_1_freq_67
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_68
+                Name: im69d_mic_1_freq_68
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_69
+                Name: im69d_mic_1_freq_69
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_70
+                Name: im69d_mic_1_freq_70
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_71
+                Name: im69d_mic_1_freq_71
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_72
+                Name: im69d_mic_1_freq_72
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_73
+                Name: im69d_mic_1_freq_73
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_74
+                Name: im69d_mic_1_freq_74
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_75
+                Name: im69d_mic_1_freq_75
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_76
+                Name: im69d_mic_1_freq_76
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_77
+                Name: im69d_mic_1_freq_77
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_78
+                Name: im69d_mic_1_freq_78
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_79
+                Name: im69d_mic_1_freq_79
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_80
+                Name: im69d_mic_1_freq_80
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_81
+                Name: im69d_mic_1_freq_81
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_82
+                Name: im69d_mic_1_freq_82
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_83
+                Name: im69d_mic_1_freq_83
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_84
+                Name: im69d_mic_1_freq_84
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_85
+                Name: im69d_mic_1_freq_85
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_86
+                Name: im69d_mic_1_freq_86
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_87
+                Name: im69d_mic_1_freq_87
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_88
+                Name: im69d_mic_1_freq_88
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_89
+                Name: im69d_mic_1_freq_89
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_90
+                Name: im69d_mic_1_freq_90
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_91
+                Name: im69d_mic_1_freq_91
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_92
+                Name: im69d_mic_1_freq_92
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_93
+                Name: im69d_mic_1_freq_93
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_94
+                Name: im69d_mic_1_freq_94
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_95
+                Name: im69d_mic_1_freq_95
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_96
+                Name: im69d_mic_1_freq_96
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_97
+                Name: im69d_mic_1_freq_97
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_98
+                Name: im69d_mic_1_freq_98
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_99
+                Name: im69d_mic_1_freq_99
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_100
+                Name: im69d_mic_1_freq_100
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_101
+                Name: im69d_mic_1_freq_101
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_102
+                Name: im69d_mic_1_freq_102
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_103
+                Name: im69d_mic_1_freq_103
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_104
+                Name: im69d_mic_1_freq_104
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_105
+                Name: im69d_mic_1_freq_105
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_106
+                Name: im69d_mic_1_freq_106
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_107
+                Name: im69d_mic_1_freq_107
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_108
+                Name: im69d_mic_1_freq_108
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_109
+                Name: im69d_mic_1_freq_109
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_110
+                Name: im69d_mic_1_freq_110
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_111
+                Name: im69d_mic_1_freq_111
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_112
+                Name: im69d_mic_1_freq_112
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_113
+                Name: im69d_mic_1_freq_113
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_114
+                Name: im69d_mic_1_freq_114
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_115
+                Name: im69d_mic_1_freq_115
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_116
+                Name: im69d_mic_1_freq_116
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_117
+                Name: im69d_mic_1_freq_117
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_118
+                Name: im69d_mic_1_freq_118
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_119
+                Name: im69d_mic_1_freq_119
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_120
+                Name: im69d_mic_1_freq_120
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_121
+                Name: im69d_mic_1_freq_121
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_122
+                Name: im69d_mic_1_freq_122
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_123
+                Name: im69d_mic_1_freq_123
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_124
+                Name: im69d_mic_1_freq_124
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_125
+                Name: im69d_mic_1_freq_125
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_126
+                Name: im69d_mic_1_freq_126
+                SqlType: DOUBLE
+              - Mapping: $.im69d_mic_1_freq_127
+                Name: im69d_mic_1_freq_127
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_4_on
+                Name: dps368_temp_4_on
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_4_min
+                Name: dps368_temp_4_min
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_4_max
+                Name: dps368_temp_4_max
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_4_mean
+                Name: dps368_temp_4_mean
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_4_rms
+                Name: dps368_temp_4_rms
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_4_std
+                Name: dps368_temp_4_std
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_4_var
+                Name: dps368_temp_4_var
+                SqlType: DOUBLE
+              - Mapping: $.dps368_air_pressure_4_on
+                Name: dps368_air_pressure_4_on
+                SqlType: DOUBLE
+              - Mapping: $.dps368_air_pressure_4_min
+                Name: dps368_air_pressure_4_min
+                SqlType: DOUBLE
+              - Mapping: $.dps368_air_pressure_4_max
+                Name: dps368_air_pressure_4_max
+                SqlType: DOUBLE
+              - Mapping: $.dps368_air_pressure_4_mean
+                Name: dps368_air_pressure_4_mean
+                SqlType: DOUBLE
+              - Mapping: $.dps368_air_pressure_4_rms
+                Name: dps368_air_pressure_4_rms
+                SqlType: DOUBLE
+              - Mapping: $.dps368_air_pressure_4_std
+                Name: dps368_air_pressure_4_std
+                SqlType: DOUBLE
+              - Mapping: $.dps368_air_pressure_4_var
+                Name: dps368_air_pressure_4_var
+                SqlType: DOUBLE
+              - Mapping: $.tli4906hall_1_on
+                Name: tli4906hall_1_on
+                SqlType: DOUBLE
+              - Mapping: $.tli4906hall_1_min
+                Name: tli4906hall_1_min
+                SqlType: DOUBLE
+              - Mapping: $.tli4906hall_1_max
+                Name: tli4906hall_1_max
+                SqlType: DOUBLE
+              - Mapping: $.tli4906hall_1_mean
+                Name: tli4906hall_1_mean
+                SqlType: DOUBLE
+              - Mapping: $.tli4906hall_1_rms
+                Name: tli4906hall_1_rms
+                SqlType: DOUBLE
+              - Mapping: $.tli4906hall_1_std
+                Name: tli4906hall_1_std
+                SqlType: DOUBLE
+              - Mapping: $.tli4906hall_1_var
+                Name: tli4906hall_1_var
+                SqlType: DOUBLE
+              - Mapping: $.tle4913hall_1_on
+                Name: tle4913hall_1_on
+                SqlType: DOUBLE
+              - Mapping: $.tle4913hall_1_min
+                Name: tle4913hall_1_min
+                SqlType: DOUBLE
+              - Mapping: $.tle4913hall_1_max
+                Name: tle4913hall_1_max
+                SqlType: DOUBLE
+              - Mapping: $.tle4913hall_1_mean
+                Name: tle4913hall_1_mean
+                SqlType: DOUBLE
+              - Mapping: $.tle4913hall_1_rms
+                Name: tle4913hall_1_rms
+                SqlType: DOUBLE
+              - Mapping: $.tle4913hall_1_std
+                Name: tle4913hall_1_std
+                SqlType: DOUBLE
+              - Mapping: $.tle4913hall_1_var
+                Name: tle4913hall_1_var
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_5_on
+                Name: dps368_temp_5_on
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_5_min
+                Name: dps368_temp_5_min
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_5_max
+                Name: dps368_temp_5_max
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_5_mean
+                Name: dps368_temp_5_mean
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_5_rms
+                Name: dps368_temp_5_rms
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_5_std
+                Name: dps368_temp_5_std
+                SqlType: DOUBLE
+              - Mapping: $.dps368_temp_5_var
+                Name: dps368_temp_5_var
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_5_on
+                Name: dps368_pressure_5_on
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_5_min
+                Name: dps368_pressure_5_min
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_5_max
+                Name: dps368_pressure_5_max
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_5_mean
+                Name: dps368_pressure_5_mean
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_5_rms
+                Name: dps368_pressure_5_rms
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_5_std
+                Name: dps368_pressure_5_std
+                SqlType: DOUBLE
+              - Mapping: $.dps368_pressure_5_var
+                Name: dps368_pressure_5_var
+                SqlType: DOUBLE
+              - Mapping: $.tle4946k_hall_1_on
+                Name: tle4946k_hall_1_on
+                SqlType: DOUBLE
+              - Mapping: $.tle4946k_hall_1_min
+                Name: tle4946k_hall_1_min
+                SqlType: DOUBLE
+              - Mapping: $.tle4946k_hall_1_max
+                Name: tle4946k_hall_1_max
+                SqlType: DOUBLE
+              - Mapping: $.tle4946k_hall_1_mean
+                Name: tle4946k_hall_1_mean
+                SqlType: DOUBLE
+              - Mapping: $.tle4946k_hall_1_rms
+                Name: tle4946k_hall_1_rms
+                SqlType: DOUBLE
+              - Mapping: $.tle4946k_hall_1_std
+                Name: tle4946k_hall_1_std
+                SqlType: DOUBLE
+              - Mapping: $.tle4946k_hall_1_var
+                Name: tle4946k_hall_1_var
+                SqlType: DOUBLE
+              - Mapping: $.tle4946k_hall_2_on
+                Name: tle4946k_hall_2_on
+                SqlType: DOUBLE
+              - Mapping: $.tle4946k_hall_2_min
+                Name: tle4946k_hall_2_min
+                SqlType: DOUBLE
+              - Mapping: $.tle4946k_hall_2_max
+                Name: tle4946k_hall_2_max
+                SqlType: DOUBLE
+              - Mapping: $.tle4946k_hall_2_mean
+                Name: tle4946k_hall_2_mean
+                SqlType: DOUBLE
+              - Mapping: $.tle4946k_hall_2_rms
+                Name: tle4946k_hall_2_rms
+                SqlType: DOUBLE
+              - Mapping: $.tle4946k_hall_2_std
+                Name: tle4946k_hall_2_std
+                SqlType: DOUBLE
+              - Mapping: $.tle4946k_hall_2_var
+                Name: tle4946k_hall_2_var
+                SqlType: DOUBLE
+              - Mapping: $.tli4966g_double_hall_speed_1_on
+                Name: tli4966g_double_hall_speed_1_on
+                SqlType: DOUBLE
+              - Mapping: $.tli4966g_double_hall_speed_1_min
+                Name: tli4966g_double_hall_speed_1_min
+                SqlType: DOUBLE
+              - Mapping: $.tli4966g_double_hall_speed_1_max
+                Name: tli4966g_double_hall_speed_1_max
+                SqlType: DOUBLE
+              - Mapping: $.tli4966g_double_hall_speed_1_mean
+                Name: tli4966g_double_hall_speed_1_mean
+                SqlType: DOUBLE
+              - Mapping: $.tli4966g_double_hall_speed_1_rms
+                Name: tli4966g_double_hall_speed_1_rms
+                SqlType: DOUBLE
+              - Mapping: $.tli4966g_double_hall_speed_1_std
+                Name: tli4966g_double_hall_speed_1_std
+                SqlType: DOUBLE
+              - Mapping: $.tli4966g_double_hall_speed_1_var
+                Name: tli4966g_double_hall_speed_1_var
+                SqlType: DOUBLE
+              - Mapping: $.tli4966g_double_hall_dir_1_on
+                Name: tli4966g_double_hall_dir_1_on
+                SqlType: DOUBLE
+              - Mapping: $.tli4966g_double_hall_dir_1_min
+                Name: tli4966g_double_hall_dir_1_min
+                SqlType: DOUBLE
+              - Mapping: $.tli4966g_double_hall_dir_1_max
+                Name: tli4966g_double_hall_dir_1_max
+                SqlType: DOUBLE
+              - Mapping: $.tli4966g_double_hall_dir_1_mean
+                Name: tli4966g_double_hall_dir_1_mean
+                SqlType: DOUBLE
+              - Mapping: $.tli4966g_double_hall_dir_1_rms
+                Name: tli4966g_double_hall_dir_1_rms
+                SqlType: DOUBLE
+              - Mapping: $.tli4966g_double_hall_dir_1_std
+                Name: tli4966g_double_hall_dir_1_std
+                SqlType: DOUBLE
+              - Mapping: $.tli4966g_double_hall_dir_1_var
+                Name: tli4966g_double_hall_dir_1_var
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_x_1_on
+                Name: tli493d_magnetic_x_1_on
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_x_1_min
+                Name: tli493d_magnetic_x_1_min
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_x_1_max
+                Name: tli493d_magnetic_x_1_max
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_x_1_mean
+                Name: tli493d_magnetic_x_1_mean
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_x_1_rms
+                Name: tli493d_magnetic_x_1_rms
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_x_1_std
+                Name: tli493d_magnetic_x_1_std
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_x_1_var
+                Name: tli493d_magnetic_x_1_var
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_y_1_on
+                Name: tli493d_magnetic_y_1_on
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_y_1_min
+                Name: tli493d_magnetic_y_1_min
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_y_1_max
+                Name: tli493d_magnetic_y_1_max
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_y_1_mean
+                Name: tli493d_magnetic_y_1_mean
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_y_1_rms
+                Name: tli493d_magnetic_y_1_rms
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_y_1_std
+                Name: tli493d_magnetic_y_1_std
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_y_1_var
+                Name: tli493d_magnetic_y_1_var
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_z_1_on
+                Name: tli493d_magnetic_z_1_on
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_z_1_min
+                Name: tli493d_magnetic_z_1_min
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_z_1_max
+                Name: tli493d_magnetic_z_1_max
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_z_1_mean
+                Name: tli493d_magnetic_z_1_mean
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_z_1_rms
+                Name: tli493d_magnetic_z_1_rms
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_z_1_std
+                Name: tli493d_magnetic_z_1_std
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_z_1_var
+                Name: tli493d_magnetic_z_1_var
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_x_2_on
+                Name: tli493d_magnetic_x_2_on
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_x_2_min
+                Name: tli493d_magnetic_x_2_min
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_x_2_max
+                Name: tli493d_magnetic_x_2_max
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_x_2_mean
+                Name: tli493d_magnetic_x_2_mean
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_x_2_rms
+                Name: tli493d_magnetic_x_2_rms
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_x_2_std
+                Name: tli493d_magnetic_x_2_std
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_x_2_var
+                Name: tli493d_magnetic_x_2_var
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_y_2_on
+                Name: tli493d_magnetic_y_2_on
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_y_2_min
+                Name: tli493d_magnetic_y_2_min
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_y_2_max
+                Name: tli493d_magnetic_y_2_max
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_y_2_mean
+                Name: tli493d_magnetic_y_2_mean
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_y_2_rms
+                Name: tli493d_magnetic_y_2_rms
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_y_2_std
+                Name: tli493d_magnetic_y_2_std
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_y_2_var
+                Name: tli493d_magnetic_y_2_var
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_z_2_on
+                Name: tli493d_magnetic_z_2_on
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_z_2_min
+                Name: tli493d_magnetic_z_2_min
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_z_2_max
+                Name: tli493d_magnetic_z_2_max
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_z_2_mean
+                Name: tli493d_magnetic_z_2_mean
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_z_2_rms
+                Name: tli493d_magnetic_z_2_rms
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_z_2_std
+                Name: tli493d_magnetic_z_2_std
+                SqlType: DOUBLE
+              - Mapping: $.tli493d_magnetic_z_2_var
+                Name: tli493d_magnetic_z_2_var
+                SqlType: DOUBLE
+            RecordFormat:
+              RecordFormatType: JSON
+          KinesisStreamsInput:
+            ResourceARN:
+              Fn::GetAtt:
+                - infineonkitrealtimeDataStream8122D501
+                - Arn
+            RoleARN:
+              Fn::GetAtt:
+                - kinesisanalyticsrole69085149
+                - Arn
+          NamePrefix: input_stream
+      ApplicationCode: >
+        -- ** Anomaly detection **
+
+        -- Compute an anomaly score for each record in the source stream using Random Cut Forest
+
+        -- Creates a temporary stream and defines a metrics schema
+
+        CREATE OR REPLACE STREAM "METRICS_STREAM" (
+          "PARTITION_KEY"                       VARCHAR(512),
+          "SEQUENCE_NUMBER"                     VARCHAR(128),
+          "SHARD_ID"                            VARCHAR(64),
+          "APPROXIMATE_ARRIVAL_TIME"            VARCHAR(30),
+          "dps368_temp_1_mean"                  DOUBLE,
+          "dps368_temp_2_mean"                  DOUBLE,
+          "dps368_temp_5_mean"                  DOUBLE,
+          "dps368_pressure_1_mean"              DOUBLE,
+          "dps368_pressure_2_mean"              DOUBLE,
+          "dps368_pressure_5_mean"              DOUBLE,
+          "tli4971_current_1_rms"               DOUBLE,
+          "tli4971_current_2_rms"               DOUBLE,
+          "tli4971_current_3_rms"               DOUBLE,
+          "tle4997e_hall_mean"                  DOUBLE
+        );
+
+
+        -- Creates an output stream and defines a schema
+
+        CREATE OR REPLACE STREAM "SCORE_STREAM" (
+           "PARTITION_KEY"       varchar(512),
+           "SEQUENCE_NUMBER"       varchar(128),
+           "SHARD_ID"       varchar(64),
+           "APPROXIMATE_ARRIVAL_TIME"  varchar(30),
+           "ANOMALY_SCORE"  DOUBLE);
+
+        -- Select metrics for algorithm
+
+        CREATE OR REPLACE PUMP "METRICS_SEPARATION_PUMP" AS INSERT INTO "METRICS_STREAM"
+
+        SELECT STREAM "PARTITION_KEY", "SEQUENCE_NUMBER", "SHARD_ID", TIMESTAMP_TO_CHAR('yyyy-MM-dd''T''HH:mm:ss.SSSZ', "APPROXIMATE_ARRIVAL_TIME"),
+                        "dps368_temp_1_mean",
+                        "dps368_temp_2_mean",
+                        "dps368_temp_5_mean",
+                        "dps368_pressure_1_mean",
+                        "dps368_pressure_2_mean",
+                        "dps368_pressure_5_mean",
+                        1000 * "tli4971_current_1_rms",
+                        1000 * "tli4971_current_2_rms",
+                        1000 * "tli4971_current_3_rms",
+                        "tle4997e_hall_mean"
+        FROM "input_stream_001";
+
+
+        CREATE OR REPLACE PUMP "STREAM_PUMP_Others" AS INSERT INTO "SCORE_STREAM"
+
+        SELECT STREAM "PARTITION_KEY", "SEQUENCE_NUMBER", "SHARD_ID", "APPROXIMATE_ARRIVAL_TIME", "ANOMALY_SCORE"
+
+        FROM TABLE(
+            RANDOM_CUT_FOREST(
+                CURSOR(
+                    SELECT STREAM * FROM "METRICS_STREAM"
+                )
+            )
+        );
+      ApplicationName: infineonkitrealtime-analytics
+  analyticsesrolepolicy4D166F0D:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - es:ESHttpGet
+              - es:ESHttpPost
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      Description: ""
+      Path: /
+  analyticsesrole75C2B315:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Ref: analyticsesrolepolicy4D166F0D
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/AmazonKinesisAnalyticsFullAccess
+      RoleName: infineonkitrealtimeanalytics-es-role
+  AnomalyToEs699A16C9:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ../lambda/analytics-to-es.zip
+      Role:
+        Fn::GetAtt:
+          - analyticsesrole75C2B315
+          - Arn
+      Environment:
+        Variables:
+          AWS_DOMAIN:
+            Fn::Join:
+              - ""
+              - - https://
+                - Fn::GetAtt:
+                    - infineonkitrealtime
+                    - DomainEndpoint
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Timeout: 60
+    DependsOn:
+      - analyticsesrole75C2B315
+  AnalyticsToESLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        Fn::Join:
+          - ""
+          - - /aws/lambda/
+            - Ref: AnomalyToEs699A16C9
+      RetentionInDays: 90
+  anomalydetectionoutput:
+    Type: AWS::KinesisAnalytics::ApplicationOutput
+    Properties:
+      ApplicationName: infineonkitrealtime-analytics
+      Output:
+        DestinationSchema:
+          RecordFormatType: JSON
+        LambdaOutput:
+          ResourceARN:
+            Fn::GetAtt:
+              - AnomalyToEs699A16C9
+              - Arn
+          RoleARN:
+            Fn::GetAtt:
+              - kinesisanalyticsrole69085149
+              - Arn
+        Name: SCORE_STREAM
+    DependsOn:
+      - infineonkitrealtimeanalyticsapp
+  infineonkitrealtimeeshttppolicyF8A5CF50:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - es:ESHttpHead
+              - es:ESHttpPut
+              - es:ESHttpGet
+              - es:ESHttpPost
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - infineonkitrealtime
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - infineonkitrealtime
+                        - Arn
+                    - /*
+        Version: "2012-10-17"
+      Description: ""
+      Path: /
+  infineonkitrealtimehttpesroleEBCA8D42:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Ref: infineonkitrealtimeeshttppolicyF8A5CF50
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaRole
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  infineonkitrealtimehttpesroleDefaultPolicy00EEB28E:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - xray:PutTraceSegments
+              - xray:PutTelemetryRecords
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      PolicyName: infineonkitrealtimehttpesroleDefaultPolicy00EEB28E
+      Roles:
+        - Ref: infineonkitrealtimehttpesroleEBCA8D42
+  infineonkitrealtimeoncreateindex77A2B3A4:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ../lambda/create-index.zip
+      Role:
+        Fn::GetAtt:
+          - infineonkitrealtimehttpesroleEBCA8D42
+          - Arn
+      FunctionName: on-create-es-index
+      Handler: create_index_request.lambda_handler
+      Runtime: python3.7
+      Timeout: 180
+      TracingConfig:
+        Mode: Active
+    DependsOn:
+      - infineonkitrealtimehttpesroleDefaultPolicy00EEB28E
+      - infineonkitrealtimehttpesroleEBCA8D42
+  infineonkitrealtimeisindexcreatecomplete3F763E15:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ../lambda/create-index.zip
+      Role:
+        Fn::GetAtt:
+          - infineonkitrealtimehttpesroleEBCA8D42
+          - Arn
+      FunctionName: index-create-complete-function
+      Handler: create_index_response.is_complete
+      Runtime: python3.7
+      TracingConfig:
+        Mode: Active
+    DependsOn:
+      - infineonkitrealtimehttpesroleDefaultPolicy00EEB28E
+      - infineonkitrealtimehttpesroleEBCA8D42
+  infineonkitrealtimeesproviderresourceframeworkonEventServiceRole90B9E721:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  infineonkitrealtimeesproviderresourceframeworkonEventServiceRoleDefaultPolicyD4EB7055:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - infineonkitrealtimeoncreateindex77A2B3A4
+                - Arn
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - infineonkitrealtimeisindexcreatecomplete3F763E15
+                - Arn
+          - Action: states:StartExecution
+            Effect: Allow
+            Resource:
+              Ref: infineonkitrealtimeesproviderresourcewaiterstatemachine4E2B5E45
+        Version: "2012-10-17"
+      PolicyName: infineonkitrealtimeesproviderresourceframeworkonEventServiceRoleDefaultPolicyD4EB7055
+      Roles:
+        - Ref: infineonkitrealtimeesproviderresourceframeworkonEventServiceRole90B9E721
+  infineonkitrealtimeesproviderresourceframeworkonEventB395A41C:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ../lambda/custom-resource
+      Role:
+        Fn::GetAtt:
+          - infineonkitrealtimeesproviderresourceframeworkonEventServiceRole90B9E721
+          - Arn
+      Description: AWS CDK resource provider framework - onEvent (InfineonKitRealtime/infineonkitrealtimees-provider-resource)
+      Environment:
+        Variables:
+          USER_ON_EVENT_FUNCTION_ARN:
+            Fn::GetAtt:
+              - infineonkitrealtimeoncreateindex77A2B3A4
+              - Arn
+          USER_IS_COMPLETE_FUNCTION_ARN:
+            Fn::GetAtt:
+              - infineonkitrealtimeisindexcreatecomplete3F763E15
+              - Arn
+          WAITER_STATE_MACHINE_ARN:
+            Ref: infineonkitrealtimeesproviderresourcewaiterstatemachine4E2B5E45
+      Handler: framework.onEvent
+      Runtime: nodejs14.x
+      Timeout: 900
+    DependsOn:
+      - infineonkitrealtimeesproviderresourceframeworkonEventServiceRoleDefaultPolicyD4EB7055
+      - infineonkitrealtimeesproviderresourceframeworkonEventServiceRole90B9E721
+  infineonkitrealtimeesproviderresourceframeworkisCompleteServiceRoleF06EB541:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  infineonkitrealtimeesproviderresourceframeworkisCompleteServiceRoleDefaultPolicy59757920:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - infineonkitrealtimeoncreateindex77A2B3A4
+                - Arn
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - infineonkitrealtimeisindexcreatecomplete3F763E15
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: infineonkitrealtimeesproviderresourceframeworkisCompleteServiceRoleDefaultPolicy59757920
+      Roles:
+        - Ref: infineonkitrealtimeesproviderresourceframeworkisCompleteServiceRoleF06EB541
+  infineonkitrealtimeesproviderresourceframeworkisComplete718E63C1:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ../lambda/custom-resource
+      Role:
+        Fn::GetAtt:
+          - infineonkitrealtimeesproviderresourceframeworkisCompleteServiceRoleF06EB541
+          - Arn
+      Description: AWS CDK resource provider framework - isComplete (InfineonKitRealtime/infineonkitrealtimees-provider-resource)
+      Environment:
+        Variables:
+          USER_ON_EVENT_FUNCTION_ARN:
+            Fn::GetAtt:
+              - infineonkitrealtimeoncreateindex77A2B3A4
+              - Arn
+          USER_IS_COMPLETE_FUNCTION_ARN:
+            Fn::GetAtt:
+              - infineonkitrealtimeisindexcreatecomplete3F763E15
+              - Arn
+      Handler: framework.isComplete
+      Runtime: nodejs14.x
+      Timeout: 900
+    DependsOn:
+      - infineonkitrealtimeesproviderresourceframeworkisCompleteServiceRoleDefaultPolicy59757920
+      - infineonkitrealtimeesproviderresourceframeworkisCompleteServiceRoleF06EB541
+  infineonkitrealtimeesproviderresourceframeworkonTimeoutServiceRole1E4FAF8A:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  infineonkitrealtimeesproviderresourceframeworkonTimeoutServiceRoleDefaultPolicy1FC39617:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - infineonkitrealtimeoncreateindex77A2B3A4
+                - Arn
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - infineonkitrealtimeisindexcreatecomplete3F763E15
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: infineonkitrealtimeesproviderresourceframeworkonTimeoutServiceRoleDefaultPolicy1FC39617
+      Roles:
+        - Ref: infineonkitrealtimeesproviderresourceframeworkonTimeoutServiceRole1E4FAF8A
+  infineonkitrealtimeesproviderresourceframeworkonTimeoutAEEE1129:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ../lambda/custom-resource
+      Role:
+        Fn::GetAtt:
+          - infineonkitrealtimeesproviderresourceframeworkonTimeoutServiceRole1E4FAF8A
+          - Arn
+      Description: AWS CDK resource provider framework - onTimeout (InfineonKitRealtime/infineonkitrealtimees-provider-resource)
+      Environment:
+        Variables:
+          USER_ON_EVENT_FUNCTION_ARN:
+            Fn::GetAtt:
+              - infineonkitrealtimeoncreateindex77A2B3A4
+              - Arn
+          USER_IS_COMPLETE_FUNCTION_ARN:
+            Fn::GetAtt:
+              - infineonkitrealtimeisindexcreatecomplete3F763E15
+              - Arn
+      Handler: framework.onTimeout
+      Runtime: nodejs14.x
+      Timeout: 900
+    DependsOn:
+      - infineonkitrealtimeesproviderresourceframeworkonTimeoutServiceRoleDefaultPolicy1FC39617
+      - infineonkitrealtimeesproviderresourceframeworkonTimeoutServiceRole1E4FAF8A
+  infineonkitrealtimeesproviderresourcewaiterstatemachineRoleEE0415DF:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                Fn::Join:
+                  - ""
+                  - - states.
+                    - Ref: AWS::Region
+                    - .amazonaws.com
+        Version: "2012-10-17"
+  infineonkitrealtimeesproviderresourcewaiterstatemachineRoleDefaultPolicyED3F8F2D:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - infineonkitrealtimeesproviderresourceframeworkisComplete718E63C1
+                - Arn
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - infineonkitrealtimeesproviderresourceframeworkonTimeoutAEEE1129
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: infineonkitrealtimeesproviderresourcewaiterstatemachineRoleDefaultPolicyED3F8F2D
+      Roles:
+        - Ref: infineonkitrealtimeesproviderresourcewaiterstatemachineRoleEE0415DF
+  infineonkitrealtimeesproviderresourcewaiterstatemachine4E2B5E45:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      DefinitionString:
+        Fn::Join:
+          - ""
+          - - '{"StartAt":"framework-isComplete-task","States":{"framework-isComplete-task":{"End":true,"Retry":[{"ErrorEquals":["States.ALL"],"IntervalSeconds":5,"MaxAttempts":360,"BackoffRate":1}],"Catch":[{"ErrorEquals":["States.ALL"],"Next":"framework-onTimeout-task"}],"Type":"Task","Resource":"'
+            - Fn::GetAtt:
+                - infineonkitrealtimeesproviderresourceframeworkisComplete718E63C1
+                - Arn
+            - '"},"framework-onTimeout-task":{"End":true,"Type":"Task","Resource":"'
+            - Fn::GetAtt:
+                - infineonkitrealtimeesproviderresourceframeworkonTimeoutAEEE1129
+                - Arn
+            - '"}}}'
+      RoleArn:
+        Fn::GetAtt:
+          - infineonkitrealtimeesproviderresourcewaiterstatemachineRoleEE0415DF
+          - Arn
+    DependsOn:
+      - infineonkitrealtimeesproviderresourcewaiterstatemachineRoleDefaultPolicyED3F8F2D
+      - infineonkitrealtimeesproviderresourcewaiterstatemachineRoleEE0415DF
+  infineonkitrealtimeescreateindexcustomresource:
+    Type: AWS::CloudFormation::CustomResource
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - infineonkitrealtimeesproviderresourceframeworkonEventB395A41C
+          - Arn
+      requests:
+        method: POST
+        tp: 1619074520720
+        region:
+          Ref: AWS::Region
+        url:
+          Fn::GetAtt:
+            - infineonkitrealtime
+            - DomainEndpoint
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+  infineonkitrealtimecstmhttppolicy4B587302:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - es:ESHttpHead
+              - es:ESHttpPut
+              - es:ESHttpGet
+              - es:ESHttpPost
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - infineonkitrealtime
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - infineonkitrealtime
+                        - Arn
+                    - /*
+        Version: "2012-10-17"
+      Description: ""
+      Path: /
+  infineonkitrealtimehttpkibanarole049DC168:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Ref: infineonkitrealtimecstmhttppolicy4B587302
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaRole
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  infineonkitrealtimehttpkibanaroleDefaultPolicy1F314A27:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - xray:PutTraceSegments
+              - xray:PutTelemetryRecords
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      PolicyName: infineonkitrealtimehttpkibanaroleDefaultPolicy1F314A27
+      Roles:
+        - Ref: infineonkitrealtimehttpkibanarole049DC168
+  infineonkitrealtimeoneventB47E362D:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ../lambda/kibana-infn.zip
+      Role:
+        Fn::GetAtt:
+          - infineonkitrealtimehttpkibanarole049DC168
+          - Arn
+      FunctionName: infn-on-event-function
+      Handler: lambda.lambda_handler
+      Runtime: python3.7
+      Timeout: 120
+      TracingConfig:
+        Mode: Active
+    DependsOn:
+      - infineonkitrealtimehttpkibanaroleDefaultPolicy1F314A27
+      - infineonkitrealtimehttpkibanarole049DC168
+  infineonkitrealtimeiscomplete99A2905A:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ../lambda/kibana-infn.zip
+      Role:
+        Fn::GetAtt:
+          - infineonkitrealtimehttpkibanarole049DC168
+          - Arn
+      FunctionName: infn-is-complete-function
+      Handler: response.is_complete
+      Runtime: python3.7
+      TracingConfig:
+        Mode: Active
+    DependsOn:
+      - infineonkitrealtimehttpkibanaroleDefaultPolicy1F314A27
+      - infineonkitrealtimehttpkibanarole049DC168
+  infineonkitrealtimeproviderframeworkonEventServiceRole3DAA72BA:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  infineonkitrealtimeproviderframeworkonEventServiceRoleDefaultPolicy687F5345:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - infineonkitrealtimeoneventB47E362D
+                - Arn
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - infineonkitrealtimeiscomplete99A2905A
+                - Arn
+          - Action: states:StartExecution
+            Effect: Allow
+            Resource:
+              Ref: infineonkitrealtimeproviderwaiterstatemachineA6B900E7
+        Version: "2012-10-17"
+      PolicyName: infineonkitrealtimeproviderframeworkonEventServiceRoleDefaultPolicy687F5345
+      Roles:
+        - Ref: infineonkitrealtimeproviderframeworkonEventServiceRole3DAA72BA
+  infineonkitrealtimeproviderframeworkonEvent4BCB3609:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ../lambda/custom-resource
+      Role:
+        Fn::GetAtt:
+          - infineonkitrealtimeproviderframeworkonEventServiceRole3DAA72BA
+          - Arn
+      Description: AWS CDK resource provider framework - onEvent (InfineonKitRealtime/infineonkitrealtimeprovider)
+      Environment:
+        Variables:
+          USER_ON_EVENT_FUNCTION_ARN:
+            Fn::GetAtt:
+              - infineonkitrealtimeoneventB47E362D
+              - Arn
+          USER_IS_COMPLETE_FUNCTION_ARN:
+            Fn::GetAtt:
+              - infineonkitrealtimeiscomplete99A2905A
+              - Arn
+          WAITER_STATE_MACHINE_ARN:
+            Ref: infineonkitrealtimeproviderwaiterstatemachineA6B900E7
+      Handler: framework.onEvent
+      Runtime: nodejs14.x
+      Timeout: 900
+    DependsOn:
+      - infineonkitrealtimeproviderframeworkonEventServiceRoleDefaultPolicy687F5345
+      - infineonkitrealtimeproviderframeworkonEventServiceRole3DAA72BA
+  infineonkitrealtimeproviderframeworkisCompleteServiceRole43F1073E:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  infineonkitrealtimeproviderframeworkisCompleteServiceRoleDefaultPolicyD230F472:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - infineonkitrealtimeoneventB47E362D
+                - Arn
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - infineonkitrealtimeiscomplete99A2905A
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: infineonkitrealtimeproviderframeworkisCompleteServiceRoleDefaultPolicyD230F472
+      Roles:
+        - Ref: infineonkitrealtimeproviderframeworkisCompleteServiceRole43F1073E
+  infineonkitrealtimeproviderframeworkisCompleteC17B6793:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ../lambda/custom-resource
+      Role:
+        Fn::GetAtt:
+          - infineonkitrealtimeproviderframeworkisCompleteServiceRole43F1073E
+          - Arn
+      Description: AWS CDK resource provider framework - isComplete (InfineonKitRealtime/infineonkitrealtimeprovider)
+      Environment:
+        Variables:
+          USER_ON_EVENT_FUNCTION_ARN:
+            Fn::GetAtt:
+              - infineonkitrealtimeoneventB47E362D
+              - Arn
+          USER_IS_COMPLETE_FUNCTION_ARN:
+            Fn::GetAtt:
+              - infineonkitrealtimeiscomplete99A2905A
+              - Arn
+      Handler: framework.isComplete
+      Runtime: nodejs14.x
+      Timeout: 900
+    DependsOn:
+      - infineonkitrealtimeproviderframeworkisCompleteServiceRoleDefaultPolicyD230F472
+      - infineonkitrealtimeproviderframeworkisCompleteServiceRole43F1073E
+  infineonkitrealtimeproviderframeworkonTimeoutServiceRoleF57D0DFF:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  infineonkitrealtimeproviderframeworkonTimeoutServiceRoleDefaultPolicy749E8999:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - infineonkitrealtimeoneventB47E362D
+                - Arn
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - infineonkitrealtimeiscomplete99A2905A
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: infineonkitrealtimeproviderframeworkonTimeoutServiceRoleDefaultPolicy749E8999
+      Roles:
+        - Ref: infineonkitrealtimeproviderframeworkonTimeoutServiceRoleF57D0DFF
+  infineonkitrealtimeproviderframeworkonTimeout8111D0D3:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ../lambda/custom-resource
+      Role:
+        Fn::GetAtt:
+          - infineonkitrealtimeproviderframeworkonTimeoutServiceRoleF57D0DFF
+          - Arn
+      Description: AWS CDK resource provider framework - onTimeout (InfineonKitRealtime/infineonkitrealtimeprovider)
+      Environment:
+        Variables:
+          USER_ON_EVENT_FUNCTION_ARN:
+            Fn::GetAtt:
+              - infineonkitrealtimeoneventB47E362D
+              - Arn
+          USER_IS_COMPLETE_FUNCTION_ARN:
+            Fn::GetAtt:
+              - infineonkitrealtimeiscomplete99A2905A
+              - Arn
+      Handler: framework.onTimeout
+      Runtime: nodejs14.x
+      Timeout: 900
+    DependsOn:
+      - infineonkitrealtimeproviderframeworkonTimeoutServiceRoleDefaultPolicy749E8999
+      - infineonkitrealtimeproviderframeworkonTimeoutServiceRoleF57D0DFF
+  infineonkitrealtimeproviderwaiterstatemachineRole3F5B536E:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                Fn::Join:
+                  - ""
+                  - - states.
+                    - Ref: AWS::Region
+                    - .amazonaws.com
+        Version: "2012-10-17"
+  infineonkitrealtimeproviderwaiterstatemachineRoleDefaultPolicyEC362DC4:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - infineonkitrealtimeproviderframeworkisCompleteC17B6793
+                - Arn
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - infineonkitrealtimeproviderframeworkonTimeout8111D0D3
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: infineonkitrealtimeproviderwaiterstatemachineRoleDefaultPolicyEC362DC4
+      Roles:
+        - Ref: infineonkitrealtimeproviderwaiterstatemachineRole3F5B536E
+  infineonkitrealtimeproviderwaiterstatemachineA6B900E7:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      DefinitionString:
+        Fn::Join:
+          - ""
+          - - '{"StartAt":"framework-isComplete-task","States":{"framework-isComplete-task":{"End":true,"Retry":[{"ErrorEquals":["States.ALL"],"IntervalSeconds":5,"MaxAttempts":360,"BackoffRate":1}],"Catch":[{"ErrorEquals":["States.ALL"],"Next":"framework-onTimeout-task"}],"Type":"Task","Resource":"'
+            - Fn::GetAtt:
+                - infineonkitrealtimeproviderframeworkisCompleteC17B6793
+                - Arn
+            - '"},"framework-onTimeout-task":{"End":true,"Type":"Task","Resource":"'
+            - Fn::GetAtt:
+                - infineonkitrealtimeproviderframeworkonTimeout8111D0D3
+                - Arn
+            - '"}}}'
+      RoleArn:
+        Fn::GetAtt:
+          - infineonkitrealtimeproviderwaiterstatemachineRole3F5B536E
+          - Arn
+    DependsOn:
+      - infineonkitrealtimeproviderwaiterstatemachineRoleDefaultPolicyEC362DC4
+      - infineonkitrealtimeproviderwaiterstatemachineRole3F5B536E
+  infineonkitrealtimecustom:
+    Type: AWS::CloudFormation::CustomResource
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - infineonkitrealtimeproviderframeworkonEvent4BCB3609
+          - Arn
+      requests:
+        method: POST
+        tp: 1619074520746
+        region:
+          Ref: AWS::Region
+        url:
+          Fn::GetAtt:
+            - infineonkitrealtime
+            - DomainEndpoint
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+Outputs:
+  AnalyticsApp:
+    Description: Analytics app name
+    Value: infineonkitrealtime-analytics
+  deviceLogs:
+    Description: Bucket name with device telematics data
+    Value:
+      Ref: infnlogs5F4229D2
+  KibanaUrl:
+    Description: Access Kibana via this URL.
+    Value:
+      Fn::Join:
+        - ""
+        - - https://
+          - Fn::GetAtt:
+              - infineonkitrealtime
+              - DomainEndpoint
+          - /_plugin/kibana/
+

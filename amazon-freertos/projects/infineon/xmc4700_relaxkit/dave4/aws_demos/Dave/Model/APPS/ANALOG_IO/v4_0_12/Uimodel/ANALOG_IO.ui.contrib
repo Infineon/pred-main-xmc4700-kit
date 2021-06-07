@@ -1,0 +1,18 @@
+<p1:Tab  xmlns="http://www.eclipse.org/xwt/presentation" xmlns:x="http://www.eclipse.org/xwt" xmlns:p1="clr-namespace:com.ifx.davex.ui.controls.app" x:Class="e" layout="{x:Null}">
+	<p1:TabFolder bounds="5, 5, 500, 600">
+		<p1:GTab text="INFO" widgetName="tab_conf" visible="true" enabled="true" manifestObj="true">
+			<p1:GTab.control>
+				<p1:Tab>
+					<p1:Tab.layout>
+						<GridLayout/>
+					</p1:Tab.layout>
+					<p1:GString x:Style="BORDER | WRAP" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gstring_note" value="ANALOG_IO APP  is used to allocate analog port pin. &#13;&#10;No configuration and API are provided." description="&lt;UL&gt;&lt;LI&gt;ANALOG_IO APP  is used to allocate analog port pin. &#13;&#10;No configuration and API are provided.&lt;/LI&gt;&lt;/UL&gt;" enabled="false">
+						<p1:GString.layoutData>
+							<GridData horizontalAlignment="RIGHT" widthHint="294" heightHint="37"/>
+						</p1:GString.layoutData>
+					</p1:GString>
+				</p1:Tab>
+			</p1:GTab.control>
+		</p1:GTab>
+	</p1:TabFolder>
+</p1:Tab>

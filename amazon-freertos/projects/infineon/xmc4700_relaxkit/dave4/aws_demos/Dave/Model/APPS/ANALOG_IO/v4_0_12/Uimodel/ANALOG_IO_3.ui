@@ -1,0 +1,37 @@
+<p1:Tab  xmlns="http://www.eclipse.org/xwt/presentation" xmlns:x="http://www.eclipse.org/xwt" xmlns:p1="clr-namespace:com.ifx.davex.ui.controls.app" x:Class="e" layout="{x:Null}">
+	<p1:TabFolder bounds="5, 5, 500, 600">
+		<p1:GTab text="General Settings" widgetName="General_Settings_TAB" visible="true" enabled="true" manifestObj="true">
+			<p1:GTab.control>
+				<p1:Tab layout="{x:Null}">
+					<p1:GGroup text="Pin Settings" manifestObj="true" widgetName="ggroup_digital_input_settings" bounds="5, 5, 478, 137">
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2"/>
+						</p1:GGroup.layout>
+						<p1:GLabel text="Pull device :" visible="true" manifestObj="true" widgetName="glabel_pull_device"/>
+						<p1:GCombo description="Selection of weak pull-up or pull-down device in the pad as well as the hardware controlled inter peripheral connections.&#13;&#10;&lt;UL&gt;&#13;&#10;&lt;LI&gt; None : No internal pull device active&lt;/LI&gt;&#13;&#10;&lt;LI&gt; Pull Up : Internal pull-up device active&lt;/LI&gt;&#13;&#10;&lt;LI&gt; Pull Down : Internal pull-down device active&lt;/LI&gt;&#13;&#10;&lt;LI&gt; Hardware Controlled : Hardware pull controlled inter peripheral connections&lt;/LI&gt;&#13;&#10;&lt;/UL&gt;&#13;&#10;" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="None&#13;&#10;Pull Up&#13;&#10;Pull Down&#13;&#10;Hardware Controlled" toolTipText="Select Pull up/Pull down Devices" value="None" widgetName="gcombo_pull_device">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GCheck text="Enable digital input" manifestObj="true" widgetName="gcheck_enable_digital_input" description="Enables digital input path for analog port pin.&lt;br&gt;&#13;&#10;Sets the Port PDISC register bit field PDIS">
+							<p1:GCheck.layoutData>
+								<GridData horizontalSpan="2"/>
+							</p1:GCheck.layoutData>
+						</p1:GCheck>
+						<p1:GCheck manifestObj="true" text="Enable digital input inversion" widgetName="gcheck_enable_digital_input_inversion" description="Inverts the digital input.">
+							<p1:GCheck.layoutData>
+								<GridData horizontalSpan="2"/>
+							</p1:GCheck.layoutData>
+						</p1:GCheck>
+						<p1:GLabel manifestObj="true" text="Hysteresis:" widgetName="glabel_hysteresis"/>
+						<p1:GCombo description="Provides optimized pad oscillation behaviour for touch-sensing applications.&lt;br&gt;&#13;&#10;&#13;&#10;NOTE: Available only for XMC1x family.&lt;BR&gt;" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Standard&#13;&#10;Large" toolTipText="Select Pad Hysteresis Control" value="Standard" widgetName="gcombo_hysteresis">
+							<p1:GCombo.layoutData>
+								<GridData widthHint="141" horizontalAlignment="FILL"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+					</p1:GGroup>
+				</p1:Tab>
+			</p1:GTab.control>
+		</p1:GTab>
+	</p1:TabFolder>
+</p1:Tab>

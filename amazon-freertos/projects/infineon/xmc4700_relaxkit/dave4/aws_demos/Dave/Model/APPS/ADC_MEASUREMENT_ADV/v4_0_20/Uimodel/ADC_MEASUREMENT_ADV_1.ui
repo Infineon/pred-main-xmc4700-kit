@@ -1,0 +1,610 @@
+<p1:Tab  xmlns="http://www.eclipse.org/xwt/presentation" xmlns:x="http://www.eclipse.org/xwt" xmlns:p1="clr-namespace:com.ifx.davex.ui.controls.app" x:Class="e" layout="{x:Null}">
+    <p1:TabFolder bounds="3, 4, 761, 569">
+        <p1:GTab text="Overview" visible="true" enabled="true" manifestObj="true" widgetName="gtab_overview">
+            <p1:GTab.control>
+                <p1:Tab widgetName="composite_8">
+                    <p1:GImage visible="true" widgetName="gimage_overview" bounds="7, 7, 738, 426" path="Uimodel/General_settings_adc_queue_scan.png" manifestObj="true">
+                        <p1:GFloat description="This is the actual sample time value (non-editable). This is the duration for which the ADC samples the input signal." enabled="false" format="*,3" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" maxValue="10000" minValue="0" widgetName="gstring_actual_sampleT" x:Style="BORDER" bounds="227, 228, 128, 21"/>
+                        <p1:GFloat description="Shows the total conversion time, the configuration is done in the required source APP (non-editable)." enabled="false" format="*,3" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" maxValue="POSITIVE_INFINITY" minValue="0" widgetName="gstring_coversion_time" x:Style="BORDER" bounds="227, 271, 127, 21"/>
+                        <p1:GString x:Style="BORDER" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gstring_trigger_edge_sel" enabled="false" value="Falling Edge" bounds="90, 180, 76, 21" description="Shows the trigger configuration, the configuration is done in the required source APP (non-editable).&#13;&#10;&lt;UL&gt;&#13;&#10;&lt;LI&gt;No Trigger: To ignore the Trigger signal. &lt;/LI&gt;&#13;&#10;&lt;LI&gt;Rising Edge : To trigger the scan / queue conversion on a rising edge.&lt;/LI&gt;&#13;&#10;&lt;LI&gt;Falling Edge :  To trigger the scan / queue conversion on a falling edge .&lt;/LI&gt;&#13;&#10;&lt;LI&gt;Both Edges: To trigger the scan / queue conversion on both rising and falling edges.&lt;/LI&gt;&#13;&#10;&lt;/ul&gt;"/>
+                        <p1:GString enabled="false" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" value="Always convert" widgetName="gstring_gating_sel" x:Style="BORDER" bounds="90, 245, 103, 21" description="Shows the gating configuration, the configuration is done in the required source APP (non-editable).&#13;&#10;&lt;UL&gt;&#13;&#10;&lt;LI&gt; Block conversion: All conversion requests are blocked.&lt;/LI&gt;&#13;&#10;&lt;LI&gt;Always convert: All conversion requests are issued if there are valid entries present in the scan / queue.&lt;/LI&gt;&#13;&#10;&lt;LI&gt;Ungate on a high: Conversion requests are issued only when gate level is high.&lt;/LI&gt;&#13;&#10;&lt;LI&gt;Ungate on a low: Conversion requests are issued only when gate level is low.&lt;/LI&gt;&#13;&#10;&lt;/ul&gt;"/>
+                        <p1:GString enabled="false" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" value="10 Bit Fast Conversion" widgetName="gstring_conv_mode" x:Style="BORDER" bounds="227, 182, 129, 21" description="Shows the actual result resolution, the configuration is done in the required source APP (non-editable).&#13;&#10;&lt;UL&gt;&#13;&#10;&lt;LI&gt;12 Bit Conversion: The result of the conversion will have a resolution of 12 bits. &lt;/LI&gt;&#13;&#10;&lt;LI&gt;10 Bit Conversion: The result of the conversion will have a resolution of 10 bits. &lt;/LI&gt;&#13;&#10;&lt;LI&gt;8 Bit Conversion: The result of the conversion will have a resolution of 8 bits. &lt;/LI&gt;&#13;&#10;&lt;LI&gt;10 Bit Fast Conversion: This mode will raise only one bit in the result register. After comparison with the actual signal, if the analog signal value is greater than the compare value, the result register&apos;s FCM bit will be set to high, else it will set low.&lt;/LI&gt;"/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="ADC_SCAN_APP&#13;&#10;ADC_QUEUE_APP" value="ADC_SCAN_APP" widgetName="gcombo_req_src_selection" bounds="89, 113, 125, 21" toolTipText="Select either scan or queue request source for conversion." description="Select the required source APP needed for the conversion of the channels.&#13;&#10;&lt;ul&gt;&#13;&#10;&lt;li&gt; Uses queue request source, if ADC_QUEUE_APP is selected &lt;/li&gt;&#13;&#10;&lt;li&gt; Uses scan request source, if ADC_SCAN_APP is selected &lt;/li&gt;&#13;&#10;&lt;li&gt; Queue request source enables flexible sequence of conversion. &lt;/li&gt;&#13;&#10;&lt;li&gt; Scan request source uses a fixed sequence of conversion (Always from higher channel number to a lower channel number). &lt;/li&gt;&#13;&#10;&lt;/ul&gt;"/>
+                        <p1:GCheck manifestObj="true" text="Start after initialization" widgetName="gcheck_insert_at_init" bounds="76, 395, 180, 16" toolTipText="This enables the ADC after initialization; the start of conversion is configured by the trigger options." description="Insert the channels into the H/W registers.&#13;&#10;&lt;ul&gt;&#13;&#10;&lt;li&gt;QUEUE sequencer with wait for trigger: Starts the conversion of the channel on a trigger event. Trigger event is generated either by an external trigger signal or by calling ADC_MEASUREMENT_ADV_StartConversion().&lt;/li&gt;&#13;&#10;&lt;li&gt;QUEUE sequencer without wait for trigger: Starts conversion as soon as the channel is inserted into the queue buffer.&lt;/li&gt;&#13;&#10;&lt;li&gt;SCAN request source with external trigger: Starts conversion on a trigger event.  Trigger event is generated either by a external trigger signal or by calling ADC_MEASUREMENT_ADV_StartConversion().&lt;/li&gt;&#13;&#10;&lt;li&gt;SCAN request source without external trigger: Starts conversion on a ADC_MEASUREMENT_ADV_StartConversion().&#13;&#10;&lt;/ul&gt;&#13;&#10;&lt;br&gt;&#13;&#10;&lt;b&gt;Note:&lt;/b&gt;&#13;&#10;&lt;ul&gt;&#13;&#10;&lt;li&gt; For Queue request source, this will insert the channels into the GxQINR0 register. &lt;/li&gt;&#13;&#10;&lt;li&gt; For Scan request source, this will insert the channels into the GxASSEL register. &lt;/li&gt;&#13;&#10;&lt;/ul&gt;&#13;&#10;" value="true"/>
+                        <p1:GInteger x:Style="NONE" minValue="1" maxValue="8" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" format="(com.ifx.davex.ui.controls.util.AppUiConstants).DEC" manifestObj="true" widgetName="gfloat_no_of_channels" bounds="197, 65, 77, 23" value="1" toolTipText="Configure the required number of channels for conversion." description="Specify number of analog input channels to be measured.&#13;&#10;&lt;UL&gt;&#13;&#10;&lt;LI&gt;The maximum value will depend on the available number of channels for the given device &lt;/LI&gt;"/>
+                        <p1:GInteger x:Style="NONE" minValue="0" maxValue="4" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" format="(com.ifx.davex.ui.controls.util.AppUiConstants).DEC" manifestObj="true" widgetName="ginteger_num_cev" enabled="false" value="0" bounds="569, 84, 25, 23" description="Shows the number of channel events configured in this APP (non-editable)."/>
+                        <p1:GInteger bounds="480, 310, 25, 23" enabled="false" format="(com.ifx.davex.ui.controls.util.AppUiConstants).DEC" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" maxValue="32" minValue="0" value="0" widgetName="ginteger_num_sync_slaves" description="Shows the number of Sync slave channels configured in in this APP (non-editable)."/>
+                        <p1:GInteger bounds="571, 204, 25, 23" enabled="false" format="(com.ifx.davex.ui.controls.util.AppUiConstants).DEC" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" maxValue="8" minValue="0" value="0" widgetName="ginteger_num_rev" description="Shows the number of result events configured in this APP (non-editable)."/>
+                        <p1:GInteger bounds="571, 288, 25, 23" enabled="false" format="(com.ifx.davex.ui.controls.util.AppUiConstants).DEC" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" maxValue="8" minValue="0" value="0" widgetName="ginteger_num_src_event" description="Shows the number of the channels which will request for a source event. Configured in this APP (non-editable).&#13;&#10;&lt;ul&gt;&#13;&#10;&lt;li&gt; In Queue the max value is 8 because all the channels can request a source event.&lt;/li&gt;&#13;&#10;&lt;li&gt; In Scan the max value is 1 because only after the last channel a source event occurs.&lt;/li&gt;&#13;&#10;&lt;/ul&gt;"/>
+                        <p1:GCheck manifestObj="true" widgetName="gcheck_expose_queue_scan" bounds="97, 138, 16, 16" toolTipText="Exposes the request source APP." description="Expose the request source APP. Each instance of the APP requests whether it should be connected to an request source APP or to consume the request source internally. If enabled the request source APP (ADC_SCAN/ ADC_QUEUE) will be added to the project. &lt;BR&gt;&#13;&#10;This feature enables sharing of the same request source between different APPS.&#13;&#10;"/>
+                    </p1:GImage>
+                    <p1:GLabel text="Note: &#13;&#10;Configure &apos;Trigger edge selection&apos; and &apos;Gating selection&apos; in ADC_SCAN / ADC_QUEUE APP." visible="true" widgetName="glabel_trigger_note" bounds="83, 433, 540, 40" manifestObj="true"/>
+                </p1:Tab>
+            </p1:GTab.control>
+        </p1:GTab>
+        <p1:GTab text="General Settings" visible="true" enabled="true" manifestObj="true" widgetName="gtab_general_configuration">
+        	<p1:GTab.control>
+        		<p1:Tab widgetName="composite_19">
+        			<p1:GGroup bounds="6, 4, 476, 170" manifestObj="true" text="Request Source Settings" widgetName="gGroup_queue_config">
+        				<p1:GGroup.layout>
+        					<GridLayout marginTop="5" numColumns="2"/>
+        				</p1:GGroup.layout>
+        				<p1:GLabel manifestObj="true" text="Trigger edge selection:" toolTipText="Select Required Edge Signal" widgetName="glabel_trigger_edge_select"/>
+        				<p1:GCombo description="Configures the Trigger edge of queue request source.&#13;&#10;&lt;UL&gt;&#13;&#10;&lt;LI&gt;No External Trigger: To ignore the Trigger signal. &lt;/LI&gt;&#13;&#10;&lt;LI&gt;External Trigger Upon Rising Edge : To trigger the queue conversion on a rising edge.&lt;/LI&gt;&#13;&#10;&lt;LI&gt;External Trigger Upon Falling Edge :  To trigger the queue conversion on a falling edge .&lt;/LI&gt;&#13;&#10;&lt;LI&gt;External Trigger Upon Both The Edge: To trigger the queue conversion on both rising and falling edges.&lt;/LI&gt;" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No External Trigger&#13;&#10;External Trigger Upon Rising Edge&#13;&#10;External Trigger Upon Falling Edge&#13;&#10;External Trigger Upon Both The Edge" toolTipText="Select the trigger operating mode to start ADC conversions." value="No External Trigger" widgetName="gcombo_trigger_edge_select">
+        					<p1:GCombo.layoutData>
+        						<GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+        					</p1:GCombo.layoutData>
+        				</p1:GCombo>
+        				<p1:GLabel manifestObj="true" text="Gating selection:" toolTipText="Select the required gating mode" widgetName="glabel_gating_select"/>
+        				<p1:GCombo description="Configures the Gating mode for the queue request source.&#13;&#10;&lt;UL&gt;&#13;&#10;&lt;LI&gt; No Conversion Request is Issued: All conversion requests are blocked.&lt;/LI&gt;&#13;&#10;&lt;LI&gt;All Conversion Requests are Issued: All conversion requests are issued if there are valid entries present in the queue.&lt;/LI&gt;&#13;&#10;&lt;LI&gt;Conversion Request Issued When Gate is High: Conversion requests are issued only when gate level is high.&lt;/LI&gt;&#13;&#10;&lt;LI&gt;Conversion Request Issued When Gate is Low: Conversion requests are issued only when gate level is low.&lt;/LI&gt;" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No Conversion Request is Issued&#13;&#10;All Conversion Requests are Issued&#13;&#10;Conversion Request Issued When Gate is High&#13;&#10;Conversion Request Issued When Gate is Low" toolTipText="Select the gating mode on which conversion requests are issued." value="All Conversion Requests are Issued" widgetName="gcombo_gating_select">
+        					<p1:GCombo.layoutData>
+        						<GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+        					</p1:GCombo.layoutData>
+        				</p1:GCombo>
+        				<p1:GLabel manifestObj="true" text="Priority of queue source:" toolTipText="Select the priority" widgetName="glabel_priority"/>
+        				<p1:GCombo description="This is Arbitration priority of queue request source.&#13;&#10;Priority-0 would be the lowest priority and Priority-3 would be the highest.&#13;&#10;This determines the request source which would be selected during the arbitration round. Range : 0x0 to 0x3 " mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Priority-0  (Lowest Priority)&#13;&#10;Priority-1&#13;&#10;Priority-2&#13;&#10;Priority-3 (Highest Priority)&#13;&#10;" toolTipText="Select the priority for the queue request source (Arbitration priority)." value="Priority-0  (Lowest Priority)" widgetName="gcombo_priority">
+        					<p1:GCombo.layoutData>
+        						<GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL" verticalAlignment="FILL"/>
+        					</p1:GCombo.layoutData>
+        				</p1:GCombo>
+        				<p1:GLabel manifestObj="true" text="Conversion start mode:" toolTipText="Select the required start mode" widgetName="glabel_adc_startmode"/>
+        				<p1:GCombo description="Selecting start mode starts the conversion.&#13;&#10;&lt;UL&gt;&#13;&#10;&lt;LI&gt;Wait For Start Mode: In this mode the converter will finish the on-going conversion  and then take up any channel that is pending conversion.&lt;/LI&gt;&#13;&#10;&lt;LI&gt;Cancel Inject Repeat Mode: In this mode the converter will stall the on-going conversion, if a channel is pending in a higher priority request source. After the higher priority request source finishes the conversion the channel which was pre-empted will resume. &lt;/LI&gt;&#13;&#10;&lt;LI&gt;Cancel Inject With Cancel Mode: In this mode the converter will cancel the on-going conversion, if a channel is pending in a higher priority request source.  This cancelled channel will not take part in the current arbitration round. &lt;/LI&gt;" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Wait For Start Mode&#13;&#10;Cancel Inject Repeat Mode&#13;&#10;Cancel Inject With Cancel Mode&#13;&#10;" toolTipText="Select the behaviour of queue with the other request sources." value="Wait For Start Mode" widgetName="gcombo_adc_startmode">
+        					<p1:GCombo.layoutData>
+        						<GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+        					</p1:GCombo.layoutData>
+        				</p1:GCombo>
+        				<p1:GCheck description="Enables the Autoscan feature. &#13;&#10;&lt;UL&gt;&#13;&#10;&lt;LI&gt;The conversion of the last channel in the sequence will cause a load event to occur. &#13;&#10;&lt;LI&gt;This causes continuous conversion of the scan sequence." manifestObj="true" text="Enable continuous conversion" toolTipText="Sequence is continuously repeating (autoscan mode)." widgetName="gcheck_autoscan_enable"/>
+        				<Label/>
+        			</p1:GGroup>
+        			<p1:GGroup bounds="8, 178, 472, 142" manifestObj="true" text="Class Settings" widgetName="gGroup_class_config">
+        				<p1:GGroup.layout>
+        					<GridLayout numColumns="2"/>
+        				</p1:GGroup.layout>
+        				<p1:GLabel manifestObj="true" text="Conversion mode:" widgetName="glabel_convert_mode"/>
+        				<p1:GCombo description="Selects a required result data width.&#13;&#10;&lt;UL&gt;&#13;&#10;&lt;LI&gt;12 Bit Conversion: The result of the conversion will have a resolution of 12 bits. &lt;/LI&gt;&#13;&#10;&lt;LI&gt;10 Bit Conversion: The result of the conversion will have a resolution of 10 bits. &lt;/LI&gt;&#13;&#10;&lt;LI&gt;8 Bit Conversion: The result of the conversion will have a resolution of 8 bits. &lt;/LI&gt;&#13;&#10;&lt;LI&gt;10 Bit Fast Conversion: This mode will raise only one bit in the result register. After comparison with the actual signal, if the analog signal value is greater than the compare value, the result register&apos;s FCM bit will be set to high, else it will set low.&lt;/LI&gt;" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="12 Bit Conversion&#13;&#10;10 Bit Conversion&#13;&#10;8 Bit Conversion&#13;&#10;10 Bit Fast Conversion" toolTipText="Select result data width (12/10/8 bit ) or Fast Compare mode&#13;&#10;" value="12 Bit Conversion" widgetName="gcombo_convert_mode">
+        					<p1:GCombo.layoutData>
+        						<GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+        					</p1:GCombo.layoutData>
+        				</p1:GCombo>
+        				<p1:GLabel manifestObj="true" text="Desired sample time [nsec]:" widgetName="glabel_desired_sampleT"/>
+        				<p1:GFloat description="Set the required sample time.&lt;BR&gt;&#13;&#10;This is the duration for which the ADC would sample the input signal." format="*,0" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" maxValue="8000" minValue="0" toolTipText="Set the desired input signal sampling duration." value="100" widgetName="gfloat_desired_sampleT" x:Style="BORDER">
+        					<p1:GFloat.layoutData>
+        						<GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+        					</p1:GFloat.layoutData>
+        				</p1:GFloat>
+        				<p1:GLabel manifestObj="true" text="Actual sample time [nsec]:" widgetName="glabel_actual_sample_time"/>
+        				<p1:GFloat description="This is the closest possible sample time value (non-editable) " enabled="false" format="*,3" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" maxValue="10000" minValue="0" value="0" widgetName="gfloat_actual_sample_time" x:Style="BORDER">
+        					<p1:GFloat.layoutData>
+        						<GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+        					</p1:GFloat.layoutData>
+        				</p1:GFloat>
+        				<p1:GLabel manifestObj="true" text="Total conversion time [nsec]:" widgetName="glabel_total_coversion_time"/>
+        				<p1:GFloat description="This is the total conversion time for a given sample time(non-editable). To vary the total conversion time, change the sample time.&#13;&#10;For XMC4x devices:&#13;&#10;If post calibration is disabled ( in GLOBAL_ADC APP),  the  total conversion time will be reduced by 2/fADC (GLOBAL_ADC APP)." enabled="false" format="*,3" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" maxValue="POSITIVE_INFINITY" minValue="0" value="0" widgetName="gfloat_total_coversion_time" x:Style="BORDER">
+        					<p1:GFloat.layoutData>
+        						<GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+        					</p1:GFloat.layoutData>
+        				</p1:GFloat>
+        			</p1:GGroup>
+        			<p1:GLabel bounds="6, 319, 412, 15" manifestObj="true" text="Note: Total conversion time is always calculated with post calibration enabled." widgetName="glabel_conversion_limitation"/>
+        			<p1:GMessage bounds="4, 343, 482, 30" isError="false" manifestObj="true" text="External trigger and continuous conversion mode is enabled. This mode is not supported by the APP." widgetName="gmessage_trigger_autoscan_warning"/>
+        		</p1:Tab>
+        	</p1:GTab.control>
+        </p1:GTab>
+        <p1:GTab text="Channel Configuration" visible="true" enabled="true" widgetName="gtab_channel_config">
+            <p1:GTab.control>
+                <p1:Tab widgetName="composite_1">
+                    <p1:GImage visible="true" manifestObj="true" x:Style="BORDER" widgetName="gimage_channel_config" bounds="15, 17, 653, 451" path="Uimodel/channel_configuration_xmc1.png">
+                    	<p1:GString bounds="51, 132, 113, 21" description="Default name for the measured channel. Name is editable. " mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Provide a name for the channel (Use only C-style naming convention)." value="Channel_A" widgetName="gstring_channel_name_a" x:Style="BORDER"/>
+                    	<p1:GString bounds="51, 168, 113, 21" description="Default name for the measured channel. &lt;BR&gt;&#13;&#10;Visible if &quot;number of channels&quot; is more or equal to 2. Name is editable." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Provide a name for the channel (Use only C-style naming convention)." value="Channel_B" widgetName="gstring_channel_name_b" x:Style="BORDER"/>
+                    	<p1:GString bounds="51, 202, 113, 21" description="Default name for the measured channel. &lt;BR&gt;&#13;&#10;Visible if &quot;number of channels&quot; is more or equal to 3. Name is editable." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Provide a name for the channel (Use only C-style naming convention)." value="Channel_C" widgetName="gstring_channel_name_c" x:Style="BORDER"/>
+                        <p1:GString bounds="51, 237, 113, 21" description="Default name for the measured channel. &lt;BR&gt;&#13;&#10;Visible if &quot;number of channels&quot; is more or equal to 4. Name is editable." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Provide a name for the channel (Use only C-style naming convention)." value="Channel_D" widgetName="gstring_channel_name_d" x:Style="BORDER"/>
+                        <p1:GString bounds="50, 272, 114, 21" description="Default name for the measured channel. &lt;BR&gt;&#13;&#10;Visible if &quot;number of channels&quot; is more or equal to 5. Name is editable." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Provide a name for the channel (Use only C-style naming convention)." value="Channel_E" widgetName="gstring_channel_name_e" x:Style="BORDER"/>
+                        <p1:GString bounds="50, 308, 114, 21" description="Default name for the measured channel. &lt;BR&gt;&#13;&#10;Visible if &quot;number of channels&quot; is more or equal to 6. Name is editable." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Provide a name for the channel (Use only C-style naming convention)." value="Channel_F" widgetName="gstring_channel_name_f" x:Style="BORDER"/>
+                        <p1:GString bounds="50, 343, 114, 21" description="Default name for the measured channel. &lt;BR&gt;&#13;&#10;Visible if &quot;number of channels&quot; is more or equal to 7. Name is editable." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Provide a name for the channel (Use only C-style naming convention)." value="Channel_G" widgetName="gstring_channel_name_g" x:Style="BORDER"/>
+                        <p1:GString bounds="50, 378, 114, 21" description="Default name for the measured channel. &lt;BR&gt;&#13;&#10;Visible if &quot;number of channels&quot; is more or equal to 8. Name is editable." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Provide a name for the channel (Use only C-style naming convention)." value="Channel_H" widgetName="gstring_channel_name_h" x:Style="BORDER"/>
+                        <p1:GCheck description="Expose all active channels. Each channel requests whether it should be connected to an existing ANALOG_IO APP or to a new one. The required number of new instances of ANALOG_IO APP will be added to the project. &lt;BR&gt;&#13;&#10;This feature enables sharing of the GPIO Pin between APPS. If enabled, the expose per channel selection is disabled. &#13;&#10;" manifestObj="true" toolTipText="Expose all pins using ANALOG_IO APPs to support sharing. " widgetName="gcheck_share_all_pins" bounds="200, 99, 13, 16"/>
+                        <p1:GCheck bounds="215, 135, 13, 16" description="Expose this specific channel. See &quot;Expose Pin All&quot; description." manifestObj="true" toolTipText="Expose the pin using ANALOG_IO APP to support sharing. " widgetName="gcheck_shared_pin_a"/>
+                        <p1:GCheck bounds="215, 171, 13, 16" description="Expose this specific channel. See &quot;Expose Pin All&quot; description." manifestObj="true" toolTipText="Expose the pin using ANALOG_IO APP to support sharing. " widgetName="gcheck_shared_pin_b"/>
+                        <p1:GCheck bounds="215, 205, 13, 16" description="Expose this specific channel. See &quot;Expose Pin All&quot; description." manifestObj="true" toolTipText="Expose the pin using ANALOG_IO APP to support sharing. " widgetName="gcheck_shared_pin_c"/>
+                        <p1:GCheck bounds="215, 240, 13, 16" description="Expose this specific channel. See &quot;Expose Pin All&quot; description." manifestObj="true" toolTipText="Expose the pin using ANALOG_IO APP to support sharing. " widgetName="gcheck_shared_pin_d"/>
+                        <p1:GCheck bounds="215, 275, 13, 16" description="Expose this specific channel. See &quot;Expose Pin All&quot; description." manifestObj="true" toolTipText="Expose the pin using ANALOG_IO APP to support sharing. " widgetName="gcheck_shared_pin_e"/>
+                        <p1:GCheck bounds="215, 311, 13, 16" description="Expose this specific channel. See &quot;Expose Pin All&quot; description." manifestObj="true" toolTipText="Expose the pin using ANALOG_IO APP to support sharing. " widgetName="gcheck_shared_pin_f"/>
+                        <p1:GCheck bounds="215, 347, 13, 16" description="Expose this specific channel. See &quot;Expose Pin All&quot; description." manifestObj="true" toolTipText="Expose the pin using ANALOG_IO APP to support sharing. " widgetName="gcheck_shared_pin_g"/>
+                        <p1:GCheck bounds="215, 381, 13, 16" description="Expose this specific channel. See &quot;Expose Pin All&quot; description." manifestObj="true" toolTipText="Expose the pin using ANALOG_IO APP to support sharing. " widgetName="gcheck_shared_pin_h"/>
+                        <p1:GCheck bounds="299, 135, 13, 16" description="Enables the wait for read for this channel&apos;s result register. This implies that the new conversion will not start until the old result value is read. " manifestObj="true" toolTipText="Next conversion will be requested only after the current result is read." widgetName="gcheck_wfr_ch_a"/>
+                        <p1:GCheck bounds="299, 171, 13, 16" description="See &quot;Wait for Read Channel_A&quot; description." manifestObj="true" toolTipText="Next conversion will be requested only after the current result is read." widgetName="gcheck_wfr_ch_b"/>
+                        <p1:GCheck bounds="299, 205, 13, 16" description="See &quot;Wait for Read Channel_A&quot; description." manifestObj="true" toolTipText="Next conversion will be requested only after the current result is read." widgetName="gcheck_wfr_ch_c"/>
+                        <p1:GCheck bounds="299, 239, 13, 16" description="See &quot;Wait for Read Channel_A&quot; description." manifestObj="true" toolTipText="Next conversion will be requested only after the current result is read." widgetName="gcheck_wfr_ch_d"/>
+                        <p1:GCheck bounds="299, 275, 13, 16" description="See &quot;Wait for Read Channel_A&quot; description." manifestObj="true" toolTipText="Next conversion will be requested only after the current result is read." widgetName="gcheck_wfr_ch_e"/>
+                        <p1:GCheck bounds="299, 311, 13, 16" description="See &quot;Wait for Read Channel_A&quot; description." manifestObj="true" toolTipText="Next conversion will be requested only after the current result is read." widgetName="gcheck_wfr_ch_f"/>
+                        <p1:GCheck bounds="299, 347, 13, 16" description="See &quot;Wait for Read Channel_A&quot; description." manifestObj="true" toolTipText="Next conversion will be requested only after the current result is read." widgetName="gcheck_wfr_ch_g"/>
+                        <p1:GCheck bounds="299, 381, 13, 16" description="See &quot;Wait for Read Channel_A&quot; description." manifestObj="true" toolTipText="Next conversion will be requested only after the current result is read." widgetName="gcheck_wfr_ch_h"/>
+                        <p1:GCombo bounds="554, 132, 52, 21" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="1:1&#13;&#10;1:3&#13;&#10;1:6&#13;&#10;1:12&#13;&#10;" toolTipText="Select the gain factor to scale up the analog input." value="1:1" widgetName="gcombo_gain_ch_a" description="The input signal being converted can have different gain levels . This is applicable for only XMC1000 series."/>
+                        <p1:GCombo bounds="554, 168, 52, 21" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="1:1&#13;&#10;1:3&#13;&#10;1:6&#13;&#10;1:12&#13;&#10;" toolTipText="Select the gain factor to scale up the analog input." value="1:1" widgetName="gcombo_gain_ch_b" description="See &quot;Channel_A Gain factor&quot; description."/>
+                        <p1:GCombo bounds="554, 203, 52, 21" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="1:1&#13;&#10;1:3&#13;&#10;1:6&#13;&#10;1:12&#13;&#10;" toolTipText="Select the gain factor to scale up the analog input." value="1:1" widgetName="gcombo_gain_ch_c" description="See &quot;Channel_A Gain factor&quot; description."/>
+                        <p1:GCombo bounds="554, 237, 52, 21" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="1:1&#13;&#10;1:3&#13;&#10;1:6&#13;&#10;1:12&#13;&#10;" toolTipText="Select the gain factor to scale up the analog input." value="1:1" widgetName="gcombo_gain_ch_d" description="See &quot;Channel_A Gain factor&quot; description."/>
+                        <p1:GCombo bounds="554, 273, 52, 21" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="1:1&#13;&#10;1:3&#13;&#10;1:6&#13;&#10;1:12&#13;&#10;" toolTipText="Select the gain factor to scale up the analog input." value="1:1" widgetName="gcombo_gain_ch_e" description="See &quot;Channel_A Gain factor&quot; description."/>
+                        <p1:GCombo bounds="554, 308, 52, 21" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="1:1&#13;&#10;1:3&#13;&#10;1:6&#13;&#10;1:12&#13;&#10;" toolTipText="Select the gain factor to scale up the analog input." value="1:1" widgetName="gcombo_gain_ch_f" description="See &quot;Channel_A Gain factor&quot; description."/>
+                        <p1:GCombo bounds="554, 344, 52, 21" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="1:1&#13;&#10;1:3&#13;&#10;1:6&#13;&#10;1:12&#13;&#10;" toolTipText="Select the gain factor to scale up the analog input." value="1:1" widgetName="gcombo_gain_ch_g" description="See &quot;Channel_A Gain factor&quot; description."/>
+                        <p1:GCombo bounds="554, 379, 52, 21" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="1:1&#13;&#10;1:3&#13;&#10;1:6&#13;&#10;1:12&#13;&#10;" toolTipText="Select the gain factor to scale up the analog input." value="1:1" widgetName="gcombo_gain_ch_h" description="See &quot;Channel_A Gain factor&quot; description."/>
+                        <p1:GCheck bounds="388, 135, 13, 16" description="Enables the result event for this channel. &#13;&#10;&lt;UL&gt;&#13;&#10;&lt;LI&gt;Connect the signal to the INTERRUPT APP in order to get an interrupt for the event.&lt;/LI&gt;&#13;&#10;&lt;LI&gt;This allows event generation each time this channel provides a new result.&lt;/LI&gt;" manifestObj="true" toolTipText="Enable generation of an event on each conversion result." widgetName="gcheck_enable_res_evt_ch_a"/>
+                        <p1:GCheck bounds="388, 171, 13, 16" description="See &quot;Channel_A Result Event&quot; description." manifestObj="true" toolTipText="Enable generation of an event on each conversion result." widgetName="gcheck_enable_res_evt_ch_b"/>
+                        <p1:GCheck bounds="388, 205, 13, 16" description="See &quot;Channel_A Result Event&quot; description." manifestObj="true" toolTipText="Enable generation of an event on each conversion result." widgetName="gcheck_enable_res_evt_ch_c"/>
+                        <p1:GCheck bounds="388, 240, 13, 16" description="See &quot;Channel_A Result Event&quot; description." manifestObj="true" toolTipText="Enable generation of an event on each conversion result." widgetName="gcheck_enable_res_evt_ch_d"/>
+                        <p1:GCheck bounds="388, 275, 13, 16" description="See &quot;Channel_A Result Event&quot; description." manifestObj="true" toolTipText="Enable generation of an event on each conversion result." widgetName="gcheck_enable_res_evt_ch_e"/>
+                        <p1:GCheck bounds="388, 311, 13, 16" description="See &quot;Channel_A Result Event&quot; description." manifestObj="true" toolTipText="Enable generation of an event on each conversion result." widgetName="gcheck_enable_res_evt_ch_f"/>
+                        <p1:GCheck bounds="388, 346, 13, 16" description="See &quot;Channel_A Result Event&quot; description." manifestObj="true" toolTipText="Enable generation of an event on each conversion result." widgetName="gcheck_enable_res_evt_ch_g"/>
+                        <p1:GCheck bounds="388, 381, 13, 16" description="See &quot;Channel_A Result Event&quot; description." manifestObj="true" toolTipText="Enable generation of an event on each conversion result." widgetName="gcheck_enable_res_evt_ch_h"/>
+                        <p1:GCombo bounds="455, 131, 67, 21" description="The input signal being converted with different reference voltages.&#13;&#10;&lt;ul&gt;&#13;&#10;&lt;li&gt;XMC1x:  The reference can be selected between VSS (Standard reference Ground) and CH0 (Alternate reference Ground).&lt;/li&gt;&#13;&#10;&lt;li&gt;XMC4x:  The reference can be selected between VAref (Analog reference voltage) and CH0 (Alternate reference Input).&lt;/li&gt;&#13;&#10;&lt;/ul&gt;" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="VAref&#13;&#10;CH0" toolTipText="Select an alternate reference voltage." value="VAref" widgetName="gcombo_input_ref_a"/>
+                        <p1:GCombo bounds="455, 167, 67, 21" description="See &quot;Channel_A Alternate Reference&quot; description." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="VAref&#13;&#10;CH0" toolTipText="Select an alternate reference voltage." value="VAref" widgetName="gcombo_input_ref_b"/>
+                        <p1:GCombo bounds="455, 202, 67, 21" description="See &quot;Channel_A Alternate Reference&quot; description." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="VAref&#13;&#10;CH0" toolTipText="Select an alternate reference voltage." value="VAref" widgetName="gcombo_input_ref_c"/>
+                        <p1:GCombo bounds="455, 236, 67, 21" description="See &quot;Channel_A Alternate Reference&quot; description." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="VAref&#13;&#10;CH0" toolTipText="Select an alternate reference voltage." value="VAref" widgetName="gcombo_input_ref_d"/>
+                        <p1:GCombo bounds="455, 273, 67, 21" description="See &quot;Channel_A Alternate Reference&quot; description." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="VAref&#13;&#10;CH0" toolTipText="Select an alternate reference voltage." value="VAref" widgetName="gcombo_input_ref_e"/>
+                        <p1:GCombo bounds="455, 308, 67, 21" description="See &quot;Channel_A Alternate Reference&quot; description." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="VAref&#13;&#10;CH0" toolTipText="Select an alternate reference voltage." value="VAref" widgetName="gcombo_input_ref_f"/>
+                        <p1:GCombo bounds="455, 343, 67, 21" description="See &quot;Channel_A Alternate Reference&quot; description." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="VAref&#13;&#10;CH0" toolTipText="Select an alternate reference voltage." value="VAref" widgetName="gcombo_input_ref_g"/>
+                        <p1:GCombo bounds="455, 379, 67, 21" description="See &quot;Channel_A Alternate Reference&quot; description." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="VAref&#13;&#10;CH0" toolTipText="Select an alternate reference voltage." value="VAref" widgetName="gcombo_input_ref_h"/>
+                    </p1:GImage>
+                </p1:Tab>
+            </p1:GTab.control>
+        </p1:GTab>
+        <p1:GTab text="Sequence Plan" visible="true" enabled="true" widgetName="gtab_queue_source_sequencer" manifestObj="true">
+            <p1:GTab.control>
+                <p1:Tab widgetName="composite_2" layout="{x:Null}">
+                    <p1:GImage visible="true" x:Style="BORDER" widgetName="gimage_sequence_plan" bounds="8, 45, 600, 419" path="Uimodel/queue_sequence_plan.png">
+                        <p1:GCombo bounds="129, 102, 119, 21" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="None" value="None" widgetName="gcombo_q_entry_0" toolTipText="Select a channel to be placed at 0th entry in the queue sequence." description="Select the channel to be placed at the position 0."/>
+                        <p1:GCombo bounds="129, 137, 119, 21" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="None" value="None" widgetName="gcombo_q_entry_1" toolTipText="Select a channel to be placed at 1th entry in the queue sequence." description="Select the channel to be placed at the position 1."/>
+                        <p1:GCombo bounds="129, 172, 119, 21" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="None" value="None" widgetName="gcombo_q_entry_2" toolTipText="Select a channel to be placed at 2th entry in the queue sequence." description="Select the channel to be placed at the position 2."/>
+                        <p1:GCombo bounds="129, 208, 119, 21" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="None" value="None" widgetName="gcombo_q_entry_3" toolTipText="Select a channel to be placed at 3th entry in the queue sequence." description="Select the channel to be placed at the position 3."/>
+                        <p1:GCombo bounds="129, 243, 119, 21" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="None" value="None" widgetName="gcombo_q_entry_4" toolTipText="Select a channel to be placed at 4th entry in the queue sequence." description="Select the channel to be placed at the position 4."/>
+                        <p1:GCombo bounds="129, 279, 119, 21" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="None" value="None" widgetName="gcombo_q_entry_5" toolTipText="Select a channel to be placed at 5th entry in the queue sequence." description="Select the channel to be placed at the position 5."/>
+                        <p1:GCombo bounds="129, 314, 119, 21" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="None" value="None" widgetName="gcombo_q_entry_6" toolTipText="Select a channel to be placed at 6th entry in the queue sequence." description="Select the channel to be placed at the position 6."/>
+                        <p1:GCombo bounds="129, 351, 119, 21" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="None" value="None" widgetName="gcombo_q_entry_7" toolTipText="Select a channel to be placed at 7th entry in the queue sequence." description="Select the channel to be placed at the position 7."/>
+                        <p1:GCheck bounds="358, 106, 13, 16" manifestObj="true" widgetName="gcheck_ext_trig_q_entry_0" toolTipText="Convert this channel on a trigger." description="If the wait for trigger is enabled, the conversion will wait for a trigger before this channel will be converted."/>
+                        <p1:GCheck bounds="358, 141, 13, 16" manifestObj="true" widgetName="gcheck_ext_trig_q_entry_1" toolTipText="Convert this channel on a trigger." description="If the wait for trigger is enabled, the conversion will wait for a trigger before this channel will be converted."/>
+                        <p1:GCheck bounds="358, 176, 13, 16" manifestObj="true" widgetName="gcheck_ext_trig_q_entry_2" toolTipText="Convert this channel on a trigger." description="If the wait for trigger is enabled, the conversion will wait for a trigger before this channel will be converted."/>
+                        <p1:GCheck bounds="358, 210, 13, 16" manifestObj="true" widgetName="gcheck_ext_trig_q_entry_3" toolTipText="Convert this channel on a trigger." description="If the wait for trigger is enabled, the conversion will wait for a trigger before this channel will be converted."/>
+                        <p1:GCheck bounds="358, 246, 13, 16" manifestObj="true" widgetName="gcheck_ext_trig_q_entry_4" toolTipText="Convert this channel on a trigger." description="If the wait for trigger is enabled, the conversion will wait for a trigger before this channel will be converted."/>
+                        <p1:GCheck bounds="358, 281, 13, 16" manifestObj="true" widgetName="gcheck_ext_trig_q_entry_5" toolTipText="Convert this channel on a trigger." description="If the wait for trigger is enabled, the conversion will wait for a trigger before this channel will be converted."/>
+                        <p1:GCheck bounds="358, 317, 13, 16" manifestObj="true" widgetName="gcheck_ext_trig_q_entry_6" toolTipText="Convert this channel on a trigger." description="If the wait for trigger is enabled, the conversion will wait for a trigger before this channel will be converted."/>
+                        <p1:GCheck bounds="358, 351, 13, 16" manifestObj="true" widgetName="gcheck_ext_trig_q_entry_7" toolTipText="Convert this channel on a trigger." description="If the wait for trigger is enabled, the conversion will wait for a trigger before this channel will be converted."/>
+                        <p1:GCheck bounds="438, 106, 13, 16" manifestObj="true" widgetName="gcheck_refill_q_entry_0" toolTipText="Reload the entry back into queue buffer after conversion." description="Reload the entry back into queue buffer after conversion." value="true"/>
+                        <p1:GCheck bounds="438, 141, 13, 16" manifestObj="true" widgetName="gcheck_refill_q_entry_1" toolTipText="Reload the entry back into queue buffer after conversion." description="Reload the entry back into queue buffer after conversion." value="true"/>
+                        <p1:GCheck bounds="438, 176, 13, 16" manifestObj="true" widgetName="gcheck_refill_q_entry_2" toolTipText="Reload the entry back into queue buffer after conversion." description="Reload the entry back into queue buffer after conversion." value="true"/>
+                        <p1:GCheck bounds="438, 210, 13, 16" manifestObj="true" widgetName="gcheck_refill_q_entry_3" toolTipText="Reload the entry back into queue buffer after conversion." description="Reload the entry back into queue buffer after conversion." value="true"/>
+                        <p1:GCheck bounds="438, 246, 13, 16" manifestObj="true" widgetName="gcheck_refill_q_entry_4" toolTipText="Reload the entry back into queue buffer after conversion." description="Reload the entry back into queue buffer after conversion." value="true"/>
+                        <p1:GCheck bounds="438, 281, 13, 16" manifestObj="true" widgetName="gcheck_refill_q_entry_5" toolTipText="Reload the entry back into queue buffer after conversion." description="Reload the entry back into queue buffer after conversion." value="true"/>
+                        <p1:GCheck bounds="438, 317, 13, 16" manifestObj="true" widgetName="gcheck_refill_q_entry_6" toolTipText="Reload the entry back into queue buffer after conversion." description="Reload the entry back into queue buffer after conversion." value="true"/>
+                        <p1:GCheck bounds="438, 352, 13, 16" manifestObj="true" widgetName="gcheck_refill_q_entry_7" toolTipText="Reload the entry back into queue buffer after conversion." description="Reload the entry back into queue buffer after conversion." value="true"/>
+                        <p1:GCheck bounds="514, 107, 13, 16" manifestObj="true" widgetName="gcheck_src_evt_q_entry_0" toolTipText="Trigger a source event after this entry is converted." description="Trigger a source event after this entry is converted."/>
+                        <p1:GCheck bounds="514, 141, 13, 16" manifestObj="true" widgetName="gcheck_src_evt_q_entry_1" toolTipText="Trigger a source event after this entry is converted." description="Trigger a source event after this entry is converted."/>
+                        <p1:GCheck bounds="514, 176, 13, 16" manifestObj="true" widgetName="gcheck_src_evt_q_entry_2" toolTipText="Trigger a source event after this entry is converted." description="Trigger a source event after this entry is converted."/>
+                        <p1:GCheck bounds="514, 211, 13, 16" manifestObj="true" widgetName="gcheck_src_evt_q_entry_3" toolTipText="Trigger a source event after this entry is converted." description="Trigger a source event after this entry is converted."/>
+                        <p1:GCheck bounds="514, 246, 13, 16" manifestObj="true" widgetName="gcheck_src_evt_q_entry_4" toolTipText="Trigger a source event after this entry is converted." description="Trigger a source event after this entry is converted."/>
+                        <p1:GCheck bounds="514, 281, 13, 16" manifestObj="true" widgetName="gcheck_src_evt_q_entry_5" toolTipText="Trigger a source event after this entry is converted." description="Trigger a source event after this entry is converted."/>
+                        <p1:GCheck bounds="514, 317, 13, 16" manifestObj="true" widgetName="gcheck_src_evt_q_entry_6" toolTipText="Trigger a source event after this entry is converted." description="Trigger a source event after this entry is converted."/>
+                        <p1:GCheck bounds="514, 352, 13, 16" manifestObj="true" widgetName="gcheck_src_evt_q_entry_7" toolTipText="Trigger a source event after this entry is converted." description="Trigger a source event after this entry is converted."/>
+                    </p1:GImage>
+                    <p1:GLabel text="&quot;Note: An external trigger is selected but no channel is configured as &quot;Wait for trigger&quot; in this APP.&quot;" visible="true" manifestObj="true" widgetName="glabel_wait_for_trigger_note" bounds="56, 471, 536, 15"/>
+                </p1:Tab>
+            </p1:GTab.control>
+        </p1:GTab>
+        <p1:GTab text="Post Processing" visible="true" enabled="true" widgetName="gtab_post_proc">
+            <p1:GTab.control>
+                <p1:Tab widgetName="composite_39" layout="{x:Null}">
+                    <p1:GImage visible="true" x:Style="BORDER" widgetName="gimage_post_proc" bounds="7, 25, 507, 414" path="Uimodel/post_proc_subtraction_mode.png" manifestObj="true">
+                    	<p1:GString description="Shows the channel name defined in this APP. (non-editable). " mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_A" widgetName="gstring_postproc_channel_name_a" x:Style="BORDER" enabled="false" bounds="48, 96, 109, 21"/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No&#13;&#10;2 Stages&#13;&#10;3 Stages&#13;&#10;4 Stages&#13;&#10;6 Stages&#13;&#10;8 Stages&#13;&#10;12 Stages&#13;&#10;16 Stages" toolTipText="Select the required result FIFO stages." value="No" widgetName="gcombo_fifo_enable_ch_a" bounds="191, 96, 109, 21" description="Select the FIFO buffer size.&#13;&#10;&lt;ul&gt;&#13;&#10;&lt;li&gt; Each group has a maximum number of 16 result registers.&lt;/li&gt;&#13;&#10;&lt;li&gt; Each channel will consume at least one result register. &lt;/li&gt;&#13;&#10;&lt;li&gt; The FIFO stages will be allocated for the channel if there are sufficient result registers available.&lt;/li&gt; &#13;&#10;&lt;/ul&gt;"/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No&#13;&#10;Subtraction Mode&#13;&#10;Accumulate 2x&#13;&#10;Accumulate 3x&#13;&#10;Accumulate 4x&#13;&#10;FIR (a=2, b=1, c=0)&#13;&#10;FIR (a=1, b=2, c=0)&#13;&#10;FIR (a=2, b=0, c=1)&#13;&#10;FIR (a=1, b=1, c=1)&#13;&#10;FIR (a=1, b=0, c=2)&#13;&#10;FIR (a=3, b=1, c=0)&#13;&#10;FIR (a=2, b=2, c=0)&#13;&#10;FIR (a=1, b=3, c=0)&#13;&#10;FIR (a=3, b=0, c=1)&#13;&#10;FIR (a=2, b=1, c=1)&#13;&#10;FIR (a=1, b=2, c=1)&#13;&#10;FIR (a=2, b=0, c=2)&#13;&#10;FIR (a=1, b=1, c=2)&#13;&#10;FIR (a=1, b=0, c=3)&#13;&#10;IIR (a=2, b=2)&#13;&#10;IIR (a=3, B=4)" toolTipText="Select the required data reduction / filtering mode." value="No" widgetName="gcombo_filter_ch_a" bounds="326, 96, 131, 21" description="Select data reduction  or filtering modes for the converted result.&#13;&#10;&lt;ul&gt;&#13;&#10;&lt;li&gt;Conversion results can be automatically modified before being used by an application.&lt;/li&gt;&#13;&#10;&lt;li&gt; Provides 4 sets of options for result processing &lt;/li&gt;&#13;&#10;&lt;ol&gt;&#13;&#10;&lt;li&gt; Data accumulation mode: This enables up to 4 result accumulation in the result registers. &lt;/li&gt;&#13;&#10;&lt;li&gt; 3rd order Finite impulse response Filters (FIR): This mode applies a 3rd order FIR filter with selectable coefficients on the converted result. &lt;/li&gt;&#13;&#10;&lt;li&gt; 1rd order Infinite impulse response Filters (IIR): This mode applies a 1st order IIR filter with selectable coefficients on the converted result. &lt;/li&gt;&#13;&#10;&lt;li&gt; Data subtraction mode: This mode subtracts the contents of result register GxRES0 from the conversion results.&lt;/li&gt;&#13;&#10;&lt;/ol&gt;&#13;&#10;&lt;/ul&gt;"/>
+                        <p1:GString description="Shows the channel name defined in this APP. (non-editable).&lt;BR&gt; Visible if the number of channels required are more than or equal to 2." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_B" widgetName="gstring_postproc_channel_name_b" x:Style="BORDER" enabled="false" bounds="48, 130, 109, 21"/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No&#13;&#10;2 Stages&#13;&#10;3 Stages&#13;&#10;4 Stages&#13;&#10;6 Stages&#13;&#10;8 Stages&#13;&#10;12 Stages&#13;&#10;16 Stages" toolTipText="Select the required result FIFO stages." value="No" widgetName="gcombo_fifo_enable_ch_b" bounds="191, 130, 109, 21" description="See &quot;Channel_A FIFO&quot; description."/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No&#13;&#10;Subtraction Mode&#13;&#10;Accumulate 2x&#13;&#10;Accumulate 3x&#13;&#10;Accumulate 4x&#13;&#10;FIR (a=2, b=1, c=0)&#13;&#10;FIR (a=1, b=2, c=0)&#13;&#10;FIR (a=2, b=0, c=1)&#13;&#10;FIR (a=1, b=1, c=1)&#13;&#10;FIR (a=1, b=0, c=2)&#13;&#10;FIR (a=3, b=1, c=0)&#13;&#10;FIR (a=2, b=2, c=0)&#13;&#10;FIR (a=1, b=3, c=0)&#13;&#10;FIR (a=3, b=0, c=1)&#13;&#10;FIR (a=2, b=1, c=1)&#13;&#10;FIR (a=1, b=2, c=1)&#13;&#10;FIR (a=2, b=0, c=2)&#13;&#10;FIR (a=1, b=1, c=2)&#13;&#10;FIR (a=1, b=0, c=3)&#13;&#10;IIR (a=2, b=2)&#13;&#10;IIR (a=3, B=4)" toolTipText="Select the required data reduction / filtering mode." value="No" widgetName="gcombo_filter_ch_b" bounds="326, 130, 131, 21" description="See &quot;Channel_A Filter Configurations&quot; description."/>
+                        <p1:GString description="Shows the channel name defined in this APP. (non-editable).&lt;BR&gt; Visible if the number of channels required are more than or equal to 3." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_C" widgetName="gstring_postproc_channel_name_c" x:Style="BORDER" enabled="false" bounds="48, 167, 109, 21"/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No&#13;&#10;2 Stages&#13;&#10;3 Stages&#13;&#10;4 Stages&#13;&#10;6 Stages&#13;&#10;8 Stages&#13;&#10;12 Stages&#13;&#10;16 Stages" toolTipText="Select the required result FIFO stages." value="No" widgetName="gcombo_fifo_enable_ch_c" bounds="191, 167, 109, 21" description="See &quot;Channel_A FIFO&quot; description."/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No&#13;&#10;Subtraction Mode&#13;&#10;Accumulate 2x&#13;&#10;Accumulate 3x&#13;&#10;Accumulate 4x&#13;&#10;FIR (a=2, b=1, c=0)&#13;&#10;FIR (a=1, b=2, c=0)&#13;&#10;FIR (a=2, b=0, c=1)&#13;&#10;FIR (a=1, b=1, c=1)&#13;&#10;FIR (a=1, b=0, c=2)&#13;&#10;FIR (a=3, b=1, c=0)&#13;&#10;FIR (a=2, b=2, c=0)&#13;&#10;FIR (a=1, b=3, c=0)&#13;&#10;FIR (a=3, b=0, c=1)&#13;&#10;FIR (a=2, b=1, c=1)&#13;&#10;FIR (a=1, b=2, c=1)&#13;&#10;FIR (a=2, b=0, c=2)&#13;&#10;FIR (a=1, b=1, c=2)&#13;&#10;FIR (a=1, b=0, c=3)&#13;&#10;IIR (a=2, b=2)&#13;&#10;IIR (a=3, B=4)" toolTipText="Select the required data reduction / filtering mode." value="No" widgetName="gcombo_filter_ch_c" bounds="326, 167, 131, 21" description="See &quot;Channel_A Filter Configurations&quot; description."/>
+                        <p1:GString description="Shows the channel name defined in this APP. (non-editable).&lt;BR&gt; Visible if the number of channels required are more than or equal to 4." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_D" widgetName="gstring_postproc_channel_name_d" x:Style="BORDER" enabled="false" bounds="48, 201, 109, 21"/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No&#13;&#10;2 Stages&#13;&#10;3 Stages&#13;&#10;4 Stages&#13;&#10;6 Stages&#13;&#10;8 Stages&#13;&#10;12 Stages&#13;&#10;16 Stages" toolTipText="Select the required result FIFO stages." value="No" widgetName="gcombo_fifo_enable_ch_d" bounds="191, 201, 109, 21" description="See &quot;Channel_A FIFO&quot; description."/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No&#13;&#10;Subtraction Mode&#13;&#10;Accumulate 2x&#13;&#10;Accumulate 3x&#13;&#10;Accumulate 4x&#13;&#10;FIR (a=2, b=1, c=0)&#13;&#10;FIR (a=1, b=2, c=0)&#13;&#10;FIR (a=2, b=0, c=1)&#13;&#10;FIR (a=1, b=1, c=1)&#13;&#10;FIR (a=1, b=0, c=2)&#13;&#10;FIR (a=3, b=1, c=0)&#13;&#10;FIR (a=2, b=2, c=0)&#13;&#10;FIR (a=1, b=3, c=0)&#13;&#10;FIR (a=3, b=0, c=1)&#13;&#10;FIR (a=2, b=1, c=1)&#13;&#10;FIR (a=1, b=2, c=1)&#13;&#10;FIR (a=2, b=0, c=2)&#13;&#10;FIR (a=1, b=1, c=2)&#13;&#10;FIR (a=1, b=0, c=3)&#13;&#10;IIR (a=2, b=2)&#13;&#10;IIR (a=3, B=4)" toolTipText="Select the required data reduction / filtering mode." value="No" widgetName="gcombo_filter_ch_d" bounds="326, 201, 131, 21" description="See &quot;Channel_A Filter Configurations&quot; description."/>
+                        <p1:GString description="Shows the channel name defined in this APP. (non-editable).&lt;BR&gt; Visible if the number of channels required are more than or equal to 5." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement for Channel-E (Use only C-style naming convention)." value="Channel_E" widgetName="gstring_postproc_channel_name_e" x:Style="BORDER" enabled="false" bounds="48, 235, 109, 21"/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No&#13;&#10;2 Stages&#13;&#10;3 Stages&#13;&#10;4 Stages&#13;&#10;6 Stages&#13;&#10;8 Stages&#13;&#10;12 Stages&#13;&#10;16 Stages" toolTipText="Select the required result FIFO stages." value="No" widgetName="gcombo_fifo_enable_ch_e" bounds="191, 235, 109, 21" description="See &quot;Channel_A FIFO&quot; description."/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No&#13;&#10;Subtraction Mode&#13;&#10;Accumulate 2x&#13;&#10;Accumulate 3x&#13;&#10;Accumulate 4x&#13;&#10;FIR (a=2, b=1, c=0)&#13;&#10;FIR (a=1, b=2, c=0)&#13;&#10;FIR (a=2, b=0, c=1)&#13;&#10;FIR (a=1, b=1, c=1)&#13;&#10;FIR (a=1, b=0, c=2)&#13;&#10;FIR (a=3, b=1, c=0)&#13;&#10;FIR (a=2, b=2, c=0)&#13;&#10;FIR (a=1, b=3, c=0)&#13;&#10;FIR (a=3, b=0, c=1)&#13;&#10;FIR (a=2, b=1, c=1)&#13;&#10;FIR (a=1, b=2, c=1)&#13;&#10;FIR (a=2, b=0, c=2)&#13;&#10;FIR (a=1, b=1, c=2)&#13;&#10;FIR (a=1, b=0, c=3)&#13;&#10;IIR (a=2, b=2)&#13;&#10;IIR (a=3, B=4)" toolTipText="Select the required data reduction / filtering mode." value="No" widgetName="gcombo_filter_ch_e" bounds="326, 235, 131, 21" description="See &quot;Channel_A Filter Configurations&quot; description."/>
+                        <p1:GString description="Shows the channel name defined in this APP. (non-editable).&lt;BR&gt; Visible if the number of channels required are more than or equal to 6." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_F" widgetName="gstring_postproc_channel_name_f" x:Style="BORDER" enabled="false" bounds="48, 272, 109, 21"/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No&#13;&#10;2 Stages&#13;&#10;3 Stages&#13;&#10;4 Stages&#13;&#10;6 Stages&#13;&#10;8 Stages&#13;&#10;12 Stages&#13;&#10;16 Stages" toolTipText="Select the required result FIFO stages." value="No" widgetName="gcombo_fifo_enable_ch_f" bounds="191, 272, 109, 21" description="See &quot;Channel_A FIFO&quot; description."/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No&#13;&#10;Subtraction Mode&#13;&#10;Accumulate 2x&#13;&#10;Accumulate 3x&#13;&#10;Accumulate 4x&#13;&#10;FIR (a=2, b=1, c=0)&#13;&#10;FIR (a=1, b=2, c=0)&#13;&#10;FIR (a=2, b=0, c=1)&#13;&#10;FIR (a=1, b=1, c=1)&#13;&#10;FIR (a=1, b=0, c=2)&#13;&#10;FIR (a=3, b=1, c=0)&#13;&#10;FIR (a=2, b=2, c=0)&#13;&#10;FIR (a=1, b=3, c=0)&#13;&#10;FIR (a=3, b=0, c=1)&#13;&#10;FIR (a=2, b=1, c=1)&#13;&#10;FIR (a=1, b=2, c=1)&#13;&#10;FIR (a=2, b=0, c=2)&#13;&#10;FIR (a=1, b=1, c=2)&#13;&#10;FIR (a=1, b=0, c=3)&#13;&#10;IIR (a=2, b=2)&#13;&#10;IIR (a=3, B=4)" toolTipText="Select the required data reduction / filtering mode." value="No" widgetName="gcombo_filter_ch_f" bounds="326, 272, 131, 21" description="See &quot;Channel_A Filter Configurations&quot; description."/>
+                        <p1:GString description="Shows the channel name defined in this APP. (non-editable).&lt;BR&gt; Visible if the number of channels required are more than or equal to 7." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_G" widgetName="gstring_postproc_channel_name_g" x:Style="BORDER" enabled="false" bounds="48, 306, 109, 21"/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No&#13;&#10;2 Stages&#13;&#10;3 Stages&#13;&#10;4 Stages&#13;&#10;6 Stages&#13;&#10;8 Stages&#13;&#10;12 Stages&#13;&#10;16 Stages" toolTipText="Select the required result FIFO stages." value="No" widgetName="gcombo_fifo_enable_ch_g" bounds="191, 306, 109, 21" description="See &quot;Channel_A FIFO&quot; description."/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No&#13;&#10;Subtraction Mode&#13;&#10;Accumulate 2x&#13;&#10;Accumulate 3x&#13;&#10;Accumulate 4x&#13;&#10;FIR (a=2, b=1, c=0)&#13;&#10;FIR (a=1, b=2, c=0)&#13;&#10;FIR (a=2, b=0, c=1)&#13;&#10;FIR (a=1, b=1, c=1)&#13;&#10;FIR (a=1, b=0, c=2)&#13;&#10;FIR (a=3, b=1, c=0)&#13;&#10;FIR (a=2, b=2, c=0)&#13;&#10;FIR (a=1, b=3, c=0)&#13;&#10;FIR (a=3, b=0, c=1)&#13;&#10;FIR (a=2, b=1, c=1)&#13;&#10;FIR (a=1, b=2, c=1)&#13;&#10;FIR (a=2, b=0, c=2)&#13;&#10;FIR (a=1, b=1, c=2)&#13;&#10;FIR (a=1, b=0, c=3)&#13;&#10;IIR (a=2, b=2)&#13;&#10;IIR (a=3, B=4)" toolTipText="Select the required data reduction / filtering mode." value="No" widgetName="gcombo_filter_ch_g" bounds="326, 306, 131, 21" description="See &quot;Channel_A Filter Configurations&quot; description."/>
+                        <p1:GString description="Shows the channel name defined in this APP. (non-editable).&lt;BR&gt; Visible if the number of channels required are more than or equal to 8." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_H" widgetName="gstring_postproc_channel_name_h" x:Style="BORDER" enabled="false" bounds="48, 343, 109, 21"/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No&#13;&#10;2 Stages&#13;&#10;3 Stages&#13;&#10;4 Stages&#13;&#10;6 Stages&#13;&#10;8 Stages&#13;&#10;12 Stages&#13;&#10;16 Stages" toolTipText="Select the required result FIFO stages." value="No" widgetName="gcombo_fifo_enable_ch_h" bounds="191, 343, 109, 21" description="See &quot;Channel_A FIFO&quot; description."/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="No&#13;&#10;Subtraction Mode&#13;&#10;Accumulate 2x&#13;&#10;Accumulate 3x&#13;&#10;Accumulate 4x&#13;&#10;FIR (a=2, b=1, c=0)&#13;&#10;FIR (a=1, b=2, c=0)&#13;&#10;FIR (a=2, b=0, c=1)&#13;&#10;FIR (a=1, b=1, c=1)&#13;&#10;FIR (a=1, b=0, c=2)&#13;&#10;FIR (a=3, b=1, c=0)&#13;&#10;FIR (a=2, b=2, c=0)&#13;&#10;FIR (a=1, b=3, c=0)&#13;&#10;FIR (a=3, b=0, c=1)&#13;&#10;FIR (a=2, b=1, c=1)&#13;&#10;FIR (a=1, b=2, c=1)&#13;&#10;FIR (a=2, b=0, c=2)&#13;&#10;FIR (a=1, b=1, c=2)&#13;&#10;FIR (a=1, b=0, c=3)&#13;&#10;IIR (a=2, b=2)&#13;&#10;IIR (a=3, B=4)" toolTipText="Select the required data reduction / filtering mode." value="No" widgetName="gcombo_filter_ch_h" bounds="326, 343, 131, 21" description="See &quot;Channel_A Filter Configurations&quot; description."/>
+                        <p1:GCheck manifestObj="true" widgetName="gcheck_subtraction_mode_result_reg" bounds="14, 10, 15, 16" toolTipText="Consume the result register 0 for subtraction mode." description="Consume the result register 0 for subtraction mode. If a channel requests for a subtraction mode the result of the conversion of that channel will be subtracted by the value stored in the Result register-0.&lt;BR&gt;&#13;&#10;In order to configure the value in the Result register-0 invoke the API ADC_MEASUREMENT_ADV_SetSubtractionValue()."/>
+                    </p1:GImage>
+                </p1:Tab>
+            </p1:GTab.control>
+        </p1:GTab>
+        <p1:GTab text="Sync. Conversion" visible="true" enabled="true" widgetName="gtab_sync_conv">
+            <p1:GTab.control>
+                <p1:Tab widgetName="composite_21">
+                	<p1:GLabel text="Synchronised groups:" visible="true" widgetName="glabel_sync_groups_required" bounds="36, 29, 124, 15"/>
+                	<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_sync_groups_required" bounds="181, 29, 82, 21" value="None" options="None&#13;&#10;1 Slave&#13;&#10;2 Slaves&#13;&#10;3 Slaves" toolTipText="Select the number of slave groups for synchronous conversions." description="The synchronized conversion in a master slave configuration is  currently not supported. To use synchronized conversion the trigger signal has to be routed to each  group. Hence this control is disabled and fixed to None.&lt;BR&gt;"/>
+                    <p1:GImage visible="true" manifestObj="true" x:Style="BORDER" widgetName="gimage_sync_group" bounds="3, 70, 752, 231" path="Uimodel/Sync_3_groups.png">
+                        <p1:GString bounds="40, 52, 99, 21" description="It defines the measurement channel name. &lt;BR&gt;&#13;&#10;Visible if the number of channels required are more than or equal to 1." enabled="false" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_A" widgetName="gstring_sync_master_name_a" x:Style="BORDER"/>
+                        <p1:GString bounds="40, 91, 99, 21" description="It defines the measurement channel name. &lt;BR&gt;&#13;&#10;Visible if the number of channels required are more than or equal to 2." enabled="false" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_B" widgetName="gstring_sync_master_name_b" x:Style="BORDER"/>
+                        <p1:GString bounds="40, 130, 99, 21" description="It defines the measurement channel name. &lt;BR&gt;&#13;&#10;Visible if the number of channels required are more than or equal to 3." enabled="false" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_C" widgetName="gstring_sync_master_name_c" x:Style="BORDER"/>
+                        <p1:GString bounds="40, 169, 99, 21" description="It defines the measurement channel name. &lt;BR&gt;&#13;&#10;Visible if the number of channels required are more than or equal to 4." enabled="false" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_D" widgetName="gstring_sync_master_name_d" x:Style="BORDER"/>
+                        <p1:GCheck manifestObj="true" widgetName="gcheck_sync_master_a" bounds="194, 57, 13, 16" toolTipText="Set the channel as master of synchronous conversion." description="Enable Synchronous conversion for the selected channel.&#13;&#10;&lt;ul&gt;&#13;&#10;&lt;li&gt; The number of slaves to be converted is always fixed and it is always as selected in the combo box &quot;Synchronised groups:&quot;. &lt;/li&gt;&#13;&#10;&lt;li&gt; The slave channel configurations will be same as the master channel configurations. This includes all the configurations of the result post processing.&lt;/li&gt;&#13;&#10;&lt;li&gt; The slave group&apos;s channel number will be the same as that of the master group&apos;s channel in order to provide synchronised conversion. &lt;/li&gt;&#13;&#10;&lt;/ul&gt;"/>
+                        <p1:GCheck manifestObj="true" widgetName="gcheck_sync_master_b" bounds="194, 94, 13, 16" toolTipText="Set the channel as master of synchronous conversion." description="See &quot;Sync. Master Channel_A&quot; description."/>
+                        <p1:GCheck manifestObj="true" widgetName="gcheck_sync_master_c" bounds="194, 132, 13, 16" toolTipText="Set the channel as master of synchronous conversion." description="See &quot;Sync. Master Channel_A&quot; description."/>
+                        <p1:GCheck manifestObj="true" widgetName="gcheck_sync_master_d" bounds="194, 172, 13, 16" toolTipText="Set the channel as master of synchronous conversion." description="See &quot;Sync. Master Channel_A&quot; description."/>
+                        <p1:GString bounds="281, 53, 138, 21" description="Shows the slave channel name for slave A, defined in this APP. (non-editable).&#13;&#10;&amp;lt;Master channel name&amp;gt;_sync_slaveA. Visible if 1 or more slaves are defined&#13;&#10;" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_A_sync_slaveA" widgetName="gstring_sync_slave_A_name_a" x:Style="BORDER"/>
+                        <p1:GString bounds="281, 91, 138, 21" description="See &quot;Channel_A SlaveA Name&quot; description." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_B_sync_slaveA" widgetName="gstring_sync_slave_A_name_b" x:Style="BORDER"/>
+                        <p1:GString bounds="281, 130, 138, 21" description="See &quot;Channel_A SlaveA Name&quot; description." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_C_sync_slaveA" widgetName="gstring_sync_slave_A_name_c" x:Style="BORDER"/>
+                        <p1:GString bounds="281, 169, 138, 21" description="See &quot;Channel_A SlaveA Name&quot; description." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_D_sync_slaveA" widgetName="gstring_sync_slave_A_name_d" x:Style="BORDER"/>
+                        <p1:GString bounds="429, 53, 137, 21" description="Shows the slave channel name for slave B, defined in this APP. (non-editable).&#13;&#10;&amp;lt;Master channel name&amp;gt;_sync_slaveB. Visible if 2 or more slaves are defined&#13;&#10;" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_A_sync_slaveB" widgetName="gstring_sync_slave_B_name_a" x:Style="BORDER"/>
+                        <p1:GString bounds="429, 91, 137, 21" description="See &quot;Channel_A SlaveB Name&quot; description." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_B_sync_slaveB" widgetName="gstring_sync_slave_B_name_b" x:Style="BORDER"/>
+                        <p1:GString bounds="429, 130, 137, 21" description="See &quot;Channel_A SlaveB Name&quot; description." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_C_sync_slaveB" widgetName="gstring_sync_slave_B_name_c" x:Style="BORDER"/>
+                        <p1:GString bounds="429, 169, 137, 21" description="See &quot;Channel_A SlaveB Name&quot; description." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_D_sync_slaveB" widgetName="gstring_sync_slave_B_name_d" x:Style="BORDER"/>
+                        <p1:GString bounds="584, 53, 138, 21" description="Shows the slave channel name for slave C, defined in this APP. (non-editable).&#13;&#10;&amp;lt;Master channel name&amp;gt;_sync_slaveC. Visible if 3 or more slaves are defined&#13;&#10;" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_A_sync_slaveC" widgetName="gstring_sync_slave_C_name_a" x:Style="BORDER"/>
+                        <p1:GString bounds="584, 91, 138, 21" description="See &quot;Channel_A SlaveC Name&quot; description." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_B_sync_slaveC" widgetName="gstring_sync_slave_C_name_b" x:Style="BORDER"/>
+                        <p1:GString bounds="584, 130, 138, 21" description="See &quot;Channel_A SlaveC Name&quot; description." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_C_sync_slaveC" widgetName="gstring_sync_slave_C_name_c" x:Style="BORDER"/>
+                        <p1:GString bounds="584, 169, 138, 21" description="See &quot;Channel_A SlaveC Name&quot; description." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Decide the name of measurement (Use only C-style naming convention)." value="Channel_D_sync_slaveC" widgetName="gstring_sync_slave_C_name_d" x:Style="BORDER"/>
+                    </p1:GImage>
+                    <p1:GLabel text="Note: Ensure that the &quot;Arbitration mode&quot; for all the sync groups are set to &quot;Runs Permanently&quot; in GLOBAL_ADC APP." visible="true" manifestObj="true" widgetName="glabel_sync_note" bounds="29, 307, 696, 16"/>
+                    <p1:GCheck text="Configure global ICLASS 1" manifestObj="true" widgetName="gcheck_config_globiclass1" bounds="338, 32, 173, 16" toolTipText="Convert slave channels with the same class settings as the master." description="When a slave channel is requested for conversion. The default class selected for the slave channels is GLOBAL ICLASS-1. Enabling this will ensure that the slave channels convert with the same resolution and sampling time as that of the master.&lt;BR&gt;&#13;&#10;&lt;b&gt;Note:&lt;/b&gt; Only one instance of the ADC_MEASUREMENT_ADV APP can enable this.&lt;BR&gt;&#13;&#10;The GLOBAL ICLASS-1 can be configured either by calling the API ADC_MEASUREMENT_ADV_SetIclass() or by enabling the check-box."/>
+                    <p1:GLabel bounds="12, 331, 734, 16" manifestObj="true" text="Note: It is mandatory to configure global ICLASS1. This can be done either by enabling &quot;Configure global ICLASS1&quot; or through an API call." widgetName="glabel_global_iclass1"/>
+                </p1:Tab>
+            </p1:GTab.control>
+        </p1:GTab>
+        <p1:GTab text="Boundary Settings" visible="true" enabled="true" widgetName="gtab_boundary_settings">
+            <p1:GTab.control>
+                <p1:Tab widgetName="composite_3">
+                    <p1:GImage visible="true" x:Style="BORDER" widgetName="gimage_boundary" bounds="11, 5, 604, 271" path="Uimodel/ADC_measurement_advanced_limitcheck.PNG" manifestObj="true"/>
+                    <p1:GLabel text="Note: Configure boundary levels with provided API." visible="true" widgetName="glabel_114" bounds="20, 278, 555, 15"/>
+                    <p1:GGroup text="Channel Boundary Settings" widgetName="ggroup_channel_boundary_settings" bounds="15, 308, 736, 169">
+                        <p1:GGroup.layout>
+                            <GridLayout numColumns="5"/>
+                        </p1:GGroup.layout>
+                        <p1:GLabel text="Channel name" visible="true" widgetName="glabel_channel_name_boundary">
+                            <p1:GLabel.layoutData>
+                                <GridData widthHint="97"/>
+                            </p1:GLabel.layoutData>
+                        </p1:GLabel>
+                        <p1:GLabel text="Lower boundary" visible="true" widgetName="glabel_lower_boundary">
+                            <p1:GLabel.layoutData>
+                                <GridData horizontalAlignment="FILL" widthHint="120"/>
+                            </p1:GLabel.layoutData>
+                        </p1:GLabel>
+                        <p1:GLabel text="Upper boundary" visible="true" widgetName="glabel_upper_boundary">
+                            <p1:GLabel.layoutData>
+                                <GridData horizontalAlignment="FILL" widthHint="120"/>
+                            </p1:GLabel.layoutData>
+                        </p1:GLabel>
+                        <p1:GLabel text="Channel event" visible="true" widgetName="glabel_channel_event">
+                            <p1:GLabel.layoutData>
+                                <GridData horizontalAlignment="FILL" widthHint="179"/>
+                            </p1:GLabel.layoutData>
+                        </p1:GLabel>
+                        <p1:GLabel text="Generate boundary flag" visible="true" widgetName="glabel_generate_boundary_flag"/>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_ncm_ch_0" value="None" options="None" description="Select the channel for which boundary or channel event is required." toolTipText="Select a channel for boundary comparison.">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_boundsell_ch_0" options="Group Boundary 0&#13;&#10;Group Boundary 1&#13;&#10;Global Boundary 0&#13;&#10;Global Boundary 1" value="Group Boundary 0" description="Select a boundary value for the lower boundary comparison. Selection is only applicable for normal comparison mode. &lt;BR&gt; For Fast compare mode the combo box is disabled." toolTipText="">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Group Boundary 0&#13;&#10;Group Boundary 1&#13;&#10;Global Boundary 0&#13;&#10;Global Boundary 1" value="Group Boundary 1" widgetName="gcombo_boundselu_ch_0" description="Select a boundary value for the upper boundary comparison.  Selection is only applicable for normal comparison mode. &lt;BR&gt; For Fast compare mode the combo box is disabled." toolTipText="">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_chev_ch_0" options="Disabled&#13;&#10;If Result Inside Band&#13;&#10;If Result Outside Band&#13;&#10;On Each New Result" value="Disabled" toolTipText="Select the condition for generation of channel event." description="Select when a channel event should be raised.&#13;&#10;&lt;UL&gt;&#13;&#10;&lt;li&gt; For normal comparison mode, the channel event can be generated when the result is inside/outside the boundary. It can also be generated for every new result.&lt;/li&gt;&#13;&#10;&lt;li&gt; For fast compare mode, the channel event can be generated when the result is above/below the compare value. It can also be generated when the result crosses the compare value.&lt;/li&gt;&#13;&#10;&lt;/ul&gt;">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL" widthHint="104"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_bfl_ctrl_ch_0" options="Disabled&#13;&#10;Enabled&#13;&#10;Inverted" value="Disabled" description="Select the behavior of the boundary flag.&#13;&#10;&lt;ul&gt;&#13;&#10;&lt;li&gt; Enable this to generate a boundary signal which can be connected to other peripherals. &lt;/li&gt;&#13;&#10;&lt;li&gt; To receive interrupts based on boundary selection of the channel event is required.&lt;/li&gt;&#13;&#10;&lt;li&gt; For XMC45: The Boundary flag is generated as non-inverted (if yes is selected).&lt;/li&gt;&#13;&#10;&lt;li&gt; For other devices : The Boundary flag can be generated as either non-inverted or inverted.&lt;/li&gt;&#13;&#10;&lt;ul&gt;" toolTipText="Select the condition for boundary flag update.">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_ncm_ch_1" options="None" value="None" description="See &quot;Boundary Channel Name for Boundary0&quot; description." toolTipText="Select a channel for boundary comparison.">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Group Boundary 0&#13;&#10;Group Boundary 1&#13;&#10;Global Boundary 0&#13;&#10;Global Boundary 1" value="Group Boundary 0" widgetName="gcombo_boundsell_ch_1" description="See &quot;Lower Boundary Selection for Boundary0&quot; description." toolTipText="">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Group Boundary 0&#13;&#10;Group Boundary 1&#13;&#10;Global Boundary 0&#13;&#10;Global Boundary 1" value="Group Boundary 1" widgetName="gcombo_boundselu_ch_1" description="See &quot;Upper Boundary Selection for Boundary0&quot; description." toolTipText="">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Disabled&#13;&#10;If Result Inside Band&#13;&#10;If Result Outside Band&#13;&#10;On Each New Result" toolTipText="Select the condition for generation of channel event." value="Disabled" widgetName="gcombo_chev_ch_1" description="See &quot;Enable Channel Event for Boundary0&quot; description.">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL" widthHint="104"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Disabled&#13;&#10;Enabled&#13;&#10;Inverted" value="Disabled" widgetName="gcombo_bfl_ctrl_ch_1" description="See &quot;Boundary Flag Selection for Boundary0&quot; description." toolTipText="Select the condition for boundary flag update.">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_ncm_ch_2" options="None" value="None" description="See &quot;Boundary Channel Name for Boundary0&quot; description." toolTipText="Select a channel for boundary comparison.">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Group Boundary 0&#13;&#10;Group Boundary 1&#13;&#10;Global Boundary 0&#13;&#10;Global Boundary 1" value="Group Boundary 0" widgetName="gcombo_boundsell_ch_2" description="See &quot;Lower Boundary Selection for Boundary0&quot; description." toolTipText="">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Group Boundary 0&#13;&#10;Group Boundary 1&#13;&#10;Global Boundary 0&#13;&#10;Global Boundary 1" value="Group Boundary 1" widgetName="gcombo_boundselu_ch_2" description="See &quot;Upper Boundary Selection for Boundary0&quot; description." toolTipText="">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Disabled&#13;&#10;If Result Inside Band&#13;&#10;If Result Outside Band&#13;&#10;On Each New Result" toolTipText="Select the condition for generation of channel event." value="Disabled" widgetName="gcombo_chev_ch_2" description="See &quot;Enable Channel Event for Boundary0&quot; description.">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL" widthHint="104"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Disabled&#13;&#10;Enabled&#13;&#10;Inverted" value="Disabled" widgetName="gcombo_bfl_ctrl_ch_2" description="See &quot;Boundary Flag Selection for Boundary0&quot; description." toolTipText="Select the condition for boundary flag update.">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_ncm_ch_3" value="None" options="None" description="See &quot;Boundary Channel Name for Boundary0&quot; description." toolTipText="Select a channel for boundary comparison.">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Group Boundary 0&#13;&#10;Group Boundary 1&#13;&#10;Global Boundary 0&#13;&#10;Global Boundary 1" value="Group Boundary 0" widgetName="gcombo_boundsell_ch_3" description="See &quot;Lower Boundary Selection for Boundary0&quot; description." toolTipText="">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Group Boundary 0&#13;&#10;Group Boundary 1&#13;&#10;Global Boundary 0&#13;&#10;Global Boundary 1" value="Group Boundary 1" widgetName="gcombo_boundselu_ch_3" description="See &quot;Upper Boundary Selection for Boundary0&quot; description." toolTipText="">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Disabled&#13;&#10;If Result Inside Band&#13;&#10;If Result Outside Band&#13;&#10;On Each New Result" toolTipText="Select the condition for generation of channel event." value="Disabled" widgetName="gcombo_chev_ch_3" description="See &quot;Enable Channel Event for Boundary0&quot; description.">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL" widthHint="104"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                        <p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Disabled&#13;&#10;Enabled&#13;&#10;Inverted" value="Disabled" widgetName="gcombo_bfl_ctrl_ch_3" description="See &quot;Boundary Flag Selection for Boundary0&quot; description." toolTipText="Select the condition for boundary flag update.">
+                            <p1:GCombo.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+                            </p1:GCombo.layoutData>
+                        </p1:GCombo>
+                    </p1:GGroup>
+                </p1:Tab>
+            </p1:GTab.control>
+        </p1:GTab>
+        <p1:GTab text="Interrupts" visible="true" enabled="true" manifestObj="true" widgetName="gtab_interrupt">
+            <p1:GTab.control>
+                <p1:Tab widgetName="composite_40">
+                    <p1:GGroup text="Request Source Callback Registration" widgetName="ggroup_request_source_callback_registration" bounds="2, 6, 402, 245">
+                        <p1:GGroup.layout>
+                            <GridLayout numColumns="2"/>
+                        </p1:GGroup.layout>
+                        <p1:GCheck manifestObj="true" text="Enable callback" widgetName="gcheck_enable_callback" description="Enable the registration of the callback function.&#13;&#10;&lt;ul&gt;&#13;&#10;&lt;li&gt; Enable the request source interrupt in the ADC_QUEUE/ADC_SCAN APP. &lt;/li&gt;&#13;&#10;&lt;li&gt; When queue requrest souce is enabled, then enable the  source event for any one of the queue entries&lt;/li&gt;&#13;&#10;&lt;/ul&gt;" toolTipText="Enable the request source ISR callback registration."/>
+                        <Label/>
+                        <p1:GLabel manifestObj="true" text="Callback function" widgetName="glabel_callback_function"/>
+                        <p1:GString mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" value="adc_measurement_adv_callback" widgetName="gstring_callback_function" x:Style="BORDER" description="Callback function for the request source interrupt." toolTipText="Callback function name for the request source interrupt.">
+                            <p1:GString.layoutData>
+                                <GridData widthHint="224"/>
+                            </p1:GString.layoutData>
+                        </p1:GString>
+                        <p1:GInterruptPrio description="Configure the priority of the request source interrupt." manifestObj="true" maxPriority="63" maxSubPriority="63" minPriority="0" minSubPriority="0" priorityMandatory="true" priorityValue="3" subPriorityValue="0" text="Request Source Interrupt Config" toolTipText="The Request source interrupt preemption priority." widgetName="ginterruptprio_request_src_intr">
+                        	<p1:GInterruptPrio.layoutData>
+                        		<GridData widthHint="348" horizontalSpan="2"/>
+                        	</p1:GInterruptPrio.layoutData>
+                        </p1:GInterruptPrio>
+                        <p1:GMessage isError="false" manifestObj="true" text="Enable the request source interrupt in the request source APP." widgetName="gmessage_intr_callback_info">
+                            <p1:GMessage.layoutData>
+                                <GridData horizontalSpan="2"/>
+                            </p1:GMessage.layoutData>
+                        </p1:GMessage>
+                        <p1:GMessage text="Invalid function name." visible="true" manifestObj="true" isError="true" widgetName="gmessage_req_src_callback">
+                            <p1:GMessage.layoutData>
+                                <GridData grabExcessHorizontalSpace="true" horizontalSpan="2" widthHint="325"/>
+                            </p1:GMessage.layoutData>
+                        </p1:GMessage>
+                    </p1:GGroup>
+                </p1:Tab>
+            </p1:GTab.control>
+        </p1:GTab>
+        <p1:GTab text="Dummy labels" visible="true" widgetName="gtab_dummy_labels" manifestObj="true">
+            <p1:GTab.control>
+                <p1:Tab widgetName="composite_4">
+                    <p1:GLabel text="Request Source Selection" visible="true" widgetName="glabel_req_src_selection" bounds="12, 14, 55, 15" enabled="false"/>
+                    <p1:GLabel text="Number of Channels" visible="true" widgetName="glabel_no_of_channels" bounds="11, 38, 55, 15" enabled="false"/>
+                    <p1:GLabel text="Trigger Edge Selection" visible="true" widgetName="glabel_trigger_edge_sel" bounds="11, 64, 55, 15" enabled="false"/>
+                    <p1:GLabel bounds="16, 100, 55, 15" text="Gating Selection" widgetName="glabel_gating_sel" enabled="false"/>
+                    <p1:GLabel bounds="14, 131, 55, 15" text="Resolution" widgetName="glabel_conv_mode" enabled="false"/>
+                    <p1:GLabel bounds="17, 164, 55, 15" text="Actual Sampling Time" widgetName="glabel_actual_sampleT" enabled="false"/>
+                    <p1:GLabel bounds="16, 203, 55, 15" text="Total Conversion Time" widgetName="glabel_coversion_time" enabled="false"/>
+                    <p1:GLabel bounds="83, 15, 55, 15" text="Channel_A Name" widgetName="glabel_channel_name_a" enabled="false"/>
+                    <p1:GLabel bounds="87, 47, 55, 15" text="Channel_B Name" widgetName="glabel_channel_name_b" enabled="false"/>
+                    <p1:GLabel bounds="88, 80, 55, 15" text="Channel_C Name" widgetName="glabel_channel_name_c" enabled="false"/>
+                    <p1:GLabel bounds="90, 105, 55, 15" text="Channel_D Name" widgetName="glabel_channel_name_d" enabled="false"/>
+                    <p1:GLabel bounds="96, 218, 55, 15" text="Channel_H Name" widgetName="glabel_channel_name_h" enabled="false"/>
+                    <p1:GLabel bounds="94, 193, 55, 15" text="Channel_G Name" widgetName="glabel_channel_name_g" enabled="false"/>
+                    <p1:GLabel bounds="93, 160, 55, 15" text="Channel_F Name" widgetName="glabel_channel_name_f" enabled="false"/>
+                    <p1:GLabel bounds="89, 128, 55, 15" text="Channel_E Name" widgetName="glabel_channel_name_e" enabled="false"/>
+                    <p1:GLabel bounds="156, 12, 55, 15" text="Expose Channel_A" widgetName="glabel_shared_pin_a" enabled="false"/>
+                    <p1:GLabel bounds="163, 42, 55, 15" text="Expose Channel_B" widgetName="glabel_shared_pin_b" enabled="false"/>
+                    <p1:GLabel bounds="162, 60, 55, 15" text="Expose Channel_C" widgetName="glabel_shared_pin_c" enabled="false"/>
+                    <p1:GLabel bounds="161, 84, 55, 15" text="Expose Channel_D" widgetName="glabel_shared_pin_d" enabled="false"/>
+                    <p1:GLabel bounds="162, 170, 55, 15" text="Expose Channel_H" widgetName="glabel_shared_pin_h" enabled="false"/>
+                    <p1:GLabel bounds="162, 148, 55, 15" text="Expose Channel_G" widgetName="glabel_shared_pin_g" enabled="false"/>
+                    <p1:GLabel bounds="163, 126, 55, 15" text="Expose Channel_F" widgetName="glabel_shared_pin_f" enabled="false"/>
+                    <p1:GLabel bounds="161, 105, 55, 15" text="Expose Channel_E" widgetName="glabel_shared_pin_e" enabled="false"/>
+                    <p1:GLabel bounds="233, 11, 55, 15" text="Wait for Read Channel_A" widgetName="glabel_wfr_ch_a" enabled="false"/>
+                    <p1:GLabel bounds="234, 35, 55, 15" text="Wait for Read Channel_B" widgetName="glabel_wfr_ch_b" enabled="false"/>
+                    <p1:GLabel bounds="234, 55, 55, 15" text="Wait for Read Channel_C" widgetName="glabel_wfr_ch_c" enabled="false"/>
+                    <p1:GLabel bounds="234, 72, 55, 15" text="Wait for Read Channel_D" widgetName="glabel_wfr_ch_d" enabled="false"/>
+                    <p1:GLabel bounds="237, 153, 55, 15" text="Wait for Read Channel_H" widgetName="glabel_wfr_ch_h" enabled="false"/>
+                    <p1:GLabel bounds="236, 128, 55, 15" text="Wait for Read Channel_G" widgetName="glabel_wfr_ch_g" enabled="false"/>
+                    <p1:GLabel bounds="235, 110, 55, 15" text="Wait for Read Channel_F" widgetName="glabel_wfr_ch_f" enabled="false"/>
+                    <p1:GLabel bounds="236, 92, 55, 15" text="Wait for Read Channel_E" widgetName="glabel_wfr_ch_e" enabled="false"/>
+                    <p1:GLabel bounds="302, 17, 55, 19" text="Channel_A Result Event" widgetName="glabel_enable_res_evt_ch_a" enabled="false"/>
+                    <p1:GLabel bounds="384, 13, 55, 19" text="Channel_A Gain factor" widgetName="glabel_gain_ch_a" enabled="false"/>
+                    <p1:GLabel bounds="302, 38, 55, 158" text="Channel_B Result Event" widgetName="glabel_enable_res_evt_ch_b" enabled="false"/>
+                    <p1:GLabel bounds="301, 59, 55, 137" text="Channel_C Result Event" widgetName="glabel_enable_res_evt_ch_c" enabled="false"/>
+                    <p1:GLabel bounds="301, 82, 55, 114" text="Channel_D Result Event" widgetName="glabel_enable_res_evt_ch_d" enabled="false"/>
+                    <p1:GLabel bounds="301, 107, 55, 89" text="Channel_E Result Event" widgetName="glabel_enable_res_evt_ch_e" enabled="false"/>
+                    <p1:GLabel bounds="301, 130, 55, 66" text="Channel_F Result Event" widgetName="glabel_enable_res_evt_ch_f" enabled="false"/>
+                    <p1:GLabel bounds="302, 152, 55, 44" text="Channel_G Result Event" widgetName="glabel_enable_res_evt_ch_g" enabled="false"/>
+                    <p1:GLabel bounds="304, 175, 55, 21" text="Channel_H Result Event" widgetName="glabel_enable_res_evt_ch_h" enabled="false"/>
+                    <p1:GLabel bounds="387, 43, 55, 153" text="Channel_B Gain factor" widgetName="glabel_gain_ch_b" enabled="false"/>
+                    <p1:GLabel bounds="386, 65, 55, 131" text="Channel_C Gain factor" widgetName="glabel_gain_ch_c" enabled="false"/>
+                    <p1:GLabel bounds="387, 86, 55, 110" text="Channel_D Gain factor" widgetName="glabel_gain_ch_d" enabled="false"/>
+                    <p1:GLabel bounds="386, 109, 55, 87" text="Channel_E Gain factor" widgetName="glabel_gain_ch_e" enabled="false"/>
+                    <p1:GLabel bounds="389, 139, 55, 57" text="Channel_F Gain factor" widgetName="glabel_gain_ch_f" enabled="false"/>
+                    <p1:GLabel bounds="388, 161, 55, 35" text="Channel_G Gain factor" widgetName="glabel_gain_ch_g" enabled="false"/>
+                    <p1:GLabel bounds="389, 182, 55, 14" text="Channel_H Gain factor" widgetName="glabel_gain_ch_h" enabled="false"/>
+                    <p1:GLabel bounds="453, 13, 55, 19" text="Queue Entry Position  0" widgetName="glabel_q_entry_0" enabled="false"/>
+                    <p1:GLabel bounds="454, 40, 55, 19" text="Queue Entry Position  1" widgetName="glabel_q_entry_1" enabled="false"/>
+                    <p1:GLabel bounds="456, 67, 55, 19" text="Queue Entry Position  2" widgetName="glabel_q_entry_2" enabled="false"/>
+                    <p1:GLabel bounds="457, 92, 55, 19" text="Queue Entry Position  3" widgetName="glabel_q_entry_3" enabled="false"/>
+                    <p1:GLabel bounds="463, 196, 55, 19" text="Queue Entry Position  7" widgetName="glabel_q_entry_7" enabled="false"/>
+                    <p1:GLabel bounds="462, 171, 55, 19" text="Queue Entry Position  6" widgetName="glabel_q_entry_6" enabled="false"/>
+                    <p1:GLabel bounds="460, 144, 55, 19" text="Queue Entry Position  5" widgetName="glabel_q_entry_5" enabled="false"/>
+                    <p1:GLabel bounds="459, 117, 55, 19" text="Queue Entry Position  4" widgetName="glabel_q_entry_4" enabled="false"/>
+                    <p1:GLabel bounds="520, 10, 55, 19" text="Wait for trigger for Queue Position 0." widgetName="glabel_ext_trig_q_entry_0" enabled="false"/>
+                    <p1:GLabel bounds="521, 28, 55, 19" text="Wait for trigger for Queue Position 1." widgetName="glabel_ext_trig_q_entry_1" enabled="false"/>
+                    <p1:GLabel bounds="519, 63, 55, 19" text="Wait for trigger for Queue Position 3." widgetName="glabel_ext_trig_q_entry_3" enabled="false"/>
+                    <p1:GLabel bounds="521, 45, 55, 19" text="Wait for trigger for Queue Position 2." widgetName="glabel_ext_trig_q_entry_2" enabled="false"/>
+                    <p1:GLabel bounds="522, 137, 55, 19" text="Wait for trigger for Queue Position 7." widgetName="glabel_ext_trig_q_entry_7" enabled="false"/>
+                    <p1:GLabel bounds="522, 118, 55, 19" text="Wait for trigger for Queue Position 6." widgetName="glabel_ext_trig_q_entry_6" enabled="false"/>
+                    <p1:GLabel bounds="523, 100, 55, 19" text="Wait for trigger for Queue Position 5." widgetName="glabel_ext_trig_q_entry_5" enabled="false"/>
+                    <p1:GLabel bounds="521, 80, 55, 19" text="Wait for trigger for Queue Position 4." widgetName="glabel_ext_trig_q_entry_4" enabled="false"/>
+                    <p1:GLabel bounds="588, 8, 55, 19" text="Refill for Queue Entry Position  0 " widgetName="glabel_refill_q_entry_0" enabled="false"/>
+                    <p1:GLabel bounds="590, 33, 55, 19" text="Refill for Queue Entry Position 1" widgetName="glabel_refill_q_entry_1" enabled="false"/>
+                    <p1:GLabel bounds="599, 86, 55, 19" text="Refill for Queue Entry Position  3" widgetName="glabel_refill_q_entry_3" enabled="false"/>
+                    <p1:GLabel bounds="597, 62, 55, 19" text="Refill for Queue Entry Position  2" widgetName="glabel_refill_q_entry_2" enabled="false"/>
+                    <p1:GLabel bounds="607, 193, 55, 19" text="Refill for Queue Entry Position 7" widgetName="glabel_refill_q_entry_7" enabled="false"/>
+                    <p1:GLabel bounds="605, 169, 55, 19" text="Refill for Queue Entry Position  6" widgetName="glabel_refill_q_entry_6" enabled="false"/>
+                    <p1:GLabel bounds="598, 139, 55, 19" text="Refill for Queue Entry Position  5" widgetName="glabel_refill_q_entry_5" enabled="false"/>
+                    <p1:GLabel bounds="596, 115, 55, 19" text="Refill for Queue Entry Position  4" widgetName="glabel_refill_q_entry_4" enabled="false"/>
+                    <p1:GLabel bounds="663, 6, 55, 19" text="Source Event for Queue Entry Position 1" widgetName="glabel_src_evt_q_entry_1" enabled="false"/>
+                    <p1:GLabel bounds="661, 29, 55, 19" text="Source Event for Queue Entry Position 0" widgetName="glabel_src_evt_q_entry_0" enabled="false"/>
+                    <p1:GLabel bounds="661, 78, 55, 19" text="Source Event for Queue Entry Position 3" widgetName="glabel_src_evt_q_entry_3" enabled="false"/>
+                    <p1:GLabel bounds="663, 55, 55, 19" text="Source Event for Queue Entry Position 2" widgetName="glabel_src_evt_q_entry_2" enabled="false"/>
+                    <p1:GLabel bounds="666, 175, 55, 19" text="Source Event for Queue Entry Position 7" widgetName="glabel_src_evt_q_entry_7" enabled="false"/>
+                    <p1:GLabel bounds="668, 152, 55, 19" text="Source Event for Queue Entry Position 6" widgetName="glabel_src_evt_q_entry_6" enabled="false"/>
+                    <p1:GLabel bounds="666, 126, 55, 19" text="Source Event for Queue Entry Position 5" widgetName="glabel_src_evt_q_entry_5" enabled="false"/>
+                    <p1:GLabel bounds="668, 103, 55, 19" text="Source Event for Queue Entry Position 4" widgetName="glabel_src_evt_q_entry_4" enabled="false"/>
+                    <p1:GLabel bounds="10, 245, 55, 19" text="Channel_A FIFO" widgetName="glabel_fifo_enable_ch_a" enabled="false"/>
+                    <p1:GLabel bounds="11, 268, 55, 19" text="Channel_B FIFO" widgetName="glabel_fifo_enable_ch_b" enabled="false"/>
+                    <p1:GLabel bounds="11, 312, 55, 19" text="Channel_D FIFO" widgetName="glabel_fifo_enable_ch_d" enabled="false"/>
+                    <p1:GLabel bounds="10, 289, 55, 19" text="Channel_C FIFO" widgetName="glabel_fifo_enable_ch_c" enabled="false"/>
+                    <p1:GLabel bounds="10, 401, 55, 19" text="Channel_H FIFO" widgetName="glabel_fifo_enable_ch_h" enabled="false"/>
+                    <p1:GLabel bounds="9, 378, 55, 19" text="Channel_G FIFO" widgetName="glabel_fifo_enable_ch_g" enabled="false"/>
+                    <p1:GLabel bounds="10, 357, 55, 19" text="Channel_F FIFO" widgetName="glabel_fifo_enable_ch_f" enabled="false"/>
+                    <p1:GLabel bounds="9, 334, 55, 19" text="Channel_E FIFO" widgetName="glabel_fifo_enable_ch_e" enabled="false"/>
+                    <p1:GLabel bounds="71, 244, 55, 19" text="Channel_A Filter Configurations" widgetName="glabel_filter_ch_a" enabled="false"/>
+                    <p1:GLabel bounds="72, 267, 55, 19" text="Channel_B Filter Configurations" widgetName="glabel_filter_ch_b" enabled="false"/>
+                    <p1:GLabel bounds="72, 313, 55, 19" text="Channel_D Filter Configurations" widgetName="glabel_filter_ch_d" enabled="false"/>
+                    <p1:GLabel bounds="71, 290, 55, 19" text="Channel_C Filter Configurations" widgetName="glabel_filter_ch_c" enabled="false"/>
+                    <p1:GLabel bounds="72, 405, 55, 19" text="Channel_H Filter Configurations" widgetName="glabel_filter_ch_h" enabled="false"/>
+                    <p1:GLabel bounds="71, 382, 55, 19" text="Channel_G Filter Configurations" widgetName="glabel_filter_ch_g" enabled="false"/>
+                    <p1:GLabel bounds="72, 359, 55, 19" text="Channel_F Filter Configurations" widgetName="glabel_filter_ch_f" enabled="false"/>
+                    <p1:GLabel bounds="71, 336, 55, 19" text="Channel_E Filter Configurations" widgetName="glabel_filter_ch_e" enabled="false"/>
+                    <p1:GLabel bounds="133, 245, 55, 19" text="Channel_A Name" widgetName="glabel_sync_master_name_a" enabled="false"/>
+                    <p1:GLabel bounds="195, 245, 55, 19" text="Sync. Master Channel_A." widgetName="glabel_sync_master_a" enabled="false"/>
+                    <p1:GLabel bounds="256, 245, 55, 19" text="Channel_A SlaveA Name" widgetName="glabel_sync_slave_A_name_a" enabled="false"/>
+                    <p1:GLabel bounds="134, 268, 55, 19" text="Channel_B Name" widgetName="glabel_sync_master_name_b" enabled="false"/>
+                    <p1:GLabel bounds="135, 313, 55, 19" text="Channel_D Name" widgetName="glabel_sync_master_name_d" enabled="false"/>
+                    <p1:GLabel bounds="134, 290, 55, 19" text="Channel_C Name" widgetName="glabel_sync_master_name_c" enabled="false"/>
+                    <p1:GLabel bounds="136, 402, 55, 19" text="Channel_H Name" widgetName="glabel_sync_master_name_h" enabled="false"/>
+                    <p1:GLabel bounds="135, 379, 55, 19" text="Channel_G Name" widgetName="glabel_sync_master_name_g" enabled="false"/>
+                    <p1:GLabel bounds="135, 357, 55, 19" text="Channel_F Name" widgetName="glabel_sync_master_name_f" enabled="false"/>
+                    <p1:GLabel bounds="134, 334, 55, 19" text="Channel_E Name" widgetName="glabel_sync_master_name_e" enabled="false"/>
+                    <p1:GLabel bounds="195, 265, 55, 19" text="Sync. Master Channel_B." widgetName="glabel_sync_master_b" enabled="false"/>
+                    <p1:GLabel bounds="196, 308, 55, 19" text="Sync. Master Channel_D." widgetName="glabel_sync_master_d" enabled="false"/>
+                    <p1:GLabel bounds="196, 288, 55, 19" text="Sync. Master Channel_C." widgetName="glabel_sync_master_c" enabled="false"/>
+                    <p1:GLabel bounds="195, 394, 55, 19" text="Sync. Master Channel_H." widgetName="glabel_sync_master_h" enabled="false"/>
+                    <p1:GLabel bounds="195, 374, 55, 19" text="Sync. Master Channel_G." widgetName="glabel_sync_master_g" enabled="false"/>
+                    <p1:GLabel bounds="194, 351, 55, 19" text="Sync. Master Channel_F." widgetName="glabel_sync_master_f" enabled="false"/>
+                    <p1:GLabel bounds="194, 331, 55, 19" text="Sync. Master Channel_E." widgetName="glabel_sync_master_e" enabled="false"/>
+                    <p1:GLabel bounds="257, 266, 55, 19" text="Channel_B SlaveA Name." widgetName="glabel_sync_slave_A_name_b" enabled="false"/>
+                    <p1:GLabel bounds="689, 241, 55, 19" text="Boundary Flag Selection for Boundary0" widgetName="glabel_bfl_ctrl_ch_0" enabled="false"/>
+                    <p1:GLabel bounds="626, 243, 55, 19" text="Enable Channel Event for Boundary0" widgetName="glabel_chev_ch_0" enabled="false"/>
+                    <p1:GLabel bounds="504, 245, 55, 19" text="Lower Boundary Selection for Boundary0" widgetName="glabel_boundsell_ch_0" enabled="false"/>
+                    <p1:GLabel bounds="442, 245, 55, 19" text="Boundary0 Channel Name" widgetName="glabel_ncm_ch_0" enabled="false"/>
+                    <p1:GLabel bounds="443, 267, 55, 19" text="Boundary Channel Name for Boundary1" widgetName="glabel_ncm_ch_1" enabled="false"/>
+                    <p1:GLabel bounds="444, 311, 55, 19" text="Boundary Channel Name for Boundary3" widgetName="glabel_ncm_ch_3" enabled="false"/>
+                    <p1:GLabel bounds="443, 289, 55, 19" text="Boundary Channel Name for Boundary2" widgetName="glabel_ncm_ch_2" enabled="false"/>
+                    <p1:GLabel bounds="503, 267, 55, 19" text="Lower Boundary Selection for Boundary1" widgetName="glabel_boundsell_ch_1" enabled="false"/>
+                    <p1:GLabel bounds="505, 286, 55, 19" text="Lower Boundary Selection for Boundary2" widgetName="glabel_boundsell_ch_2" enabled="false"/>
+                    <p1:GLabel bounds="505, 307, 55, 19" text="Lower Boundary Selection for Boundary3" widgetName="glabel_boundsell_ch_3" enabled="false"/>
+                    <p1:GLabel bounds="566, 245, 55, 19" text="Upper Boundary Selection for Boundary0" widgetName="glabel_boundselu_ch_0" enabled="false"/>
+                    <p1:GLabel bounds="567, 266, 55, 19" text="Upper Boundary Selection for Boundary1" widgetName="glabel_boundselu_ch_1" enabled="false"/>
+                    <p1:GLabel bounds="569, 308, 55, 19" text="Upper Boundary Selection for Boundary3" widgetName="glabel_boundselu_ch_3" enabled="false"/>
+                    <p1:GLabel bounds="568, 287, 55, 19" text="Upper Boundary Selection for Boundary2" widgetName="glabel_boundselu_ch_2" enabled="false"/>
+                    <p1:GLabel bounds="626, 267, 55, 19" text="Enable Channel Event for Boundary1" widgetName="glabel_chev_ch_1" enabled="false"/>
+                    <p1:GLabel bounds="629, 311, 55, 19" text="Enable Channel Event for Boundary3" widgetName="glabel_chev_ch_3" enabled="false"/>
+                    <p1:GLabel bounds="629, 287, 55, 19" text="Enable Channel Event for Boundary2" widgetName="glabel_chev_ch_2" enabled="false"/>
+                    <p1:GLabel bounds="689, 265, 55, 19" text="Boundary Flag Selection for Boundary1" widgetName="glabel_bfl_ctrl_ch_1" enabled="false"/>
+                    <p1:GLabel bounds="690, 311, 55, 19" text="Boundary Flag Selection for Boundary3" widgetName="glabel_bfl_ctrl_ch_3" enabled="false"/>
+                    <p1:GLabel bounds="690, 287, 55, 19" text="Boundary Flag Selection for Boundary2" widgetName="glabel_bfl_ctrl_ch_2" enabled="false"/>
+                    <p1:GLabel bounds="258, 311, 55, 19" text="Channel_D SlaveA Name." widgetName="glabel_sync_slave_A_name_d" enabled="false"/>
+                    <p1:GLabel bounds="257, 290, 55, 19" text="Channel_C SlaveA Name." widgetName="glabel_sync_slave_A_name_c" enabled="false"/>
+                    <p1:GLabel bounds="260, 400, 55, 19" text="Channel_H SlaveA Name." widgetName="glabel_sync_slave_A_name_h" enabled="false"/>
+                    <p1:GLabel bounds="259, 379, 55, 19" text="Channel_G SlaveA Name." widgetName="glabel_sync_slave_A_name_g" enabled="false"/>
+                    <p1:GLabel bounds="259, 355, 55, 19" text="Channel_F SlaveA Name." widgetName="glabel_sync_slave_A_name_f" enabled="false"/>
+                    <p1:GLabel bounds="258, 334, 55, 19" text="Channel_E SlaveA Name." widgetName="glabel_sync_slave_A_name_e" enabled="false"/>
+                    <p1:GLabel bounds="318, 243, 55, 19" text="Channel_A SlaveB Name." widgetName="glabel_sync_slave_B_name_a" enabled="false"/>
+                    <p1:GLabel bounds="319, 264, 55, 19" text="Channel_B SlaveB Name." widgetName="glabel_sync_slave_B_name_b" enabled="false"/>
+                    <p1:GLabel bounds="319, 288, 55, 19" text="Channel_C SlaveB Name." widgetName="glabel_sync_slave_B_name_c" enabled="false"/>
+                    <p1:GLabel bounds="320, 309, 55, 19" text="Channel_D SlaveB Name." widgetName="glabel_sync_slave_B_name_d" enabled="false"/>
+                    <p1:GLabel bounds="320, 332, 55, 19" text="Channel_E SlaveB Name." widgetName="glabel_sync_slave_B_name_e" enabled="false"/>
+                    <p1:GLabel bounds="321, 353, 55, 19" text="Channel_F SlaveB Name." widgetName="glabel_sync_slave_B_name_f" enabled="false"/>
+                    <p1:GLabel bounds="321, 377, 55, 19" text="Channel_G SlaveB Name." widgetName="glabel_sync_slave_B_name_g" enabled="false"/>
+                    <p1:GLabel bounds="322, 398, 55, 19" text="Channel_H SlaveB Name." widgetName="glabel_sync_slave_B_name_h" enabled="false"/>
+                    <p1:GLabel bounds="379, 241, 55, 19" text="Channel_A SlaveC Name." widgetName="glabel_sync_slave_C_name_a" enabled="false"/>
+                    <p1:GLabel bounds="380, 262, 55, 19" text="Channel_B SlaveC Name." widgetName="glabel_sync_slave_C_name_b" enabled="false"/>
+                    <p1:GLabel bounds="380, 286, 55, 19" text="Channel_C SlaveC Name." widgetName="glabel_sync_slave_C_name_c" enabled="false"/>
+                    <p1:GLabel bounds="381, 307, 55, 19" text="Channel_D SlaveC Name." widgetName="glabel_sync_slave_C_name_d" enabled="false"/>
+                    <p1:GLabel bounds="381, 330, 55, 19" text="Channel_E SlaveC Name." widgetName="glabel_sync_slave_C_name_e" enabled="false"/>
+                    <p1:GLabel bounds="382, 351, 55, 19" text="Channel_F SlaveC Name." widgetName="glabel_sync_slave_C_name_f" enabled="false"/>
+                    <p1:GLabel bounds="382, 375, 55, 19" text="Channel_G SlaveC Name." widgetName="glabel_sync_slave_C_name_g" enabled="false"/>
+                    <p1:GLabel bounds="383, 396, 55, 19" text="Channel_H SlaveC Name." widgetName="glabel_sync_slave_C_name_h" enabled="false"/>
+                    <p1:GLabel bounds="11, 433, 55, 15" enabled="false" text="Channel_A Name" widgetName="glabel_postproc_channel_name_a"/>
+                    <p1:GLabel bounds="12, 453, 55, 15" enabled="false" text="Channel_B Name" widgetName="glabel_postproc_channel_name_b"/>
+                    <p1:GLabel bounds="11, 494, 55, 15" enabled="false" text="Channel_D Name" widgetName="glabel_postproc_channel_name_d"/>
+                    <p1:GLabel bounds="10, 474, 55, 15" enabled="false" text="Channel_C Name" widgetName="glabel_postproc_channel_name_c"/>
+                    <p1:GLabel bounds="74, 494, 55, 15" enabled="false" text="Channel_H Name" widgetName="glabel_postproc_channel_name_h"/>
+                    <p1:GLabel bounds="73, 474, 55, 15" enabled="false" text="Channel_G Name" widgetName="glabel_postproc_channel_name_g"/>
+                    <p1:GLabel bounds="75, 453, 55, 15" enabled="false" text="Channel_F Name" widgetName="glabel_postproc_channel_name_f"/>
+                    <p1:GLabel bounds="74, 433, 55, 15" enabled="false" text="Channel_E Name" widgetName="glabel_postproc_channel_name_e"/>
+                    <p1:GLabel text="Number of channel events" visible="true" widgetName="glabel_num_cev" bounds="138, 432, 55, 15" description="" enabled="false"/>
+                    <p1:GLabel text="Number of Sync slaves channels" visible="true" widgetName="glabel_num_sync_slaves" bounds="139, 454, 55, 15" description="" enabled="false"/>
+                    <p1:GLabel text="Number of result events" visible="true" widgetName="glabel_num_rev" bounds="139, 474, 55, 15" description="" enabled="false"/>
+                    <p1:GLabel text="Number of src events configured." visible="true" widgetName="glabel_num_src_event" bounds="139, 491, 55, 15" description="Number of the channels which will request for a source event.&#13;&#10;&lt;ul&gt;&#13;&#10;&lt;li&gt; In Queue the max value is 8 because all the channels can request a source event.&lt;/li&gt;&#13;&#10;&lt;li&gt; In Scan the max value is 1 because only after the last channel can a source event occur.&lt;/li&gt;&#13;&#10;&lt;/ul&gt;" enabled="false"/>
+                    <p1:GLabel text="Expose all pins." visible="true" widgetName="glabel_share_all_pins" bounds="138, 510, 55, 15" description="" enabled="false"/>
+                    <p1:GLabel text="Expose APP" visible="true" widgetName="glabel_expose_queue_scan" bounds="214, 434, 55, 15" enabled="false"/>
+                    <p1:GLabel text="Channel_G Alternate Reference" visible="true" widgetName="glabel_input_ref_g" bounds="283, 449, 79, 15" enabled="false"/>
+                    <p1:GLabel bounds="283, 466, 79, 15" enabled="false" text="Channel_H Alternate Reference" widgetName="glabel_input_ref_h"/>
+                    <p1:GLabel bounds="202, 462, 79, 15" enabled="false" text="Channel_B Alternate Reference" widgetName="glabel_input_ref_b"/>
+                    <p1:GLabel bounds="202, 477, 79, 15" enabled="false" text="Channel_C Alternate Reference" widgetName="glabel_input_ref_c"/>
+                    <p1:GLabel bounds="205, 494, 79, 15" enabled="false" text="Channel_D Alternate Reference" widgetName="glabel_input_ref_d"/>
+                    <p1:GLabel bounds="202, 510, 79, 15" enabled="false" text="Channel_E Alternate Reference" widgetName="glabel_input_ref_e"/>
+                    <p1:GLabel bounds="282, 431, 79, 15" enabled="false" text="Channel_F Alternate Reference" widgetName="glabel_input_ref_f"/>
+                    <p1:GLabel bounds="199, 448, 79, 15" enabled="false" text="Channel_A Alternate Reference" widgetName="glabel_input_ref_a"/>
+                    <p1:GLabel bounds="375, 452, 79, 15" enabled="false" text="Reserve Result Regsiter-0" widgetName="glabel_subtraction_mode_result_reg"/>
+                </p1:Tab>
+            </p1:GTab.control>
+        </p1:GTab>
+    </p1:TabFolder>
+</p1:Tab>

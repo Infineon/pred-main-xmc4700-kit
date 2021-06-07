@@ -1,0 +1,8 @@
+si SWD
+Device XMC4700-2048
+speed auto
+loadfile build\lte_demos.hex
+loadfile build\patch.bin, 0x0C1FD000
+r
+g
+q

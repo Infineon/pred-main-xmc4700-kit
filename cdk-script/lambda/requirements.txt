@@ -1,0 +1,4 @@
+requests
+cfnresponse
+boto3
+requests_aws4auth

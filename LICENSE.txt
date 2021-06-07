@@ -1,0 +1,225 @@
+Infineon Technologies AG.
+
+EVAL_XMC47_PREDMAIN_AA Evaluation Software License Agreement V1.0
+
+BY DOWNLOADING AND/OR USING (INCLUDING COPYING) THE SOFTWARE, LICENSEE AGREES TO
+BE BOUND BY THE TERMS AND CONDITIONS OF THIS AGREEMENT. IF LICENSEE DOES NOT
+AGREE TO ALL TERMS AND CONDITIONS OF THIS AGREEMENT, LICENSEE (INCLUDING YOU)
+SHALL NOT DOWNLOAD AND/OR USE (INCLUDING COPYING) THE SOFTWARE.
+
+1. DEFINITIONS
+1.1 "Affiliate" means a legal entity which is directly or indirectly controlled
+by the relevant entity, whereas control means the direct or indirect ownership
+of more than fifty (50) percent of the shares or ownership interests
+representing the right to make decisions for that entity, as long as such
+ownership subsists.
+1.2 "Agreement" means this Evaluation Software License Agreement.
+1.3 "Documentation" means the technical information potentially provided along
+with the Software.
+1.4 "Licensee" means the company or individual indicated in the Registration.
+1.5 "Licensed Items" means the Software and the Documentation.
+1.6 "Licensor" means Infineon Technologies AG, having its offices at Am Campeon
+1-15, 85579 Neubiberg, Germany.
+1.7 “Modified Software” means any software program and software specifications
+only as far and to the extent it is derived from the Software by Licensee in
+accordance with the license rights granted to Licensee under Sec. 3.1.
+1.8 "Registration" means an account with Licensor's internet service
+MyInfineon.com and Infineon Toolbox enabling the download of the Software.
+1.9 "Software" means the software package of which this Agreement forms part.
+1.10 "You" means (i) if Licensee is a company, an individual acting in the
+ordinary course of business of Licensee; or (ii) if Licensee is an individual,
+Licensee.
+
+2. IMPORTANT NOTICE
+Software delivered by Licensor under this Agreement shall not be used in any
+applications where a failure or any consequences of the use of the Software can
+reasonably be expected to result in personal injury, which might include without
+limitation medical, aviation or aerospace applications. However, the foregoing
+shall not prevent Licensee from using Software in such fields of application
+(e.g. automotive applications) if the Software is explicitly designed and
+licensed for by Licensor, provided that the overall responsibility for the
+system in which Licensee integrates the Software as well as the system
+integration lies with Licensee. 
+
+3. LICENSE GRANT
+3.1 For the term and subject to the terms and conditions of this Agreement,
+Licensor hereby grants Licensee under Licensor's intellectual property rights in
+the Licensed Items a limited, worldwide, non-exclusive, non-transferable,
+non-assignable, non-sublicensable, royalty-free right to 
+
+(i) use and reproduce the Software in order to install and run the Software on
+and/or in connection with Licensor hardware only;
+(ii) modify the source code of the Software as required in order to exercise the
+rights pursuant to (i);
+(iii) use the Documentation as required in order to exercise the rights pursuant
+to (i) and (ii); always provided that the Licensed Items are used by Licensee
+for evaluation purposes only.
+
+3.2 Subject to the Affiliates' compliance with all terms and conditions of this
+Agreement, Licensee's Affiliates may exercise all license rights granted under
+this Agreement. Company may share Confidential Information with its Affiliates
+and/or Subcontractors only after having secured that the respective Affiliate
+and/or Subcontractor has agreed to be bound by the terms and conditions of this
+Agreement. Except for the limited rights granted in Section 3.1, Licensor
+retains all right, title and interest in and to the Software and the
+Documentation and all intellectual property rights therein. Licensee
+acknowledges that the license rights granted pursuant to this Agreement do not
+transfer to Licensee title or ownership in the Software or any copies thereof,
+but only a limited right of use.
+3.3	In the event that Licensee provides any Modified Software or parts thereof
+to Licensor and/or its Affiliates, Licensee hereby grants to Licensor and its
+Affiliates the transferable, sublicensable, perpetual, irrevocable, fully
+paid-up and worldwide license — notwithstanding any ownership right of Licensor
+in the unmodified parts hereof — on any parts of modifications to the Software
+which have been created during the term of the Agreement including associated
+documentation for any and all purposes as Licensor or its Affiliates see fit
+including the right to freely grant sublicenses thereof. Such licenses shall
+survive expiration or termination of this Agreement.
+
+4. OPEN SOURCE SOFTWARE
+4.1  The package to which this Agreement forms part of contains Open Source
+Software. For copyright information, licensing terms and additional information
+(e.g. on how to obtain the source code of such Open Source Software), please
+refer to:
+
+https://github.com/Infineon/pred-main-xmc4700-kit
+
+4.2 This Agreement does not limit Licensee's rights under, or grant Licensee
+rights that supersede, the license of any Open Source Software delivered to
+Licensee by Licensor. In case of conflict, the license terms of such Open Source
+Software shall supersede the terms and conditions of this Agreement. 
+4.3 Licensee acknowledges that Licensee shall use the Open Source Software
+provided as part of the package which the Software forms part of only in
+accordance with the licensing terms applicable to such Open Source Software.
+
+5. RESTRICTIONS
+Licensee shall not itself or through any third party:
+
+(i) reproduce the Software (including printouts thereof) unless otherwise
+permitted under this Agreement or by mandatory statutory law;
+(ii) use the Software in and for the purpose of series production;
+(iii) remove any copyright notices contained in the Licensed Items;
+(iv) publicly display, publicly perform, publish or broadcast the Licensed Items
+without Licensor's prior written approval;
+(v) sell, lease, license or sublicense the Licensed Items to any third party
+without Licensor’s prior written approval;
+(vi) make available the Licensed Items or assign or otherwise transfer any right
+in the Licensed Items to third parties;
+(vii) use the Licensed Items for the purposes of determining whether they are
+covered by any intellectual property rights (including without limitation
+patents and copyrights) of Licensee or any other third party;
+(viii) directly or indirectly bring any suit before any court or administrative
+agency or otherwise assert any claim against Licensor, its subsidiaries and/or
+any of their respective suppliers and/or customers due to their development,
+use, reproduction, manufacturing, marketing, sale, distribution, licensing,
+sublicensing or other disposal of the Licensed Items based on infringement of
+any of Licensee's intellectual property rights (including without limitation
+patents and copyrights).
+
+6. CONFIDENTIAL INFORMATION
+6.1 Licensee shall treat ideas, concepts and information incorporated in the
+Software, the source code of the Software, the Documentation and the content of
+this Agreement (together hereinafter "Confidential Information") confidential,
+not disclose it to any third party other than its and/or its Affiliates'
+employees who are bound to confidentiality obligations not less strict than
+those contained in this Agreement, not use it for any other purposes than for
+evaluation of the Software, and protect the confidentiality of such information
+with the same degree of care which it uses to protect its own confidential
+information but at least with reasonable care. 
+6.2 The obligations pursuant to Section 6.1 shall not apply with respect to
+information that: (i) was publicly known or made generally available in the
+public domain prior to the time of disclosure to Licensee by Licensor; (ii)
+becomes publicly known or made generally available after disclosure to Licensee
+by Licensor through no action or inaction of Licensee; or (iii) is in the
+possession of Licensee, without confidentiality restrictions, at the time of
+disclosure by Licensor as shown by Licensee’s records immediately prior to the
+time of disclosure.
+6.3 Licensee shall designate the right to use Confidential Information only to
+such employees who are bound to confidentiality obligations similar to those
+under this Agreement.
+
+7. TERM AND TERMINATION
+7.1 This Agreement will become effective upon Licensee's start to use the
+Software and shall remain in effect until terminated.
+7.2 This Agreement shall automatically terminate if Licensee is in breach of any
+provision of this Agreement.
+7.3 Licensee may terminate this Agreement at any time by stopping use of the
+Software and deleting all copies of the Software in Licensee's control.
+7.4 Licensor may terminate this Agreement by giving 2 weeks written notice to
+Licensee to the address indicated in the Registration (i) if a third party
+claims to have intellectual property rights in the Software; (ii) if Licensee
+itself or through any third party directly or indirectly brings any suit before
+any court or administrative agency or otherwise asserts any claim against
+Licensor and/or any of its Affiliates, suppliers or customers due to their
+development, use, reproduction, manufacturing, marketing, sale, distribution,
+licensing, sublicensing or other disposal of the Licensed Items based on
+infringement of any of Licensee's intellectual property rights (including
+without limitation patents and copyrights); and/or (iii) in case of a change of
+control of Licensee.
+7.5 Upon expiration or termination of this Agreement for any reason, the rights
+and licenses granted to Licensee under this Agreement shall immediately cease.
+Licensee shall immediately stop using the Licensed Items, destroy all copies of
+the Licensed Items which are in Licensee's control, and, upon Licensor's written
+request, provide Licensor with a written certification from an authorized
+officer of Licensee within five (5) business days after Licensor's request,
+confirming that all copies of the Licensed Items have been destroyed.
+7.6 The provisions of Sections 5, 6, 7.7, 8, 9, 10 and 11 shall survive any
+termination or expiration of this Agreement.
+
+8. WARRANTY
+Licensee acknowledges that the Licensed Items are provided by Licensor free of
+charge. Accordingly, without prejudice to Section 9, the Licensed Items provided
+by Licensor under this Agreement are provided "AS IS" without any warranty or
+liability of any kind and Licensor hereby expressly disclaims any warranties or
+representations, whether express, implied, statutory or otherwise, including but
+not limited to warranties of workmanship, merchantability, fitness for a
+particular purpose, defects in the Licensed Items, or non-infringement of third
+parties' intellectual property rights.
+
+9. LIABILITY
+9.1 Nothing in this Agreement shall limit or exclude Licensor's liability under
+mandatory statutory liability laws, or in cases of Licensor's intentional
+misconduct or gross negligence.
+9.2 Without prejudice to Section 9.1, Licensor's liability under and/or in
+connection with this Agreement shall be excluded in all other cases.
+
+10. EXPORT REGULATIONS
+10.1 It is the responsibility of Licensee to comply with all applicable export
+control, anti-terrorism and trade laws and regulations, including, but not
+limited to, the requirements of the United States Arms Export Control Act,
+International Traffic in Arms Regulation, Export Administration Act, and Export
+Administration Regulations, and European Council Regulation (EC) No. 428/2009
+(including revisions), as well as applicable national laws, as relevant to any
+items or services purchased or received from Infineon. Licensee agrees and
+confirms that Licensee shall not export or re-export, directly or indirectly,
+any good or service received from Infineon, including any items incorporating
+such good or service, to any country, destination, or individual, for which an
+export authorization or other governmental or official approval is required,
+without first obtaining such authorization or approval.
+10.2 Licensee shall neither use any good or services delivered by Infineon
+directly or indirectly for nuclear technology, weapons of mass destruction, or
+carriers thereof, nor supply them outside of the European Union to military,
+paramilitary, police, intelligence agencies or civil administrations of such
+institutions or other institutions acting on behalf of them.
+
+11. APPLICABLE LAW / VENUE
+11.1 This Agreement shall be governed by Swiss law without reference to its
+conflicts of law provisions. The application of the United Nations Convention on
+Contracts for the International Sale of Goods of April 11, 1980, shall be
+excluded. 
+11.2 The Commercial Court of the Canton of Zurich (Handelsgericht des Kantons
+Zürich) shall have exclusive jurisdiction on any dispute arising out of or in
+connection with this Agreement.
+
+12. GENERAL PROVISIONS
+12.1 Licensee shall not assign this Agreement or any rights or obligations
+hereunder, without the prior written consent of Licensor.
+12.2 This Agreement embodies the entire understanding between Licensor and
+Licensee with respect to the subject matter contained herein, and replaces any
+prior oral or written communications between them. General Terms and Conditions
+of either party shall not apply to this Agreement.
+12.3 If any provision of this Agreement is considered void or unfeasible by a
+court of competent jurisdiction, the remaining provisions of this Agreement
+shall remain in full force and effect.
+12.4 This Agreement may only be modified or amended in written form. This form
+requirement can only be waived by mutual written agreement.

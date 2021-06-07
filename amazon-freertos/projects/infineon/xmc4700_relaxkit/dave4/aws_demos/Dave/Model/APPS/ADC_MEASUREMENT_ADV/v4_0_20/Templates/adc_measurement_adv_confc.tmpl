@@ -1,0 +1,1001 @@
+package Model.APPS.ADC_MEASUREMENT_ADV.v4_0_20.Templates;
+
+import Model.APPS.ADC_MEASUREMENT_ADV.v4_0_20.ADC_MEASUREMENT_ADV
+
+out.print("""
+/* @cond
+ ***********************************************************************************************************************
+ *
+ * Copyright (c) 2015-2020, Infineon Technologies AG
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the
+ * following conditions are met:
+ *
+ *   Redistributions of source code must retain the above copyright notice, this list of conditions and the  following
+ *   disclaimer.
+ *
+ *   Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *   following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ *   Neither the name of the copyright holders nor the names of its contributors may be used to endorse or promote
+ *   products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE  FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT  OF THE
+ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * To improve the quality of the software, users are encouraged to share modifications, enhancements or bug fixes
+ * with Infineon Technologies AG (dave@infineon.com).
+ ***********************************************************************************************************************
+ *
+ * Change History
+ * --------------
+ *
+ * 2015-10-09:
+ *     - Initial version for DAVEv4.<BR>
+ *
+ * 2015-10-20:
+ *     - Documentation updated.<BR>
+ *
+ * 2015-12-15:
+ *     - Added support for XMC4300 devices.<BR>
+ *
+ * 2016-01-18:
+ *     - 1.Internal consumption of request source.<BR>
+ *     - 2.Support for synchronized conversion reduced from 8 master channels to 4 .<BR>
+ *     - 3.Converted the SetBoundary() API from public API to private API .<BR>
+ *     - 4.Updated all APIs for the Internal consumption of request source.<BR>
+ *
+ *
+ * 2016-02-05:
+ *     - Documentation updated.<BR>
+ *
+ * 2016-03-18:
+ *     - Added consumption of the GLOBAL ICLASS -1 for Sync. Conversions.<BR>
+ *     - Added consumption of the result register-0 for subtraction mode.<BR>
+ *     - Removed ADC_MEASUREMENT_ADV_SetUniformConversion().<BR>
+ *     - New API ADC_MEASUREMENT_ADV_SetIclass() added to configure the GLOBAL ICLASS for Slaves. <BR>
+ *
+ * 2016-04-26:
+ *     - The synchronized conversion in a master slave configuration is currently not supported.<BR>
+ *
+ * 2016-06-17:
+ *     - The synchronized conversion is supported.<BR>
+ *     - Modified the Sync initialization sequence to configure the EVAL bits in the slave groups.<BR>
+ *
+ * 2016-08-18:
+ *     - Minimum sample time at low frequencies changed to incorporate Errata ADC_AI.H006 and ADC_AI.H007.
+ *
+ * 2018-06-19:
+ *     - Avoid generating wrong setting for sync_conversion field in XMC_VADC_CHANNEL_CONFIG_t
+ *
+ * @endcond
+ *
+ */
+
+/***********************************************************************************************************************
+ * HEADER FILES
+ **********************************************************************************************************************/
+
+#include "adc_measurement_adv.h"
+
+/***********************************************************************************************************************
+ * EXTERN DECLARATIONS
+ ***********************************************************************************************************************/
+""");
+for(Object appIns : appInstancesList )
+{
+    if(appIns.gcheck_enable_callback.value == true)
+    {
+        out.print("""\n /*Callback function for the instance ${appIns.getInstanceLabel()}*/ """);
+        out.print("""\nextern void ${appIns.gstring_callback_function.value}(void); """);
+    }
+}
+out.print("""
+
+/**********************************************************************************************************************
+* DATA STRUCTURES
+**********************************************************************************************************************/
+""");
+
+String MappedUri = null;
+int i;
+int MAX_CHANNELS = 8;
+int MAX_GROUPS_AVIALABLE = 4;
+int MAX_SYNC_RESOURCES = 4;
+int MAX_ENABLED_SYNC_CHANNELS = 4;
+int MAX_NON_SYNC_CHANNELS = 4;
+int total_channels_for_single_instance = 0;
+int total_number_of_entries_sigle_instance = 0;
+int lowest_channel_number;
+int highest_queue_postion;
+int insert_mask;
+
+String channel_bfl;
+String lower_boundary_select;
+String upper_boundary_select;
+String event_gen_criteria;
+List channel_uri;
+String group_num;
+String channel_num;
+String channel_array='';
+String scan_entries='';
+String queue_entries='';
+String scan_or_queue_array='';
+String scan_or_queue_handle='';
+String sync_slaves='';
+String sync_master = '';
+String mux_configuration = '';
+String mux_config = '';
+String iclass_selection;
+
+
+Boolean sync_used = false;
+
+
+int boundary_index =0;
+
+List alphabets = "A".."Z"
+List boundary_selection_array = ['XMC_VADC_CHANNEL_BOUNDARY_GROUP_BOUND0','XMC_VADC_CHANNEL_BOUNDARY_GROUP_BOUND1',
+                             'XMC_VADC_CHANNEL_BOUNDARY_GLOBAL_BOUND0','XMC_VADC_CHANNEL_BOUNDARY_GLOBAL_BOUND1']
+List channel_event_gen_array = ['XMC_VADC_CHANNEL_EVGEN_NEVER','XMC_VADC_CHANNEL_EVGEN_INBOUND','XMC_VADC_CHANNEL_EVGEN_OUTBOUND',
+'XMC_VADC_CHANNEL_EVGEN_ALWAYS']
+
+List channel_event_gen_fcm_array = ['XMC_VADC_CHANNEL_EVGEN_NEVER','XMC_VADC_CHANNEL_EVGEN_COMPHIGH','XMC_VADC_CHANNEL_EVGEN_COMPLOW',
+    'XMC_VADC_CHANNEL_EVGEN_ALWAYS'] 
+
+List boundary_condition_array = ['XMC_VADC_CHANNEL_BOUNDARY_CONDITION_ABOVE_BAND','XMC_VADC_CHANNEL_BOUNDARY_CONDITION_BELOW_BAND'];
+
+List All_SR_lines = [ 'XMC_VADC_SR_GROUP_SR0','XMC_VADC_SR_GROUP_SR1','XMC_VADC_SR_GROUP_SR2','XMC_VADC_SR_GROUP_SR3',
+    'XMC_VADC_SR_SHARED_SR0','XMC_VADC_SR_SHARED_SR1','XMC_VADC_SR_SHARED_SR2','XMC_VADC_SR_SHARED_SR3'];
+ 
+Map fifo_selections = ["No":0, "2 Stages":2, "3 Stages":3, "4 Stages":4, "6 Stages":6, "8 Stages":8, "12 Stages":12, "16 Stages":16]
+
+List result_alignment = ["XMC_VADC_RESULT_ALIGN_RIGHT,  /* Result alignment - Right Aligned*/","XMC_VADC_RESULT_ALIGN_LEFT,   /* Result alignment - Left Aligned*/"] 
+
+Map drctr = [
+    'No': 0 ,
+    'Subtraction Mode': 0,
+    'Accumulate 2x':1 ,
+    'Accumulate 3x':2 ,
+    'Accumulate 4x':3 ,
+    'FIR (a=2, b=1, c=0)' : 0 ,
+    'FIR (a=1, b=2, c=0)' : 1 ,
+    'FIR (a=2, b=0, c=1)' : 2 ,
+    'FIR (a=1, b=1, c=1)' : 3 ,
+    'FIR (a=1, b=0, c=2)' : 4 ,
+    'FIR (a=3, b=1, c=0)' : 5 ,
+    'FIR (a=2, b=2, c=0)' : 6 ,
+    'FIR (a=1, b=3, c=0)' : 7 ,
+    'FIR (a=3, b=0, c=1)' : 8 ,
+    'FIR (a=2, b=1, c=1)' : 9 ,
+    'FIR (a=1, b=2, c=1)' : 10 ,
+    'FIR (a=2, b=0, c=2)' : 11 ,
+    'FIR (a=1, b=1, c=2)' : 12 ,
+    'FIR (a=1, b=0, c=3)' : 13 ,
+    'IIR (a=2, b=2)' : 14 ,
+    'IIR (a=3, B=4)' : 15
+    ]
+
+Map result_post_processing_mode = [
+    'No':'XMC_VADC_DMM_REDUCTION_MODE',
+    'Subtraction':'XMC_VADC_DMM_DIFFERENCE_MODE',
+    'Accumulate':'XMC_VADC_DMM_REDUCTION_MODE',
+    'FIR':'XMC_VADC_DMM_FILTERING_MODE',
+    'IIR':'XMC_VADC_DMM_FILTERING_MODE']
+
+Map channel_names_to_index =[:];
+
+List ConvMode 		  = ['XMC_VADC_CONVMODE_12BIT','XMC_VADC_CONVMODE_10BIT','XMC_VADC_CONVMODE_8BIT','XMC_VADC_CONVMODE_FASTCOMPARE'];
+List StartMode        = ['XMC_VADC_STARTMODE_WFS','XMC_VADC_STARTMODE_CIR','XMC_VADC_STARTMODE_CNR']
+List Trigger          = ['XMC_VADC_TRIGGER_EDGE_NONE','XMC_VADC_TRIGGER_EDGE_RISING','XMC_VADC_TRIGGER_EDGE_FALLING','XMC_VADC_TRIGGER_EDGE_ANY'];
+List Gating           = ['XMC_VADC_GATEMODE_BLOCK','XMC_VADC_GATEMODE_IGNORE','XMC_VADC_GATEMODE_ACTIVEHIGH','XMC_VADC_GATEMODE_ACTIVELOW'];
+List rs_priority	  = ['XMC_VADC_GROUP_RS_PRIORITY_0','XMC_VADC_GROUP_RS_PRIORITY_1','XMC_VADC_GROUP_RS_PRIORITY_2','XMC_VADC_GROUP_RS_PRIORITY_3']
+
+List Gating_signal = ['XMC_VADC_REQ_GT_A','XMC_VADC_REQ_GT_B','XMC_VADC_REQ_GT_C','XMC_VADC_REQ_GT_D','XMC_VADC_REQ_GT_E','XMC_VADC_REQ_GT_F',
+                      'XMC_VADC_REQ_GT_G','XMC_VADC_REQ_GT_H','XMC_VADC_REQ_GT_I','XMC_VADC_REQ_GT_J','XMC_VADC_REQ_GT_K','XMC_VADC_REQ_GT_L',
+                      'XMC_VADC_REQ_GT_M','XMC_VADC_REQ_GT_N','XMC_VADC_REQ_GT_O','XMC_VADC_REQ_GT_P']
+
+List trigger_signal = [ 'XMC_VADC_REQ_TR_A','XMC_VADC_REQ_TR_B','XMC_VADC_REQ_TR_C','XMC_VADC_REQ_TR_D','XMC_VADC_REQ_TR_E','XMC_VADC_REQ_TR_F',
+                        'XMC_VADC_REQ_TR_G','XMC_VADC_REQ_TR_H','XMC_VADC_REQ_TR_I','XMC_VADC_REQ_TR_J','XMC_VADC_REQ_TR_K','XMC_VADC_REQ_TR_L',
+                        'XMC_VADC_REQ_TR_M','XMC_VADC_REQ_TR_N','XMC_VADC_REQ_TR_O','XMC_VADC_REQ_TR_P']
+
+List ServiceRequestLines = ['XMC_VADC_SR_GROUP_SR0','XMC_VADC_SR_GROUP_SR1','XMC_VADC_SR_GROUP_SR2','XMC_VADC_SR_GROUP_SR3',
+                            'XMC_VADC_SR_SHARED_SR0','XMC_VADC_SR_SHARED_SR1','XMC_VADC_SR_SHARED_SR2','XMC_VADC_SR_SHARED_SR3'];
+
+String family = daveEnv.project.selectedDevice.deviceId.family;
+String series = daveEnv.project.selectedDevice.deviceId.series;
+String device = family + series
+
+/* universal check for fifo enable/ queue app used/scan app used/ sync used*/
+Boolean fifo_used = false;
+Boolean gain_used = false;
+Boolean analog_io_used = false;
+for (Object appIns : appInstancesList )
+{
+    for(i = 0; i < (MAX_CHANNELS) ; i++)
+    {
+        fifo_used |= ((appIns.rarray_adc_adv_measurement_fifo_enable[i].value != "No")  && (appIns.gstring_conv_mode.value != "10 Bit Fast Conversion" ))
+        gain_used |= (appIns.rarray_adc_adv_measurement_gain[i].value != "1:1")
+        analog_io_used |= (appIns.rarray_adc_adv_measurement_shared_pins[i].value || appIns.gcheck_share_all_pins.value)
+        
+    }
+    sync_used |= (appIns.gcombo_sync_groups_required.value != "None")
+    
+}
+
+/* for 1 instance of the APP the various configurations-> ch,res,handle_t */
+for (Object appIns : appInstancesList )
+{
+appInst          = appIns.getInstanceLabel()
+
+/* Reset local variables for each instance of the APP */
+channel_bfl = ''
+lower_boundary_select= ''
+upper_boundary_select = ''
+event_gen_criteria = ''
+group_num = ''
+channel_num= ''
+sync_master = '' 
+total_channels_for_single_instance = 0;
+lowest_channel_number = 9;
+scan_entries = '';
+queue_entries = '';
+channel_array = '';
+highest_queue_postion =0;
+scan_or_queue_array = '';
+scan_or_queue_handle = '';
+sync_slaves = '';
+mux_configuration = '';
+mux_config = ''
+total_number_of_entries_sigle_instance = 0;
+iclass_selection = '';
+
+List ref_selection_box = [appIns.gcombo_input_ref_a.value,appIns.gcombo_input_ref_b.value,appIns.gcombo_input_ref_c.value,appIns.gcombo_input_ref_d.value,
+    appIns.gcombo_input_ref_e.value,appIns.gcombo_input_ref_f.value,appIns.gcombo_input_ref_g.value,appIns.gcombo_input_ref_h.value]
+/*end of -- Reset local variables for each instance of the APP */
+
+/************************************** Dummy solver variable reads ***********************************************/
+for(i=0;i< (appIns.gfloat_no_of_channels.value * MAX_GROUPS_AVIALABLE);i++)
+{
+  if(i >= ((MAX_ENABLED_SYNC_CHANNELS * MAX_GROUPS_AVIALABLE) + MAX_NON_SYNC_CHANNELS))
+      continue
+  if (appIns.rarray_hwres_adc_adv_measurement_channel_pin[i].getSolverUri() == null)
+    continue
+  appIns.rarray_hwres_adc_adv_measurement_channel_pin[i].getRegValue("","pdisc_pdis");
+  appIns.rarray_hwres_adc_adv_measurement_channel_pin[i].getRegValue("","hwsel_hw");
+}
+/******************************************************************************************************************/
+
+/* Initialize the Map for channels names*/
+for(i = 0; i < (appIns.gfloat_no_of_channels.value) ; i++)
+{
+    channel_names_to_index.put(appIns.rarray_adc_adv_measurement_channel_names[i].value,i);
+}
+
+/* MUX configurations*/
+for(i = 0; i < ((MAX_ENABLED_SYNC_CHANNELS * MAX_GROUPS_AVIALABLE) + MAX_NON_SYNC_CHANNELS) ; i++) //for ch event/ result event
+{
+    int index = i;
+    int channel_index = index / MAX_SYNC_RESOURCES;
+    int actual_channel_index = (index % MAX_SYNC_RESOURCES);
+    
+    if(index >= (MAX_ENABLED_SYNC_CHANNELS * MAX_GROUPS_AVIALABLE) )
+    {
+        channel_index = index - (MAX_ENABLED_SYNC_CHANNELS * MAX_GROUPS_AVIALABLE) + MAX_ENABLED_SYNC_CHANNELS ;
+        actual_channel_index = 0;
+    }
+
+    channel_uri = appIns.rarray_hwres_adc_adv_measurement_channels[i].getSolverUri()
+    if((channel_uri == null) || (actual_channel_index != 0))
+        continue
+        
+    group_num = channel_uri[6]
+    channel_num = channel_uri[8]
+    result_reg_num = appIns.rarray_hwres_adc_adv_measurement_channels[i].getRegValue("","gchctr_resreg").toInteger();
+    
+    int channel_event_needed = 0;
+    for( boundary_index = 0; boundary_index < 4 ; boundary_index++)
+    {
+        if(appIns.rarray_adc_adv_measurement_channel_names[channel_index].value == appIns.("gcombo_ncm_ch_"+boundary_index).value)
+        {
+            channel_event_needed  = appIns.("gcombo_chev_ch_"+boundary_index).options.indexOf(appIns.("gcombo_chev_ch_"+boundary_index).value)
+            break;
+        }
+    }
+        // for channel
+    if(channel_event_needed != 0 )
+    {
+        mux_configuration += """
+  /* Channel Event Node Mux Configuration for ${appIns.rarray_adc_adv_measurement_channel_names[channel_index].value} (Group-${group_num} channel-${channel_num})*/
+  XMC_VADC_GROUP_ChannelSetEventInterruptNode(VADC_G${group_num}, ${channel_num}U, ${String temp = appIns.rarray_hwres_adc_adv_measurement_channels[i].getRegValue("","gcevnp0_cevnp"); if(temp !=null){ All_SR_lines[temp.toInteger()] } else { All_SR_lines[0]} });
+"""
+    }
+    
+    // for result event 
+    String result_stage_number = '';
+    if(appIns.rarray_adc_adv_measurement_enable_res_evt[channel_index].value)
+    {
+        if(appIns.rarray_adc_adv_measurement_fifo_enable[channel_index].value != "No" )
+        {
+            result_reg_num = result_reg_num - fifo_selections[appIns.rarray_adc_adv_measurement_fifo_enable[channel_index].value] + 1;
+            result_stage_number = "_Stage_"+alphabets[fifo_selections[appIns.rarray_adc_adv_measurement_fifo_enable[channel_index].value]-2]
+        }
+        mux_configuration += """
+    /* Result Event Node Mux Configuration for ${appIns.rarray_adc_adv_measurement_channel_names[channel_index].value} (Group-${group_num} channel-${channel_num} Result_Register${result_stage_number}-${result_reg_num})*/
+    XMC_VADC_GROUP_SetResultInterruptNode(VADC_G${group_num}, ${result_reg_num}U, ${String temp = appIns.rarray_hwres_adc_adv_measurement_result_reg[channel_index].getRegValue("","grevnp_revnp"); if(temp !=null){ All_SR_lines[temp.toInteger()] } else { All_SR_lines[0]} });
+"""
+    }
+    
+    // Dummy Reads for all the the channel events and result events.
+    appIns.rarray_hwres_adc_adv_measurement_result_reg[channel_index].getRegValue("","grevnp_revnp");
+    appIns.rarray_hwres_adc_adv_measurement_channels[i].getRegValue("","gcevnp0_cevnp")
+    
+    
+    
+}
+if(mux_configuration != '')
+{
+    /* Mux configuration print*/
+    out.print("""
+/* This function would be called in the ADC_MEASUREMENT_Init() to initialize the SR lines of the
+ * Result event/channel event.
+ */
+static void ${appInst}_event_config(void)
+{
+${mux_configuration}
+}
+
+""")
+    mux_config = ".event_config               = (${appInst}_event_config),"
+}
+else
+{
+    mux_config = ".event_config               = NULL,"
+}
+
+for(i = 0; i < ((MAX_ENABLED_SYNC_CHANNELS * MAX_GROUPS_AVIALABLE) + MAX_NON_SYNC_CHANNELS) ; i++)
+    {
+        int index = i;
+        int channel_index = index / MAX_SYNC_RESOURCES;
+        int actual_channel_index = (index % MAX_SYNC_RESOURCES);
+        int channel_number_selection_for_sync =  (channel_index *4) + actual_channel_index
+        
+        String channel_name;
+        String alias_channel_number;
+        String event_gen_enable = '';
+        
+        if(index >= (MAX_ENABLED_SYNC_CHANNELS * MAX_GROUPS_AVIALABLE) )
+        {
+            channel_index = index - (MAX_ENABLED_SYNC_CHANNELS * MAX_GROUPS_AVIALABLE) + MAX_ENABLED_SYNC_CHANNELS ;
+            actual_channel_index = 0;
+            channel_number_selection_for_sync = (MAX_ENABLED_SYNC_CHANNELS * MAX_GROUPS_AVIALABLE) +(channel_index -MAX_ENABLED_SYNC_CHANNELS)
+        }
+        
+        channel_uri = appIns.rarray_hwres_adc_adv_measurement_channels[i].getSolverUri()
+        if(channel_uri == null)
+            continue
+        group_num = channel_uri[6]
+        channel_num = channel_uri[8]
+        result_reg_num = appIns.rarray_hwres_adc_adv_measurement_channels[i].getRegValue("","gchctr_resreg").toInteger();
+
+        total_channels_for_single_instance++;
+        if(lowest_channel_number > channel_num.toInteger())
+        {
+            lowest_channel_number = channel_num.toInteger()
+        }
+        /*For alias configurations only*/
+        alias_channel_number = ''
+        if(channel_num=='0' && appIns.rarray_hwres_adc_adv_measurement_channels[i].getRegValue("","galias_alias0").toInteger() != 0)
+        {
+            alias_channel_number = "(int8_t) XMC_VADC_CHANNEL_ALIAS_CH"+appIns.rarray_hwres_adc_adv_measurement_channels[i].getRegValue("","galias_alias0").toString() +
+            "  /* Channel is Aliased*/"
+        }
+        else if (channel_num=='1'  && appIns.rarray_hwres_adc_adv_measurement_channels[i].getRegValue("","galias_alias1").toInteger() != 1)
+        {
+            alias_channel_number = "(int8_t) XMC_VADC_CHANNEL_ALIAS_CH"+appIns.rarray_hwres_adc_adv_measurement_channels[i].getRegValue("","galias_alias1").toString()+
+            "  /* Channel is Aliased*/"
+        }
+        else
+        {
+            alias_channel_number = "(int8_t) XMC_VADC_CHANNEL_ALIAS_DISABLED,   /* ALIAS is Disabled*/";
+        }
+    
+        channel_name = appIns.rarray_adc_adv_measurement_sync_channel_names[channel_number_selection_for_sync].value ;
+        if(actual_channel_index == 0)
+        {
+            String class_number = appIns.rarray_hwres_adc_adv_measurement_channels[i].getRegValue("","gchctr_iclsel")
+            if(appIns.rarray_hwres_adc_adv_measurement_channels[i].getRegValue("","gchctr_iclsel") == null)
+                class_number = 0;
+            iclass_selection = "XMC_VADC_CHANNEL_CONV_GROUP_CLASS"+class_number.toString()
+        }
+        else
+        {
+            iclass_selection = "XMC_VADC_CHANNEL_CONV_GLOBAL_CLASS1"
+        }
+        
+//		if((actual_channel_index) != 0)
+//		{
+//			channel_name += "_sync_slave"+alphabets[actual_channel_index - 1].toUpperCase()
+//		}
+//			String input_class = appIns.appres_scan.get
+        lower_boundary_select = boundary_selection_array[0]
+        upper_boundary_select = boundary_selection_array[0]
+        event_gen_criteria = channel_event_gen_array[0]
+        channel_bfl = "\n  .bfl                        = (uint32_t) 0,                            /* No Boundary flag */"
+        for( boundary_index = 0; boundary_index < 4 ; boundary_index++)
+        {
+            if(appIns.rarray_adc_adv_measurement_channel_names[channel_index].value == appIns.("gcombo_ncm_ch_"+boundary_index).value)
+            {
+                lower_boundary_select = boundary_selection_array[appIns.("gcombo_boundsell_ch_"+boundary_index).options.indexOf(appIns.("gcombo_boundsell_ch_"+boundary_index).value)];
+                upper_boundary_select = boundary_selection_array[appIns.("gcombo_boundselu_ch_"+boundary_index).options.indexOf(appIns.("gcombo_boundselu_ch_"+boundary_index).value)];
+                if(appIns.gstring_conv_mode.value != "10 Bit Fast Conversion")
+                {
+                    event_gen_criteria  = channel_event_gen_array[appIns.("gcombo_chev_ch_"+boundary_index).options.indexOf(appIns.("gcombo_chev_ch_"+boundary_index).value)]
+                }
+                else // for fcm 
+                {
+                    event_gen_criteria  = channel_event_gen_fcm_array[appIns.("gcombo_chev_ch_"+boundary_index).options.indexOf(appIns.("gcombo_chev_ch_"+boundary_index).value)]
+                }
+                if(appIns.("gcombo_bfl_ctrl_ch_"+boundary_index).options.indexOf(appIns.("gcombo_bfl_ctrl_ch_"+boundary_index).value) != 0)
+                {
+                    channel_bfl =''
+                    for (j=0;j <4 ; j++)
+                    {
+                        if(device == "XMC45")
+                        {
+                            if(appIns.gstring_conv_mode.value != "10 Bit Fast Conversion")
+                            {
+                                if(channel_num.toInteger() != j)
+                                {
+                                    channel_bfl += "\n  .boundary_flag_output_ch"+j+"   = (uint32_t) false,"
+                                }
+                                else
+                                {
+                                    channel_bfl += "\n  .boundary_flag_output_ch"+channel_num+"   = (uint32_t) true,"
+                                }
+                            }
+                            else // if the conversion mode is fast compare then read from result registers
+                            {
+                                if(result_reg_num != j)
+                                {
+                                    channel_bfl += "\n  .boundary_flag_output_ch"+j+"   = (uint32_t) false,"
+                                }
+                                else
+                                {
+                                    channel_bfl += "\n  .boundary_flag_output_ch"+result_reg_num+"   = (uint32_t) true,"
+                                }
+                            }
+                        }
+                        else /* for XMC1x, XMC44, XMC42 and XMC47*/
+                        {
+                            if(result_reg_num != j)
+                            {
+                                channel_bfl += "\n  .invert_boundary_flag_ch"+j+"   = (uint32_t) false,"
+                            }
+                            else
+                            {
+                                
+                                channel_bfl += "\n  .invert_boundary_flag_ch"+j+"""   = (uint32_t) ${appIns.("gcombo_bfl_ctrl_ch_"+boundary_index).value == "Inverted"},"""
+                            }
+                            
+                        }
+                    }
+                    if(device != "XMC45")
+                    {
+                        for (j=0;j <4 ; j++)
+                        {
+                            channel_bfl += "\n  .flag_output_condition_ch"+j+"  = (uint32_t) false,"
+                        }
+                        
+                        for (j=0;j <4 ; j++)
+                        {
+                            if(result_reg_num != j)
+                            {
+                                channel_bfl += "\n  .boundary_flag_mode_ch"+j+"     = (uint32_t) 0,"
+                            }
+                            else
+                            {
+                                
+                                channel_bfl += """\n  .boundary_flag_mode_ch"""+j+"""     = (uint32_t) 1,"""
+                            }
+                        }
+                        
+                    }
+                    break; // exit from the boundary settings since the right line is found
+                } // boundary if condition
+            } // if channel name is found in the boundary combo box
+        } // boundary for loop closed
+        
+        result_reg_name = appIns.rarray_adc_adv_measurement_sync_channel_names[channel_number_selection_for_sync].value ;
+//		if((actual_channel_index) != 0)
+//		{
+//			result_reg_name += "_sync_slave"+alphabets[actual_channel_index - 1].toUpperCase()
+//		}
+        if(appIns.rarray_adc_adv_measurement_fifo_enable[channel_index].value != "No" )
+        {
+            result_reg_name_tail = result_reg_name + "_stage"+alphabets[fifo_selections[appIns.rarray_adc_adv_measurement_fifo_enable[channel_index].value] - 2]
+        }
+            
+        
+        if(actual_channel_index == 0 && sync_used)
+        {
+            sync_conversion = (appIns.rarray_adc_adv_measurement_sync_master[channel_index].value)
+        }
+        else
+        {
+            sync_conversion = "false"
+        }
+
+        if(ref_selection_box[channel_index] !="CH0" )
+        {
+            reference_selection = "XMC_VADC_CHANNEL_REF_INTREF,  /* Internal reference selected */"
+        }
+        else
+        {
+            reference_selection = "XMC_VADC_CHANNEL_REF_ALT_CH0,  /* External voltage available on Channel-0 */"
+        }
+        
+        out.print("""
+
+/********************************* ${channel_name} ADC Channel configuration structure ********************************/
+static const XMC_VADC_CHANNEL_CONFIG_t  ${appInst}_${channel_name}_ch_config =
+{
+  .input_class                = (uint32_t) ${iclass_selection},
+  .lower_boundary_select      = (uint32_t) ${lower_boundary_select},
+  .upper_boundary_select      = (uint32_t) ${upper_boundary_select},
+  .event_gen_criteria         = (uint32_t) ${event_gen_criteria},
+  .sync_conversion            = (uint32_t) ${sync_conversion},                            /* Sync feature disabled*/
+  .alternate_reference        = (uint32_t) ${reference_selection}
+  .result_reg_number          = (uint32_t) ${result_reg_num},                           /* GxRES[${result_reg_num}] selected */
+  .result_alignment           = (uint32_t) ${if(appIns.gstring_conv_mode.value == "10 Bit Fast Conversion") {result_alignment[1]} else {result_alignment[0]}}
+  .broken_wire_detect_channel = (uint32_t) XMC_VADC_CHANNEL_BWDCH_VAGND, /* No Broken wire mode select*/
+  .broken_wire_detect         = (uint32_t) false,                     /* No Broken wire detection*/${channel_bfl}
+  .channel_priority           = (uint32_t) true,                      /* Highest Priority: 1 selected*/
+  .alias_channel              = ${alias_channel_number}
+};
+""");
+
+        if(appIns.gstring_conv_mode.value != "10 Bit Fast Conversion" )
+        {
+            data_reduction_control = drctr[appIns.rarray_adc_adv_measurement_filter[channel_index].value]
+            post_processing_mode  = result_post_processing_mode[appIns.rarray_adc_adv_measurement_filter[channel_index].value.split(" ")[0]]
+        }
+        else
+        {
+            data_reduction_control = "0"
+            post_processing_mode  = result_post_processing_mode["No"]
+        }
+        
+        /* Result event */
+        event_gen_enable = "(uint32_t) false   /* Disable Result event */";
+        if(actual_channel_index == 0)
+        {
+            if(appIns.rarray_adc_adv_measurement_enable_res_evt[channel_index].value)
+            {
+                event_gen_enable =   "(uint32_t) true   /* Result event Enabled*/"
+            }
+        }
+        
+        /* shs gain configuration for XMC1x */
+        String shs_config = ''
+        if((family == "XMC1") && (gain_used == true))
+        {
+            shs_config = "\n  .shs_gain_factor = ADC_MEASUREMENT_ADV_GAIN_${appIns.rarray_adc_adv_measurement_gain[channel_index].value.split(':')[1]}, "
+        }
+        
+        String analog_io = '';
+        if(analog_io_used == true)
+        {
+            analog_io = "\n  .analog_io_config = ${if(appIns.rarray_adc_adv_measurement_shared_pins[channel_index].value || appIns.gcheck_share_all_pins.value){'(ANALOG_IO_t*) &'+appIns.rarray_appres_analog_io[i].getInstanceLabel()}else{'NULL'}},"
+//			analog_io = ''
+        }
+            
+        
+        channel_array += "  (ADC_MEASUREMENT_ADV_CHANNEL_t *) (void*) &"+appInst+"_"+channel_name+"_handle,\n"
+        /* No fifo selected hence all configurations are set into the one result register*/
+        if((appIns.rarray_adc_adv_measurement_fifo_enable[channel_index].value) == "No" || (appIns.gstring_conv_mode.value == "10 Bit Fast Conversion" ))
+        {
+            out.print("""
+
+/*${channel_name} Result configuration structure*/
+static const XMC_VADC_RESULT_CONFIG_t ${appInst}_${result_reg_name}_res_config =
+{
+  .data_reduction_control  = (uint32_t) ${data_reduction_control},
+  .post_processing_mode    = (uint32_t) ${post_processing_mode},
+  .wait_for_read_mode      = (uint32_t) ${appIns.rarray_adc_adv_measurement_enable_wait_for_read[channel_index].value},
+  .part_of_fifo            = (uint32_t) false , /* No FIFO */
+  .event_gen_enable        = ${event_gen_enable}
+};
+
+/* ${channel_name} ADC channel Handle */
+const ADC_MEASUREMENT_ADV_CHANNEL_t ${appInst}_${channel_name}_handle =
+{
+  .ch_num        = (uint8_t) ${channel_num},
+  .group_index   = (uint8_t) ${group_num},
+  .ch_handle     = (XMC_VADC_CHANNEL_CONFIG_t*) &${appInst}_${channel_name}_ch_config,
+  .res_handle[0] = (XMC_VADC_RESULT_CONFIG_t*) &${appInst}_${result_reg_name}_res_config, ${if(fifo_used){'\n  .res_handle[1] = (XMC_VADC_RESULT_CONFIG_t*) NULL,\n  .result_fifo_tail_number = 0U, \n  .max_fifo_required = 0U,'}else{''}} ${shs_config} ${analog_io}
+};
+
+""");
+        }
+        else /* when fifo is enabled the result registers will be generated for only the head and the tail fifo registers*/
+        {
+            out.print("""
+/*${channel_name} Result configuration structure*/
+static const XMC_VADC_RESULT_CONFIG_t ${appInst}_${result_reg_name}_head_res_config =
+{
+  .data_reduction_control  = (uint32_t) ${data_reduction_control},
+  .post_processing_mode    = (uint32_t) ${post_processing_mode},
+  .wait_for_read_mode      = (uint32_t) ${appIns.rarray_adc_adv_measurement_enable_wait_for_read[channel_index].value},
+  .part_of_fifo            = (uint32_t) false , /* Head result register not in FIFO*/
+  .event_gen_enable        = (uint32_t) false , /* No result event generation */
+};
+
+/*${channel_name} Result configuration structure*/
+static const XMC_VADC_RESULT_CONFIG_t ${appInst}_${result_reg_name_tail}_tail_res_config =
+{
+  .data_reduction_control  = (uint32_t) 0,  /* No Accumulation */
+  .post_processing_mode    = (uint32_t) XMC_VADC_DMM_REDUCTION_MODE,
+  .wait_for_read_mode      = (uint32_t) false,  /* Disabled */
+  .part_of_fifo            = (uint32_t) true , /* Tail result register is a part of FIFO*/
+  .event_gen_enable        = ${event_gen_enable}
+};
+
+/* ${channel_name} ADC channel Handle */
+const ADC_MEASUREMENT_ADV_CHANNEL_t ${appInst}_${channel_name}_handle =
+{
+  .ch_num        = (uint8_t) ${channel_num},
+  .group_index	 = (uint8_t) ${group_num},
+  .ch_handle	 = (XMC_VADC_CHANNEL_CONFIG_t*) &${appInst}_${channel_name}_ch_config,
+  .res_handle	 = {
+                     (XMC_VADC_RESULT_CONFIG_t*) &${appInst}_${result_reg_name}_head_res_config,
+                     (XMC_VADC_RESULT_CONFIG_t*) &${appInst}_${result_reg_name_tail}_tail_res_config
+                   },
+  .max_fifo_required = ${fifo_selections[appIns.rarray_adc_adv_measurement_fifo_enable[channel_index].value]},
+ .result_fifo_tail_number = ${result_reg_num.toInteger() - fifo_selections[appIns.rarray_adc_adv_measurement_fifo_enable[channel_index].value] + 1}${","+shs_config} ${analog_io}
+};
+""");
+    }
+
+        
+} /* for(i = 0; i < (MAX_CHANNELS * MAX_GROUPS_AVIALABLE) ; i++) */
+    
+    /* For scan entries */
+    if(appIns.gcombo_req_src_selection.value == "ADC_SCAN_APP")
+    {
+        int local_channel_num
+        insert_mask = 0;
+         total_number_of_entries_sigle_instance = appIns.gfloat_no_of_channels.value
+         
+         for(i = 0; i < appIns.gfloat_no_of_channels.value ; i++)
+         {
+             int index = i;
+             if(index >= MAX_ENABLED_SYNC_CHANNELS)
+             {
+                 local_channel_num = appIns.rarray_hwres_adc_adv_measurement_channels[(MAX_ENABLED_SYNC_CHANNELS * MAX_GROUPS_AVIALABLE) + (index - MAX_ENABLED_SYNC_CHANNELS)].getSolverUri()[8].toInteger();
+             }
+             else
+             {
+                 local_channel_num = appIns.rarray_hwres_adc_adv_measurement_channels[index*4].getSolverUri()[8].toInteger();
+             }
+             
+             insert_mask |= (1 << local_channel_num );
+             if(appIns.gcheck_expose_queue_scan.value == true)
+             {
+                 scan_entries += "\n  (ADC_SCAN_ENTRY_t*) (void *) &"+appInst+"_"+appIns.rarray_adc_adv_measurement_channel_names[i].value+"_scan_entry_"+i+","
+                 out.print("""
+static const ADC_SCAN_ENTRY_t ${appInst}_${appIns.rarray_adc_adv_measurement_channel_names[i].value}_scan_entry_${i} =
+{
+  .channel_number        = (uint8_t) ${local_channel_num},
+  .ch_event_notification = (bool) false,
+  .rs_event_notification = (bool) ${if(lowest_channel_number == local_channel_num ){appIns.gcheck_enable_callback.value}else{'false'}},
+  .adc_event_callback    = ${if((lowest_channel_number == local_channel_num) && (appIns.gcheck_enable_callback.value)){'('+appIns.gstring_callback_function.value+')'}else{'NULL'}},
+};
+""");
+             }
+         }
+         
+         if(appIns.gcheck_expose_queue_scan.value != true) //TODO
+         {
+             irqctrl = ''
+             List MappedSrcNvicUri = appIns.hwres_nvicnode_srcevt.getSolverUri()
+             if(MappedSrcNvicUri != null)
+             {
+                 SRCNodeID     = MappedSrcNvicUri[7]
+                 priority		= appIns.ginterruptprio_request_src_intr.priorityValue
+                 sub_priority 	= appIns.ginterruptprio_request_src_intr.subPriorityValue
+                 // Dummy read for NVIC
+                 appIns.hwres_nvicnode_srcevt.getRegValue("","iser_setena");
+                 nvic_sharing = appIns.hwres_nvicnode_srcevt.getRegValue("","intcr_insel")
+                 if(nvic_sharing != null && nvic_sharing.toInteger() != 0)
+                 {
+                     irqctrl = ",\n  .irqctrl = (uint32_t) ${nvic_sharing}"
+                 }
+             }
+             else
+             {
+                 SRCNodeID 	 = "0"
+                 priority 	 = "0"
+                 sub_priority = "0"
+             }
+             
+             out.print("""
+static const XMC_VADC_SCAN_CONFIG_t ${appInst}_scan_config = {
+  .conv_start_mode   = (uint32_t) ${StartMode[appIns.gcombo_adc_startmode.options.indexOf(appIns.gcombo_adc_startmode.value)]},     /* Conversion start mode WFS/CIR/CNR*/
+  .req_src_priority  = (uint32_t) ${rs_priority[appIns.gcombo_priority.options.indexOf(appIns.gcombo_priority.value)]}, /*The scan request source priority */
+  .trigger_signal    = (uint32_t) ${String temp = appIns.hwres_vadc_scan.getRegValue("","gasctrl_xtsel"); if(temp !=null){ trigger_signal[temp.toInteger()] } else { trigger_signal[0]} },      /*If trigger needed the signal input*/
+  .trigger_edge      = (uint32_t) ${Trigger[appIns.gcombo_trigger_edge_select.options.indexOf(appIns.gcombo_trigger_edge_select.value)]},   /*Trigger edge needed if trigger enabled*/
+  .gate_signal       = (uint32_t) ${String temp = appIns.hwres_vadc_scan.getRegValue("","gasctrl_gtsel"); if(temp !=null){ Gating_signal[temp.toInteger()] } else { Gating_signal[0]} },            /*If gating needed the signal input*/
+  .timer_mode        = (uint32_t) 0,                            /* Disabled equidistant sampling*/
+  .external_trigger	 = (uint32_t) ${appIns.gcombo_trigger_edge_select.value != "No External Trigger"},          /*External trigger Enabled/Disabled*/
+  .req_src_interrupt = (uint32_t) ${appIns.gcheck_enable_callback.value},               /*Request source event Enabled/disabled*/
+  .enable_auto_scan  = (uint32_t) ${appIns.gcheck_autoscan_enable.value},  /*Autoscan enabled/disabled */
+  .load_mode          = (uint32_t) XMC_VADC_SCAN_LOAD_COMBINE,   /*Response from SCAN when a Load event occours.*/
+};
+
+static const ADC_MEASUREMENT_ADV_SCAN_t ${appInst}_scan_handle =
+{
+  .rs_intr_handle  = {
+                       .node_id          = ${SRCNodeID},
+                       .priority         = ${priority}, ${(family !="XMC1")? "\n					   .sub_priority     = "+ sub_priority + "," :""}
+                       .interrupt_enable = (bool) ${appIns.gcheck_enable_callback.value},${irqctrl}
+                     },
+  .iclass_config_handle = {
+                            .sample_time_std_conv        = (uint32_t) ${appIns.gfloat_adc_measurement_adv_stc0.value.toInteger()},
+                            .conversion_mode_standard    = (uint32_t) ${ConvMode[appIns.gcombo_convert_mode.options.indexOf(appIns.gcombo_convert_mode.value)]},
+                            .sampling_phase_emux_channel = (uint32_t) 0,
+                            .conversion_mode_emux        = (uint32_t) XMC_VADC_CONVMODE_12BIT
+                          },
+  .scan_config_handle = &${appInst}_scan_config,
+  .gating_mode  = ${Gating[appIns.gcombo_gating_select.options.indexOf(appIns.gcombo_gating_select.value)]},
+  .srv_req_node = ${String temp = appIns.hwres_vadc_scan.getRegValue("","gsevnp_sev1np"); if(temp !=null){ ServiceRequestLines[temp.toInteger()] } else { ServiceRequestLines[0]} }, /*Service Request line for Request source Event */
+  .insert_mask  = ${insert_mask},
+  .iclass_num = ${appIns.hwres_vadc_inputclass.getSolverUri()[8]}
+};
+ """);
+         }
+         
+         if(appIns.gcheck_expose_queue_scan.value == true)
+         {
+             out.print("""
+
+static const ADC_SCAN_ENTRY_t *${appInst}_scan_entries[] =
+{${scan_entries}
+};
+
+""");
+
+            scan_or_queue_array = ".scan_entries             = ${appInst}_scan_entries,"
+            scan_or_queue_handle = ".scan_handle              = (ADC_SCAN_t *) (void *) &${appIns.appres_scan.getInstanceLabel()},"
+         }
+         else
+         {
+             scan_or_queue_array = '';
+             scan_or_queue_handle = ".local_scan_handle        = (ADC_MEASUREMENT_ADV_SCAN_t *) (void *) &${appInst}_scan_handle,"
+         }
+         
+
+
+    }
+    else /* for queue related configuration generation*/
+    {
+        /* for highest queue position*/
+        for(i = 0; i < MAX_CHANNELS ; i++)
+        {
+            if(appIns.rarray_adc_adv_measurement_queue_entries[i].value != "None")
+            {
+                highest_queue_postion = i;
+                total_number_of_entries_sigle_instance++;
+            }
+        }
+        
+        if(appIns.gcheck_expose_queue_scan.value != true) //TODO
+        {
+            irqctrl = ''
+            List MappedSrcNvicUri = appIns.hwres_nvicnode_srcevt.getSolverUri()
+            if(MappedSrcNvicUri != null)
+            {
+                SRCNodeID     = MappedSrcNvicUri[7]
+                priority		= appIns.ginterruptprio_request_src_intr.priorityValue
+                sub_priority 	= appIns.ginterruptprio_request_src_intr.subPriorityValue
+                // Dummy read for NVIC
+                appIns.hwres_nvicnode_srcevt.getRegValue("","iser_setena");
+                nvic_sharing = appIns.hwres_nvicnode_srcevt.getRegValue("","intcr_insel")
+                if(nvic_sharing != null && nvic_sharing.toInteger() != 0)
+                {
+                    irqctrl = ",\n  .irqctrl = (uint32_t) ${nvic_sharing}"
+                }
+            }
+            else
+            {
+                SRCNodeID 	 = "0"
+                priority 	 = "0"
+                sub_priority = "0"
+            }
+            
+            out.print("""
+static const XMC_VADC_QUEUE_CONFIG_t ${appInst}_queue_config = {
+  .conv_start_mode   = (uint32_t) ${StartMode[appIns.gcombo_adc_startmode.options.indexOf(appIns.gcombo_adc_startmode.value)]},	/* Conversion start mode WFS/CIR/CNR*/
+  .req_src_priority  = (uint32_t) ${rs_priority[appIns.gcombo_priority.options.indexOf(appIns.gcombo_priority.value)]}, /*The queue request source priority */
+  .trigger_signal    = (uint32_t) ${String temp = appIns.hwres_vadc_queue.getRegValue("","gqctrl0_xtsel"); if(temp !=null){ trigger_signal[temp.toInteger()] } else { trigger_signal[0]} },        /*If trigger needed the signal input*/
+  .trigger_edge      = (uint32_t) ${Trigger[appIns.gcombo_trigger_edge_select.options.indexOf(appIns.gcombo_trigger_edge_select.value)]},   /*Trigger edge needed if trigger enabled*/
+  .gate_signal       = (uint32_t) ${String temp = appIns.hwres_vadc_queue.getRegValue("","gqctrl0_gtsel"); if(temp !=null){ Gating_signal[temp.toInteger()] } else { Gating_signal[0]} },            /*If gating needed the signal input*/
+  .timer_mode        = (uint32_t) 0,                            /* Disabled equidistant sampling*/
+  .external_trigger	 = (uint32_t) ${(appIns.gcombo_trigger_edge_select.value != "No External Trigger")},         /*External trigger Enabled/Disabled*/
+};
+
+static const ADC_MEASUREMENT_ADV_QUEUE_t ${appInst}_queue_handle =
+{
+  .rs_intr_handle  = {
+                       .node_id          = (uint32_t) ${SRCNodeID},
+                       .priority         = (uint32_t) ${priority},${(family !="XMC1")? "\n             .sub_priority     = "+ sub_priority + "," :""}
+                       .interrupt_enable = (bool) ${appIns.gcheck_enable_callback.value},${irqctrl}
+                     },
+  .iclass_config_handle = {
+                            .sample_time_std_conv        = (uint32_t) ${appIns.gfloat_adc_measurement_adv_stc0.value.toInteger()},
+                            .conversion_mode_standard    = (uint32_t) ${ConvMode[appIns.gcombo_convert_mode.options.indexOf(appIns.gcombo_convert_mode.value)]},
+                            .sampling_phase_emux_channel = (uint32_t) 0,
+                            .conversion_mode_emux        = (uint32_t) XMC_VADC_CONVMODE_12BIT
+                          },
+  .queue_config_handle = &${appInst}_queue_config,
+  .gating_mode  = ${Gating[appIns.gcombo_gating_select.options.indexOf(appIns.gcombo_gating_select.value)]},
+  .srv_req_node = ${String temp = appIns.hwres_vadc_queue.getRegValue("","gsevnp_sev0np"); if(temp !=null){ ServiceRequestLines[temp.toInteger()] } else { ServiceRequestLines[0]} }, /*Service Request line for Request source Event */
+  .iclass_num = ${appIns.hwres_vadc_inputclass.getSolverUri()[8]}
+};
+ """);
+        }
+        
+        
+        for(i = 0; i < MAX_CHANNELS ; i++)
+        {
+            int local_channel_num;
+            int local_group_num;
+//			if(highest_queue_postion == 0)
+//				break;
+            if(appIns.rarray_adc_adv_measurement_queue_entries[i].value == "None")
+            {
+                continue
+            }
+            if(channel_names_to_index[appIns.rarray_adc_adv_measurement_queue_entries[i].value] < 4 )
+            {
+                local_channel_num = appIns.rarray_hwres_adc_adv_measurement_channels[(channel_names_to_index[appIns.rarray_adc_adv_measurement_queue_entries[i].value])*4].getSolverUri()[8].toInteger();
+                local_group_num = appIns.rarray_hwres_adc_adv_measurement_channels[(channel_names_to_index[appIns.rarray_adc_adv_measurement_queue_entries[i].value])*4].getSolverUri()[6].toInteger();
+            }
+            else
+            {
+                local_channel_num = appIns.rarray_hwres_adc_adv_measurement_channels[16+((channel_names_to_index[appIns.rarray_adc_adv_measurement_queue_entries[i].value]) - 4)].getSolverUri()[8].toInteger();
+                local_group_num = appIns.rarray_hwres_adc_adv_measurement_channels[16+((channel_names_to_index[appIns.rarray_adc_adv_measurement_queue_entries[i].value]) - 4)].getSolverUri()[6].toInteger();
+            }
+            
+            if(appIns.gcheck_expose_queue_scan.value == true) //TODO
+            {
+                queue_entries += "\n  (ADC_QUEUE_ENTRY_t*) (void *) &"+appInst+"_"+appIns.rarray_adc_adv_measurement_queue_entries[i].value+"_queue_entry_"+i+","
+                out.print("""
+static const ADC_QUEUE_ENTRY_t ${appInst}_${appIns.rarray_adc_adv_measurement_queue_entries[i].value}_queue_entry_${i} =
+{
+  .channel_number        = (uint8_t) ${local_channel_num},
+  .queue_position        = (uint8_t) VADC_QUEUE_GROUP_${local_group_num}_POSITION_${i},
+  .trigger_needed        = (bool) ${appIns.rarray_adc_adv_measurement_ext_trig_q_entry[i].value},
+  .refill_needed         = (bool) ${appIns.rarray_adc_adv_measurement_refill_q_entry[i].value},
+  .ch_event_notification = (bool) false,
+  .rs_event_notification = (bool) ${appIns.rarray_adc_adv_measurement_src_evt_gen_q_entry[i].value && appIns.gcheck_enable_callback.value},
+  .adc_event_callback    = ${if(appIns.rarray_adc_adv_measurement_src_evt_gen_q_entry[i].value && appIns.gcheck_enable_callback.value ){'('+appIns.gstring_callback_function.value+')'}else{'NULL'}},
+};
+""");
+            }
+            else /* if(appIns.gcheck_expose_queue_scan.value == true)*/
+            {
+                queue_entries += "\n  (XMC_VADC_QUEUE_ENTRY_t*) (void *) &"+appInst+"_"+appIns.rarray_adc_adv_measurement_queue_entries[i].value+"_queue_entry_"+i+","
+                out.print("""
+static const XMC_VADC_QUEUE_ENTRY_t ${appInst}_${appIns.rarray_adc_adv_measurement_queue_entries[i].value}_queue_entry_${i} =
+{
+  .channel_num        = (uint8_t) ${local_channel_num},
+  .refill_needed      = (bool) ${appIns.rarray_adc_adv_measurement_refill_q_entry[i].value},
+  .generate_interrupt = (bool) ${appIns.rarray_adc_adv_measurement_src_evt_gen_q_entry[i].value && appIns.gcheck_enable_callback.value},
+  .external_trigger   = (bool) ${appIns.rarray_adc_adv_measurement_ext_trig_q_entry[i].value},
+};
+""");
+            }
+        }
+        if(total_number_of_entries_sigle_instance != 0)
+        {
+            if(appIns.gcheck_expose_queue_scan.value == true) //TODO
+            {
+                out.print("""
+
+static const ADC_QUEUE_ENTRY_t *${appInst}_queue_entries[] =
+{${queue_entries}
+};
+
+""");
+    scan_or_queue_array = ".queue_entries            = ${appInst}_queue_entries,"
+    scan_or_queue_handle = ".queue_handle             = (ADC_QUEUE_t *) (void *) &${appIns.appres_queue.getInstanceLabel()},"
+            }
+            else /*if(appIns.gcheck_expose_queue_scan.value == true) */
+            {
+                out.print("""
+
+static const XMC_VADC_QUEUE_ENTRY_t *${appInst}_queue_entries[] =
+{${queue_entries}
+};
+
+""");
+                        scan_or_queue_array = ".local_queue_entries       = ${appInst}_queue_entries,"
+                        scan_or_queue_handle = ".local_queue_handle       = (ADC_MEASUREMENT_ADV_QUEUE_t *) &${appInst}_queue_handle,"
+            }
+        }
+        else
+        {
+            out.print("""
+
+#error "No Queue entries defined. Goto the sequence plan TAB in ${appInst} and configure conversion sequence"
+""");
+        }
+    }
+    
+    /* Sync related configurations*/
+    List slaves = [];
+    sync_master = '';
+    for(i = 0; i < (MAX_SYNC_RESOURCES) ; i++)
+    {
+        List sync_resource = appIns.rarray_adc_adv_measurement_sync_resource[i].getSolverUri();
+        if(sync_resource != null)
+        {
+            if(i == 0)
+            {
+//				sync_master = ".sync_master = (uint8_t)"+ sync_resource[6].toInteger() +"/* VADC Group ${sync_resource[6]} is acting as Master Group */"
+                sync_master = "/* VADC Group-${sync_resource[6]} is acting as Master Group */"
+            }
+            else
+            {
+                sync_slaves += "\n  .sync_slave_g${sync_resource[6]}            = (bool) true,"
+                slaves.add(sync_resource[6].toInteger())
+            }
+        }
+    }
+    if(sync_used == true )
+    {
+        for(i = 0; i < (MAX_SYNC_RESOURCES) ; i++)
+        {
+            if( !slaves.contains(i))
+            {
+                sync_slaves += "\n  .sync_slave_g${i}            = (bool) false,"
+            }
+        }
+    }
+    
+    out.print("""
+
+static const ADC_MEASUREMENT_ADV_CHANNEL_t *${appInst}_channel_array[] =
+{
+${channel_array}
+};
+
+static ADC_MEASUREMENT_ADV_STATUS_t ${appInst}_initialization_status = ADC_MEASUREMENT_ADV_STATUS_UNINITIALIZED;
+
+const ADC_MEASUREMENT_ADV_t ${appInst} =
+{
+  .channel_array            = ${appInst}_channel_array,
+  ${scan_or_queue_array}
+  ${mux_config}
+  ${scan_or_queue_handle}
+  .init_state               = &${appInst}_initialization_status,
+  .req_src                  = ${if(appIns.gcombo_req_src_selection.value == "ADC_SCAN_APP"){!appIns.gcheck_expose_queue_scan.value.value?'ADC_MEASUREMENT_ADV_REQUEST_SOURCE_LOCAL_SCAN' :'ADC_MEASUREMENT_ADV_REQUEST_SOURCE_SCAN'}else{!appIns.gcheck_expose_queue_scan.value?'ADC_MEASUREMENT_ADV_REQUEST_SOURCE_LOCAL_QUEUE' :'ADC_MEASUREMENT_ADV_REQUEST_SOURCE_QUEUE'}},  ${sync_slaves}
+  .group_index              = (uint8_t) ${appIns.rarray_hwres_adc_adv_measurement_channels[0].getSolverUri()[6]}, ${sync_master}
+  .total_number_of_entries  = (uint8_t) ${total_number_of_entries_sigle_instance},
+  .total_number_of_channels = (uint8_t) ${total_channels_for_single_instance},
+  .start_at_initialization  = (bool) ${appIns.gcheck_insert_at_init.value}${(sync_used)?', \n  .configure_globiclass1    = (bool) '+appIns.gcheck_config_globiclass1.value:''}  
+};
+
+/**********************************************************************************************************************/
+""");
+
+
+
+} /* for (Object appIns : appInstancesList ) */

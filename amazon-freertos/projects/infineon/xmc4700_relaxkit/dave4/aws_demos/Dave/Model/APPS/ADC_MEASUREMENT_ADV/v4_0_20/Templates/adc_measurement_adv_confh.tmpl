@@ -1,0 +1,453 @@
+package Model.APPS.ADC_MEASUREMENT_ADV.v4_0_20.Templates;
+
+import Model.APPS.ADC_MEASUREMENT_ADV.v4_0_20.ADC_MEASUREMENT_ADV
+
+out.print("""
+/* @cond
+ ***********************************************************************************************************************
+ *
+ * Copyright (c) 2015-2020, Infineon Technologies AG
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the
+ * following conditions are met:
+ *
+ *   Redistributions of source code must retain the above copyright notice, this list of conditions and the  following
+ *   disclaimer.
+ *
+ *   Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *   following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ *   Neither the name of the copyright holders nor the names of its contributors may be used to endorse or promote
+ *   products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE  FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT  OF THE
+ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * To improve the quality of the software, users are encouraged to share modifications, enhancements or bug fixes
+ * with Infineon Technologies AG (dave@infineon.com).
+ ***********************************************************************************************************************
+ *
+ * Change History
+ * --------------
+ *
+ * 2015-10-09:
+ *     - Initial version for DAVEv4.<BR>
+ *
+ * 2015-10-20:
+ *     - Documentation updated.<BR>
+ *
+ * 2015-12-15:
+ *     - Added support for XMC4300 devices.<BR>
+ *
+ * 2016-01-18:
+ *     - 1.Internal consumption of request source.<BR>
+ *     - 2.Support for synchronized conversion reduced from 8 master channels to 4 .<BR>
+ *     - 3.Converted the SetBoundary() API from public API to private API .<BR>
+ *     - 4.Updated all APIs for the Internal consumption of request source.<BR>
+ * 
+ *
+ * 2016-02-05:
+ *     - Documentation updated.<BR>
+ * 
+ * 2016-03-18:
+ *     - Added consumption of the GLOBAL ICLASS -1 for Sync. Conversions.<BR>
+ *     - Added consumption of the result register-0 for subtraction mode.<BR>
+ *     - Removed ADC_MEASUREMENT_ADV_SetUniformConversion().<BR>
+ *     - New API ADC_MEASUREMENT_ADV_SetIclass() added to configure the GLOBAL ICLASS for Slaves. <BR>
+ *
+ * 2016-04-26:
+ *     - The synchronized conversion in a master slave configuration is currently not supported.<BR>
+ *
+ * 2016-06-17:
+ *     - The synchronized conversion is supported.<BR>
+ *     - Modified the Sync initialization sequence to configure the EVAL bits in the slave groups.<BR>
+ *
+ * 2016-08-18:
+ *     - Minimum sample time at low frequencies changed to incorporate Errata ADC_AI.H006 and ADC_AI.H007.
+ *
+ * @endcond
+ *
+ *
+ */
+
+#ifndef ADC_MEASUREMENT_ADV_CONF_H
+#define ADC_MEASUREMENT_ADV_CONF_H
+
+/***********************************************************************************************************************
+ * HEADER FILES
+ **********************************************************************************************************************/
+""");
+Boolean scan_used = false;
+Boolean queue_used= false;
+Boolean fifo_used= false;
+Boolean sync_used= false;
+Boolean gain_used= false;
+Boolean alias_channel_used = false;
+Boolean analog_io_used = false;
+Boolean analog_io_all_used = true;
+Boolean sync_not_all_used = false;
+Boolean temp_mux_var = false;
+Boolean temp_mux_not_all_used_var = false;
+Boolean mux_used = false;
+Boolean mux_not_all_used = true;
+Boolean insert_used = false;
+Boolean insert_not_all_used = true;
+Boolean local_scan_used = false;
+Boolean local_queue_used = false;
+Boolean adc_scan_used = false;
+Boolean adc_queue_used = false;
+Boolean nvic_shared = false;
+
+int i;
+int MAX_CHANNELS = 8;
+int MAX_GROUPS_AVIALABLE = 4;
+int MAX_SYNC_RESOURCES = 4;
+int MAX_ENABLED_SYNC_CHANNELS = 4;
+int MAX_NON_SYNC_CHANNELS = 4;
+String global_adc_instance_label = '';
+List alphabets = "A".."Z"
+Map channel_names_to_index =[:];
+
+for (Object appIns : appInstancesList ) {
+
+    int MAX_CONSUMED_CHANNELS = appIns.gfloat_no_of_channels.value;
+    
+    if(appIns.gcombo_req_src_selection.value == "ADC_SCAN_APP")
+    {
+        scan_used = true;
+    }
+    else
+    {
+        queue_used = true;
+    }
+    
+    for(i = 0; i < MAX_CONSUMED_CHANNELS ; i++ )
+    {
+        fifo_used |= ((appIns.rarray_adc_adv_measurement_fifo_enable[i].value != "No")  && (appIns.gstring_conv_mode.value != "10 Bit Fast Conversion" ))
+    }
+    
+    if(appIns.gcombo_sync_groups_required.value != "None")
+    {
+        sync_used = true
+    }
+    
+    sync_not_all_used |= (appIns.gcombo_sync_groups_required.value == "None")
+    insert_used |= (appIns.gcheck_insert_at_init.value)
+    insert_not_all_used &= (appIns.gcheck_insert_at_init.value)
+    
+    temp_mux_not_all_used_var = false;
+    for(i = 0; i < MAX_CONSUMED_CHANNELS ; i++ )
+    {
+        gain_used |= (appIns.rarray_adc_adv_measurement_gain[i].value != "1:1")
+        temp_mux_var |= (appIns.rarray_adc_adv_measurement_enable_res_evt[i].value)
+        temp_mux_not_all_used_var |= (appIns.rarray_adc_adv_measurement_enable_res_evt[i].value)
+        analog_io_used |= (appIns.rarray_adc_adv_measurement_shared_pins[i].value || appIns.gcheck_share_all_pins.value)
+        analog_io_all_used &= (appIns.rarray_adc_adv_measurement_shared_pins[i].value || appIns.gcheck_share_all_pins.value)
+    }
+    
+    for(i=0; i< (MAX_CONSUMED_CHANNELS>4? 4: MAX_CONSUMED_CHANNELS);i++ ) // for the number of boundary values
+    {
+        temp_mux_var |= ((appIns.("gcombo_ncm_ch_"+i).value != "None") && (appIns.("gcombo_chev_ch_"+i).value) != "Disabled")
+        temp_mux_not_all_used_var |= ((appIns.("gcombo_ncm_ch_"+i).value != "None") && (appIns.("gcombo_chev_ch_"+i).value) != "Disabled")
+    }
+    
+    mux_used |= temp_mux_var;
+    mux_not_all_used &=  temp_mux_not_all_used_var;
+    
+    for(i = 0; i < ((MAX_ENABLED_SYNC_CHANNELS * MAX_GROUPS_AVIALABLE) + MAX_NON_SYNC_CHANNELS) ; i++ )
+    {
+        if(i >= (MAX_ENABLED_SYNC_CHANNELS * MAX_GROUPS_AVIALABLE) )
+        {
+            channel_index = i - (MAX_ENABLED_SYNC_CHANNELS * MAX_GROUPS_AVIALABLE) + MAX_ENABLED_SYNC_CHANNELS ;
+            actual_channel_index = 0;
+        }
+        
+        channel_uri = appIns.rarray_hwres_adc_adv_measurement_channels[i].getSolverUri()
+        if(channel_uri == null)
+            continue
+        channel_num = channel_uri[8]
+        if(channel_num=='0' && appIns.rarray_hwres_adc_adv_measurement_channels[i].getRegValue("","galias_alias0").toInteger() != 0)
+        {
+            alias_channel_used = true;
+        }
+        else if (channel_num=='1'  && appIns.rarray_hwres_adc_adv_measurement_channels[i].getRegValue("","galias_alias1").toInteger() != 1)
+        {
+            alias_channel_used = true;
+        }
+    }
+    
+    local_scan_used |= (appIns.gcheck_expose_queue_scan.value == false) && (appIns.gcombo_req_src_selection.value == "ADC_SCAN_APP");
+    local_queue_used |= (appIns.gcheck_expose_queue_scan.value == false) && (appIns.gcombo_req_src_selection.value == "ADC_QUEUE_APP");
+    
+    adc_scan_used |= (appIns.gcheck_expose_queue_scan.value == true) && (appIns.gcombo_req_src_selection.value == "ADC_SCAN_APP");
+    adc_queue_used |= (appIns.gcheck_expose_queue_scan.value == true) && (appIns.gcombo_req_src_selection.value == "ADC_QUEUE_APP");
+    
+    if(appIns.gcheck_expose_queue_scan.value == false)
+    {
+        global_adc_instance_label = appIns.appres_global_adc.getInstanceLabel();
+    }
+    
+    List MappedSrcNvicUri = appIns.hwres_nvicnode_srcevt.getSolverUri()
+    if(MappedSrcNvicUri != null)
+    {
+        String nvic_sharing = appIns.hwres_nvicnode_srcevt.getRegValue("","intcr_insel")
+        if(nvic_sharing != null && nvic_sharing.toInteger() != 0)
+        {
+            nvic_shared |= true
+        }
+    }
+    
+}
+
+if((queue_used == true) && (adc_queue_used == true))
+{
+    out.print("""\n#include "ADC_QUEUE/adc_queue.h" """);
+}
+if((scan_used == true)&& (adc_scan_used == true))
+{
+    out.print("""\n#include "ADC_SCAN/adc_scan.h" """);
+}
+if(analog_io_used == true)
+{
+    out.print("""\n#include "ANALOG_IO/analog_io.h" """);
+}
+
+out.print("""
+
+/**********************************************************************************************************************
+ * MACROS
+ **********************************************************************************************************************/
+
+""");
+
+if(queue_used == true)
+{
+    out.print("""\n/* If a queue request source is used by any of the ADC_MEASUREMENT_ADV APP 
+ * Instances this macro is generated*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_QUEUE_USED (1U)\n""");
+}
+if(scan_used == true)
+{
+    out.print("""\n/* If a scan request source is used by any of the ADC_MEASUREMENT_ADV APP
+ * Instances this macro is generated*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_SCAN_USED (1U)\n""");
+}
+if(sync_used == true)
+{
+    out.print("""\n/* If synchronous conversion is used by any of the ADC_MEASUREMENT_ADV APP
+ * Instances this macro is generated*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_SYNC_USED (1U)\n""");
+}
+if((sync_not_all_used == true) && (sync_used == true))
+{
+    out.print("""\n/* If synchronous conversion is not used by all the ADC_MEASUREMENT_ADV APP
+ * Instances this macro is generated. Needed for optimization of the code.*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_SYNC_NOT_ALL_USED (1U)\n""");
+}
+if(mux_used == true)
+{
+    out.print("""\n/* If event configuration is used by any of the ADC_MEASUREMENT_ADV APP
+ * Instances this macro is generated.*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_MUX_USED (1U)\n""");
+}
+if((mux_not_all_used == false) && (mux_used == true))
+{
+    out.print("""\n/* If event configuration is not used by all the ADC_MEASUREMENT_ADV APP
+ * Instances this macro is generated. Needed for optimization of the code.*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_MUX_NOT_ALL_USED (1U)\n""");
+}
+if(gain_used == true)
+{
+    out.print("""\n/* If SHS gain apart from 1:1 is needed by the ADC_MEASUREMENT_ADV APP
+ * Instances this macro is generated. Needed for optimization of the code.*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_SHS_GAIN_NON_DEFAULT (1U)\n""");
+}
+if(alias_channel_used == true)
+{
+    out.print("""\n/* If SHS gain apart from 1:1 is needed and an alias channel is used by one of 
+ * the ADC_MEASUREMENT_ADV APP Instances this macro is generated. Needed for correct configuration of the gain value.*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_SHS_GAIN_ALIAS (1U)\n""");
+}
+if(fifo_used == true)
+{
+    out.print("""\n/* If FIFO is used by any of the ADC_MEASUREMENT_ADV APP
+ * Instances this macro is generated.*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_FIFO_USED (1U)\n""");
+    
+    out.print("""\n/* If FIFO is used by any of the ADC_MEASUREMENT_ADV APP
+ * Instances this macro is generated. The Result register configuration is modified to include both head and tail
+ * config structures.*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_RESULT_REG (2U)\n""");
+}
+else
+{
+out.print("""\n/* If FIFO is not used by any of the ADC_MEASUREMENT_ADV APP
+ * Instances this macro is generated. The Result register configuration holds only one config structure.*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_RESULT_REG (1U)\n""");
+}
+if(analog_io_used == true)
+{
+    out.print("""\n/* If ANALOG_IO is used by any of the ADC_MEASUREMENT_ADV APP
+ * Instances this macro is generated.*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_ANALOG_IO_USED (1U)\n""");
+}
+if((analog_io_all_used != false ) && (analog_io_used == true))
+{
+    out.print("""\n/* If ANALOG_IO is not used by all the channels in the ADC_MEASUREMENT_ADV APP
+ * Instances this macro is generated. Needed for optimization of the code.*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_ANALOG_IO_ALL_CHANNELS_USED (1U)\n""");
+}
+if(local_scan_used == true)
+{
+    out.print("""\n/* If Internal consumption of scan request source takes place in any of the ADC_MEASUREMENT_ADV APP
+ * Instances this macro is generated.*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_LOCAL_SCAN_USED (1U)\n""");
+}
+if(local_queue_used == true)
+{
+    out.print("""\n/* If Internal consumption of queue request source takes place in any of the ADC_MEASUREMENT_ADV APP
+ * Instances this macro is generated.*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_LOCAL_QUEUE_USED (1U)\n""");
+}
+if(adc_scan_used == true)
+{
+    out.print("""\n/* If scan request source is need by using ADC_SCAN APP in any of the ADC_MEASUREMENT_ADV APP
+ * Instances this macro is generated.*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_ADC_SCAN_USED (1U)\n""");
+}
+if(adc_queue_used == true)
+{
+    out.print("""\n/* If queue request source is need by using ADC_QUEUE APP in any of the ADC_MEASUREMENT_ADV APP
+ * Instances this macro is generated.*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_ADC_QUEUE_USED (1U)\n""");
+}
+if(insert_used == true)
+{
+    out.print("""\n/* If Start after initialization is used by any of the ADC_MEASUREMENT_ADV APP
+ * Instances this macro is generated.*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_START_ADC (1U)\n""");
+}
+if((insert_used == true) && (insert_not_all_used == false))
+{
+    out.print("""\n/* If Start after initialization is not used by all of the ADC_MEASUREMENT_ADV APP
+ * Instances this macro is generated. Needed for optimization of the code.*/""");
+    out.print("""\n#define ADC_MEASUREMENT_ADV_NOT_ALL_REQ_START (1U)""");
+}
+if(nvic_shared == true)
+{
+    out.print("""\n#define ADC_MEASUREMENT_ADV_NON_DEFAULT_IRQ_SOURCE_SELECTED (1U)\n""");
+}
+
+
+out.print("""\n""");
+for (Object appIns : appInstancesList ) {
+/* channel names declaration */
+    out.print("""\n /* Channel and result related macros for the instance ${appIns.getInstanceLabel()}*/""");
+    out.print("""\n#define ${appIns.getInstanceLabel()+"_GROUP_PTR"}  ((XMC_VADC_GROUP_t*)(void*) VADC_G${appIns.rarray_hwres_adc_adv_measurement_channels[0].getSolverUri()[6]})\n""");
+    for(i = 0; i < ((MAX_ENABLED_SYNC_CHANNELS * MAX_GROUPS_AVIALABLE) + MAX_NON_SYNC_CHANNELS) ; i++)
+    {
+        int index = i;
+        int channel_index = index / MAX_SYNC_RESOURCES;
+        int actual_channel_index = (index % MAX_SYNC_RESOURCES);
+        int channel_number_selection_for_sync = (channel_index * 4) + actual_channel_index
+        
+        if(index >= (MAX_ENABLED_SYNC_CHANNELS * MAX_GROUPS_AVIALABLE) )
+        {
+            channel_index = index - (MAX_ENABLED_SYNC_CHANNELS * MAX_GROUPS_AVIALABLE) + MAX_ENABLED_SYNC_CHANNELS ;
+            actual_channel_index = 0;
+        }
+        
+        channel_uri = appIns.rarray_hwres_adc_adv_measurement_channels[i].getSolverUri()
+        if(channel_uri == null)
+            continue
+//		channel_name = appIns.rarray_adc_adv_measurement_channel_names[channel_index].value ;
+        channel_name = appIns.rarray_adc_adv_measurement_sync_channel_names[channel_number_selection_for_sync].value
+        result_reg_num = appIns.rarray_hwres_adc_adv_measurement_channels[i].getRegValue("","gchctr_resreg").toInteger();
+        if(appIns.rarray_adc_adv_measurement_fifo_enable[channel_index].value != "No")
+        {
+            result_reg_num -= appIns.rarray_adc_adv_measurement_fifo_enable[channel_index].value.split(" ")[0].toInteger() -1;
+        }
+        marcro_name = channel_name
+//		if((actual_channel_index) != 0)
+//		{
+//			channel_name += "_sync_slave"+alphabets[actual_channel_index - 1]
+//			marcro_name += "_SLAVE_"+alphabets[actual_channel_index - 1]
+//		}
+        
+        out.print("""\n#define ${appIns.getInstanceLabel()+"_"+marcro_name}  (${appIns.getInstanceLabel()+"_"+channel_name+"_handle"})""");
+        
+        out.print("""\n#define ${appIns.getInstanceLabel()+"_"+marcro_name+"_RES"}  (VADC_G${channel_uri[6]}->RES[${result_reg_num}])\n""");
+        
+        if( (appIns.gcheck_expose_queue_scan.value != true) && appIns.gcheck_enable_callback.value)
+        {
+            List NvicNode = appIns.hwres_nvicnode_srcevt.getSolverUri()
+            if(NvicNode != null)
+            {
+                out.print("""\n#define ${appIns.gstring_callback_function.value} IRQ_Hdlr_${NvicNode[7]}""");
+            }
+        }
+    }
+
+    /* Initialize the Map for channels names*/
+    for(i = 0; i < (appIns.gfloat_no_of_channels.value) ; i++)
+    {
+        channel_names_to_index.put(appIns.rarray_adc_adv_measurement_channel_names[i].value,i);
+    }
+
+    if(appIns.gcombo_req_src_selection.value == "ADC_QUEUE_APP")
+    {
+        /* for queue postions*/
+        for(i = 0; i < MAX_CHANNELS ; i++)
+        {
+            int local_group_num;
+        //			if(highest_queue_postion == 0)
+        //				break;
+            if(appIns.rarray_adc_adv_measurement_queue_entries[i].value == "None")
+            {
+                continue
+            }
+            if(channel_names_to_index[appIns.rarray_adc_adv_measurement_queue_entries[i].value] < 4 )
+            {
+                local_group_num = appIns.rarray_hwres_adc_adv_measurement_channels[(channel_names_to_index[appIns.rarray_adc_adv_measurement_queue_entries[i].value])*4].getSolverUri()[6].toInteger();
+            }
+            else
+            {
+                local_group_num = appIns.rarray_hwres_adc_adv_measurement_channels[16 + ((channel_names_to_index[appIns.rarray_adc_adv_measurement_queue_entries[i].value]) - 4)].getSolverUri()[6].toInteger();
+            }
+out.print("""
+#ifndef VADC_QUEUE_GROUP_${local_group_num}_POSITION_${i}
+#define VADC_QUEUE_GROUP_${local_group_num}_POSITION_${i} (${i}U)
+#else
+#error "Redefined the same Queue position. Please change the queue position to a different value in the UI editor of the APP"
+#endif
+""");
+        }
+    }
+    
+} /* for (Object appIns : appInstancesList ) */
+
+if(local_queue_used || local_scan_used)
+{
+    out.print("""
+#define ADC_MEASUREMENT_ADV_GLOBAL_HANDLE ((GLOBAL_ADC_t *)(void *) &${global_adc_instance_label})
+""");
+}
+
+out.print("""
+
+#define ADC_MEASUREMENT_ADV_MAJOR_VERSION (${ADC_MEASUREMENT_ADV.version.split("\\.")[0]}U) /**< Major version number of ADC_MEASUREMENT_ADV APP*/
+#define ADC_MEASUREMENT_ADV_MINOR_VERSION (${ADC_MEASUREMENT_ADV.version.split("\\.")[1]}U) /**< Minor version number of ADC_MEASUREMENT_ADV APP*/
+#define ADC_MEASUREMENT_ADV_PATCH_VERSION (${ADC_MEASUREMENT_ADV.version.split("\\.")[2]}U) /**< Patch version number of ADC_MEASUREMENT_ADV APP*/
+""");
+
+out.print("""
+  
+#endif /* _ADC_MEASUREMENT_ADV_CONF_H_ */
+""")
+

@@ -1,0 +1,31 @@
+package Model.APPS.ANALOG_IO.v4_0_12;
+
+/* Import statements */
+import ifx.davex.app.manifest.*
+
+abstract class ANALOG_IO_GUI extends AppManifest {
+	/* Begin : UI variable section */
+	 public GTab General_Settings_TAB;
+	 public GCombo gcombo_pull_device;
+	 public GCombo gcombo_hysteresis;
+	 public GCheck gcheck_enable_digital_input;
+	 public GCheck gcheck_enable_digital_input_inversion;
+	 public GLabel glabel_pull_device;
+	 public GLabel glabel_hysteresis;
+	 public GGroup ggroup_digital_input_settings;
+
+	 public ANALOG_IO_GUI(DaveEnv daveEnv){
+
+	 General_Settings_TAB = GTab(widgetName:"General_Settings_TAB", text:"General Settings", enabled:true, visible:true)
+	 gcombo_pull_device = GCombo(widgetName:"gcombo_pull_device", options:["None","Pull Up","Pull Down","Hardware Controlled"], value:"None", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_hysteresis = GCombo(widgetName:"gcombo_hysteresis", options:["Standard","Large"], value:"Standard", enabled:true, visible:true, isMandatoryValue:false)
+	 gcheck_enable_digital_input = GCheck(widgetName:"gcheck_enable_digital_input", value:false, enabled:true, visible:true)
+	 gcheck_enable_digital_input_inversion = GCheck(widgetName:"gcheck_enable_digital_input_inversion", value:false, enabled:true, visible:true)
+	 glabel_pull_device = GLabel(widgetName:"glabel_pull_device", text:"Pull device :", enabled:true, visible:true)
+	 glabel_hysteresis = GLabel(widgetName:"glabel_hysteresis", text:"Hysteresis:", enabled:true, visible:true)
+	 ggroup_digital_input_settings = GGroup(widgetName:"ggroup_digital_input_settings", text:"Pin Settings", enabled:true, visible:true)
+
+
+	 }
+	/* End : UI variable section */
+}
