@@ -127,9 +127,9 @@ To register your device, execute the following steps from a terminal:
 
 4. If you want to receive the public certificate of the EVAL_XMC47_PREDMAIN_AA kit, you could either:  
     * Get it online for your device with [Infineon Toolbox](https://softwaretools.infineon.com/?_ga=2.64790316.20786652.1621330825-107268889.1614749757) by scanning the QR code of the box or entering the serial number from the `Extension Board for Sensors`.  
-    For more information, please follow the instructions here [Get the Certificate from the OPTIGA™ Trust M with Infineon Toolbox](#get-the-certificate-from-the-optiga-trust-m-with-infineon-toolbox)
+    For more information, please follow the instructions here [Get the Certificate from the OPTIGA™ Trust M with Infineon Toolbox](/docs/03_Software/01_SoftwareDevelopment.md#get-the-certificate-from-the-optiga-trust-m-with-infineon-toolbox)
     * Get it offline for your device via a serial connection to a connected and [programmed](/patch/README.md) evaluation board during start-up.  
-    For more information, please follow the instructions here [Get the Certificate from the OPTIGA™ Trust M with a Serial Connection](#get-the-certificate-from-the-optiga-trust-m-with-a-serial-connection)
+    For more information, please follow the instructions here [Get the Certificate from the OPTIGA™ Trust M with a Serial Connection](/docs/03_Software/01_SoftwareDevelopment.md#get-the-certificate-from-the-optiga-trust-m-with-a-serial-connection)
 
 5. Enter the received certificate from the OPTIGA™ Trust M secure element by copying and pasting it.  
 ![](/docs/00_Images/SerialConsole_Certificate.png)
